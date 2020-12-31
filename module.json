@@ -8,7 +8,7 @@
 	"minimumCoreVersion": "0.7.5",
 	"compatibleCoreVersion": "0.7.9",
 	"scripts": [
-		"src/auras.js"
+		"src/aura.js"
 	],
 	 "url": "https://github.com/kandashi/Active-Auras",
          "manifest": "https://raw.githubusercontent.com/kandashi/Active-Auras/main/module.json",
