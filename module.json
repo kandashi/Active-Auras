@@ -1,0 +1,13 @@
+{
+	"name": "Active-Auras",
+	"title": "Active-Auras",
+	"description": "Active-Auras",
+	"author": "Kandashi",
+	"version": "0.0.1",
+	"systems": ["dnd5e"],
+	"minimumCoreVersion": "0.7.5",
+	"compatibleCoreVersion": "0.7.9",
+	 "url": "https://github.com/kandashi/Dynamic-Effects-SRD",
+         "manifest": "https://raw.githubusercontent.com/kandashi/Dynamic-Effects-SRD/master/module.json",
+	"download": "https://github.com/kandashi/Dynamic-Effects-SRD/archive/master.zip"
+}

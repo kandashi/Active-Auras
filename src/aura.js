@@ -2,36 +2,32 @@
 
 Hooks.on("renderActiveEffectConfig", (sheet, html) => {
     console.log(sheet)
-        const originHandle = html.find($('input[name="disabled"]'))
+    const originHandle = html.find($('input[name="disabled"]'))
     const flags = sheet.object.data.flags;
-    
-        const aoeHTML = `
+
+    const aoeHTML = `
     <div class="form-group">
           <label>Effect is Aura?</label>
           <label></label>
           <div class="active-aura">
-            <select name="flags.active-auras.aura" data-dtype="String" value=${flags.active-auras.aura}>
-              <option value="None" ${flags.active-auras.aura === 'None' ? 'selected' : ''}></option>
-              <option value="Enemy"${flags.active-auras.aura === 'Enemy' ? 'selected' : ''}>Enemies</option>
-              <option value="Allies"${flags.active-auras.aura === 'Allies' ? 'selected' : ''}>Allies</option>
-               <option value="All"${flags.active-auras.aura === 'All' ? 'selected' : ''}>All</option>
+            <select name="flags.active-auras.aura" data-dtype="String" value=${flags.active - auras.aura}>
+              <option value="None" ${flags.active - auras.aura === 'None' ? 'selected' : ''}></option>
+              <option value="Enemy"${flags.active - auras.aura === 'Enemy' ? 'selected' : ''}>Enemies</option>
+              <option value="Allies"${flags.active - auras.aura === 'Allies' ? 'selected' : ''}>Allies</option>
+               <option value="All"${flags.active - auras.aura === 'All' ? 'selected' : ''}>All</option>
             </select>
           </div>
         </div>
     `
-        html.css("height", "auto");
-        originHandle.parent().after(aoeHTML)
-    });
+    html.css("height", "auto");
+    originHandle.parent().after(aoeHTML)
+});
 
 Hooks.on("updateToken", async (scene, token, update, flags, id) => {
     // console.log(token);
     // console.log(updateData);
     if (!("y" in update || "x" in update)) return;
-    if (checkOwner(token)) {
-        applyAllAuras(update);
-    }
-        applyAura(update);
-    }
+
 });
 
 
@@ -40,17 +36,17 @@ Hooks.on("updateToken", async (scene, token, update, flags, id) => {
 // update moved token
 //update tokens around aura
 
-function FindAuras (tokens){
+function FindAuras(tokens) {
     let auraTokenArray;
-    for(let auraToken of tokens){
-        if(auraToken.actor.items.find(e => e.effects.flags.active-auras.aura)){
+    for (let auraToken of tokens) {
+        if (auraToken.actor.items.find(e => e.effects.flags.active - auras.aura)) {
             auraTokenArray.push(auraToken)
         }
     }
 }
 
 function checkOwner(token) {
-    if (token.actor.items.find(element => element.effects.flags.active-auras.aura)) {
+    if (token.actor.items.find(element => element.effects.flags.active - auras.aura)) {
         return true;
     }
     return false;
