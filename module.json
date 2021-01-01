@@ -3,11 +3,14 @@
 	"title": "Active-Auras",
 	"description": "Active-Auras",
 	"author": "Kandashi",
-	"version": "0.0.1",
+	"version": "0.0.13",
 	"systems": ["dnd5e"],
 	"minimumCoreVersion": "0.7.5",
 	"compatibleCoreVersion": "0.7.9",
-	 "url": "https://github.com/kandashi/Dynamic-Effects-SRD",
-         "manifest": "https://raw.githubusercontent.com/kandashi/Dynamic-Effects-SRD/master/module.json",
-	"download": "https://github.com/kandashi/Dynamic-Effects-SRD/archive/master.zip"
+	"scripts": [
+		"src/aura.js"
+	],
+	 "url": "https://github.com/kandashi/Active-Auras",
+         "manifest": "https://raw.githubusercontent.com/kandashi/Active-Auras/main/module.json",
+	"download": "https://github.com/kandashi/Active-Auras/archive/main.zip"
 }
