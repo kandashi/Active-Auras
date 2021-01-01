@@ -7,7 +7,7 @@ Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
 
     const aoeHTML = `
     <div class="form-group">
-          <label>EAura Targets:</label>
+          <label>Aura Targets:</label>
           <label></label>
           <div class="aura">
             <select name="flags.${MODULE_NAME}.aura" data-dtype="String" value=${flags[MODULE_NAME]?.aura}>
@@ -38,8 +38,6 @@ Hooks.on("deleteToken", (scene, token) => {
 });
 
 Hooks.on("updateToken", async (scene, token, update, flags, id) => {
-    // console.log(token);
-    // console.log(updateData);
     if (!("y" in update || "x" in update)) return;
     MainAura(token,)
 });
@@ -63,7 +61,7 @@ function MainAura(movedToken) {
 
     for(let update of map){
         if(update[1].add){
-            createActiveEffect(update[1].token, update[1].effect.data)
+            createActiveEffect(update[1].token, update[1].effect)
         }
         else {
             removeActiveEffects(update[1].token, update[1].effect.data.label)
@@ -123,9 +121,14 @@ function RayDistance(token1, token2) {
 
 
 async function createActiveEffect(token, effectData) {
-    let newEffectData = duplicate(effectData)
+    let newEffectData = duplicate(effectData.data)
     newEffectData.flags.ActiveAuras= {
         aura: "None"
+    }
+    if(newEffectData.changes[0].value.includes("@")){
+        let dataPath = newEffectData.changes[0].value.substring(1)
+        let newValue = getProperty(effectData.parent.getRollData(), dataPath)
+        newEffectData.changes[0].value = newValue
     }
     console.log(newEffectData)
     if (token.actor.effects.entries.find(e => e.data.label === newEffectData.label)) return
@@ -140,12 +143,3 @@ function removeActiveEffects(token, effectLabel) {
         }
     }
 }
-
-//Split this up -->
-//getRecipients --> create an array of recipients, their token + the mod.
-//Overwrite array entry if existing token in multiple paladin auraSource
-
-//applyAuras(recipients) --> single database update
-//use updateEmbeddedEntity() or updateMany()
-
-
