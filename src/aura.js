@@ -7,7 +7,7 @@ Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
 
     const aoeHTML = `
     <div class="form-group">
-          <label>Effect is Aura?</label>
+          <label>EAura Targets:</label>
           <label></label>
           <div class="aura">
             <select name="flags.${MODULE_NAME}.aura" data-dtype="String" value=${flags[MODULE_NAME]?.aura}>
