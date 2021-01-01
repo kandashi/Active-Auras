@@ -1,7 +1,7 @@
+const MODULE_NAME = "ActiveAuras";
 
-
-Hooks.on("renderActiveEffectConfig", (sheet, html) => {
-    console.log(sheet)
+Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
+    await sheet.object.setFlag(`${MODULE_NAME}`, 'aura')
     const originHandle = html.find($('input[name="disabled"]'))
     const flags = sheet.object.data.flags;
 
@@ -9,12 +9,18 @@ Hooks.on("renderActiveEffectConfig", (sheet, html) => {
     <div class="form-group">
           <label>Effect is Aura?</label>
           <label></label>
-          <div class="active-aura">
-            <select name="flags.active-auras.aura" data-dtype="String" value=${flags.active - auras.aura}>
-              <option value="None" ${flags.active - auras.aura === 'None' ? 'selected' : ''}></option>
-              <option value="Enemy"${flags.active - auras.aura === 'Enemy' ? 'selected' : ''}>Enemies</option>
-              <option value="Allies"${flags.active - auras.aura === 'Allies' ? 'selected' : ''}>Allies</option>
-               <option value="All"${flags.active - auras.aura === 'All' ? 'selected' : ''}>All</option>
+          <div class="aura">
+            <select name="flags.${MODULE_NAME}.aura" data-dtype="String" value=${flags[MODULE_NAME]?.aura}>
+              <option value="None" ${flags[MODULE_NAME].aura === 'None' ? 'selected' : ''}></option>
+              <option value="Enemy"${flags[MODULE_NAME].aura === 'Enemy' ? 'selected' : ''}>Enemies</option>
+              <option value="Allies"${flags[MODULE_NAME].aura === 'Allies' ? 'selected' : ''}>Allies</option>
+               <option value="All"${flags[MODULE_NAME].aura === 'All' ? 'selected' : ''}>All</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Aura radius (from token center)</label>
+          <input id="radius" name="flags.${MODULE_NAME}.radius" type="number" min="0" value="${flags[MODULE_NAME].radius}"></input>
             </select>
           </div>
         </div>
@@ -23,112 +29,116 @@ Hooks.on("renderActiveEffectConfig", (sheet, html) => {
     originHandle.parent().after(aoeHTML)
 });
 
+Hooks.on("createToken", (scene, token) => {
+    MainAura(token)
+});
+
+Hooks.on("deleteToken", (scene, token) => {
+    MainAura(token)
+});
+
 Hooks.on("updateToken", async (scene, token, update, flags, id) => {
     // console.log(token);
     // console.log(updateData);
     if (!("y" in update || "x" in update)) return;
-
+    MainAura(token,)
 });
 
 
+function MainAura(movedToken) {
+    let movedToken_has_aura = false;
+    let auraEffectArray = [];
 
-// on movement check current token for auras, check scene for other auras 
-// update moved token
-//update tokens around aura
+    for (let testToken of canvas.tokens.placeables) {
+        for (let testEffect of testToken.actor.effects.entries) {
+            if (testEffect.data.flags.ActiveAuras.aura !== "None") {
+                if (testToken.id === movedToken.id) movedToken_has_aura = true
+                auraEffectArray.push(testEffect)
+            }
+        }
+    }
 
-function FindAuras(tokens) {
-    let auraTokenArray;
-    for (let auraToken of tokens) {
-        if (auraToken.actor.items.find(e => e.effects.flags.active - auras.aura)) {
-            auraTokenArray.push(auraToken)
+    let map = new Map();
+    UpdateAllTokens(map, auraEffectArray, canvas.tokens.placeables)
+
+    for(let update of map){
+        if(update[1].add){
+            createActiveEffect(update[1].token, update[1].effect.data)
+        }
+        else {
+            removeActiveEffects(update[1].token, update[1].effect.data.label)
         }
     }
 }
 
-function checkOwner(token) {
-    if (token.actor.items.find(element => element.effects.flags.active - auras.aura)) {
-        return true;
-    }
-    return false;
-}
-
-function getPlayerCharacters() {
-    let playerCharacters = canvas.tokens.placeables.filter(token => token.data.disposition == 1);
-    console.log(playerCharacters);
-    return playerCharacters;
-}
-
-function getProtectors(playerCharacters) {
-    let protectors = [];
-    //loop through PCs, find only "protectors"
-    playerCharacters.forEach((item, i) => {
-        let aura = item.actor.items.find(element => element.data?.name == "Aura of Protection");
-
-        //create an array entry into "protectors" containing the token and the cha mod
-        let protectorCount = 0;
-        if (aura) {
-            protectors.push([]);
-            protectors[protectorCount].push(item);
-            protectors[protectorCount].push(item.actor.data.data.abilities.cha.mod);
-            protectorCount++;
-        }
-    });
-    //sort from highest to lowest charisma mod and return protectors
-    protectors.sort((a, b) => (a[1] - b[1]));
-    return protectors;
-
-}
-
-function createActiveEffect(actor, newSave) {
-    console.log(newSave)
-    let aura = actor.effects.find(i => i.data.label === "Aura of Protection");
-    if (aura !== null) {
-        let changes = aura.data.changes;
-        changes[0].value = newSave
-        aura.update({ changes });
-    } else {
-        let effectData = {
-            label: "Aura of Protection",
-            icon: "",
-            changes: [{
-                "key": "data.bonuses.abilities.save",
-                "mode": 2,
-                "value": newSave,
-                "priority": "20"
-            }]
-        }
-        actor.createEmbeddedEntity("ActiveEffect", effectData);
+function UpdateAllTokens(map, auraEffectArray, tokens){
+    for (let canvasToken of tokens ){
+        UpdateToken(map, auraEffectArray, canvasToken)
     }
 }
 
-function applyAura(updateData) {
+function UpdateToken(map, auraEffectArray, canvasToken){
+    for( let auraEffect of auraEffectArray) {
+        let auraTargets = auraEffect.data.flags.ActiveAuras.aura
+        let MapKey = auraEffect.data.label + "-" + canvasToken.id;
+        MapObject = map.get(MapKey);
+        let auraToken;
+        let auraRadius = auraEffect.data.flags.ActiveAuras.radius
+        if (auraEffect.parent.token) {
+            auraToken = auraEffect.parent.token
+        }
+        else if(auraEffect.parent.data.type === "character") {
+            auraToken = game.actors.get(auraEffect.parent.data._id).getActiveTokens()[0]
+        }
+        if(auraTargets === "Allies"  && (auraToken.data.disposition !== canvasToken.data.disposition)) continue;
+        if(auraTargets === "Enemy"  && (auraToken.data.disposition === canvasToken.data.disposition)) continue;
 
-    let auraTokens = canvas.tokens.placeables.filter(t => t.actor.items.find(i => i.effects.data.changes?.aura))
+        let distance = RayDistance(canvasToken, auraToken)
+        if(distance <= auraRadius){
+            if(MapObject) {
+                MapObject.add = true
+            }
+            else {
+                map.set(MapKey, {add: true, token: canvasToken, effect: auraEffect})
+            }
+        }
+        else if(!MapObject?.add && canvasToken.actor.effects.entries.some(e => e.data.label === auraEffect.data.label)){
+            if(MapObject) {
+                MapObject.add = false
+            }
+            else {
+                map.set(MapKey, {add: false, token: canvasToken, effect: auraEffect})
+            }
+        }
+    }
+}
+
+function RayDistance(token1, token2) {
+    const ray = new Ray(token1.center, token2.center)
+    const segments = [{ ray }]
+    let distance = canvas.grid.measureDistances(segments, { gridSpaces: true })[0]
+    return distance
+}
 
 
-    let playerCharacters = getPlayerCharacters();
-    let protectors = getProtectors(playerCharacters);
-    let token = canvas.tokens.placeables.find(element => element.id == updateData._id);
-    let gs = canvas.grid.size;
 
-    protectors.forEach((protector, i) => {
-        let x = updateData.x ? updateData.x : token.x;
-        let y = updateData.y ? updateData.y : token.y;
+async function createActiveEffect(token, effectData) {
+    let newEffectData = duplicate(effectData)
+    newEffectData.flags.ActiveAuras= {
+        aura: "None"
+    }
+    console.log(newEffectData)
+    if (token.actor.effects.entries.find(e => e.data.label === newEffectData.label)) return
+    await token.actor.createEmbeddedEntity("ActiveEffect", newEffectData);
 
-        let d1 = Math.abs((protector[0].x - x) / gs);
-        let d2 = Math.abs((protector[0].y - y) / gs);
-        let maxDim = Math.max(d1, d2);
-        let minDim = Math.min(d1, d2);
-        let dist = (maxDim + Math.floor(minDim / 2)) * canvas.scene.data.gridDistance;
+}
 
-        let newSave = dist <= 10 ? protector[1] : 0;
-        let actor = game.actors.get(token.actor._id);
-        createActiveEffect(actor, newSave);
-        // //Previous application method
-        // let newSave = dist <= 10 ? protector[1] : 0;
-        // game.actors.get(token.actor._id).update({ "data.bonuses.abilities.save": newSave });
-
-    });
+function removeActiveEffects(token, effectLabel) {
+    for (let tokenEffects of token.actor.effects) {
+        if (tokenEffects.data.label === effectLabel) {
+            tokenEffects.delete()
+        }
+    }
 }
 
 //Split this up -->
@@ -139,47 +149,3 @@ function applyAura(updateData) {
 //use updateEmbeddedEntity() or updateMany()
 
 
-function applyAllAuras(updateData) {
-    // console.log("Paladin Movement");
-    let playerCharacters = getPlayerCharacters();
-    let protectors = getProtectors(playerCharacters);
-    let gs = canvas.grid.size;
-    let updates = [];
-
-    protectors.forEach((protector, i) => {
-        playerCharacters.forEach((pc, j) => {
-
-            //do not apply to self
-            if (protector[0].id != pc.id) {
-
-
-                //get correct x + y data for updated token
-                let x = updateData._id == protector[0].id && "x" in updateData ? updateData.x : protector[0].x;
-                let y = updateData._id == protector[0].id && "y" in updateData ? updateData.y : protector[0].y;
-                // console.log("x: ", x, "y: ", y);
-
-                //distance calculation between tokens
-                let d1 = Math.abs((x - pc.x) / gs);
-                let d2 = Math.abs((y - pc.y) / gs);
-                let maxDim = Math.max(d1, d2);
-                let minDim = Math.min(d1, d2);
-                let dist = (maxDim + Math.floor(minDim / 2)) * canvas.scene.data.gridDistance;
-
-                //check distnace and apply aura
-                let newSave = dist <= 10 ? protector[1] : 0;
-                let actor = game.actors.get(pc.actor._id);
-                createActiveEffect(actor, newSave);
-
-                // updates.push({
-                //   _id: pc.actor._id,
-                //   "data.bonuses.abilities.save": newSave
-                // });
-
-                //game.actors.get(pc.actor._id).update({"data.bonuses.abilities.save": newSave });
-
-            }
-        });
-        // console.log(updates);
-        // game.actors.updateMany(updates);
-    });
-}
