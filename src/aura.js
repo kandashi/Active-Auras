@@ -59,8 +59,8 @@ function MainAura(movedToken) {
     let map = new Map();
     UpdateAllTokens(map, auraEffectArray, canvas.tokens.placeables)
 
-    for(let update of map){
-        if(update[1].add){
+    for (let update of map) {
+        if (update[1].add) {
             createActiveEffect(update[1].token, update[1].effect)
         }
         else {
@@ -69,14 +69,14 @@ function MainAura(movedToken) {
     }
 }
 
-function UpdateAllTokens(map, auraEffectArray, tokens){
-    for (let canvasToken of tokens ){
+function UpdateAllTokens(map, auraEffectArray, tokens) {
+    for (let canvasToken of tokens) {
         UpdateToken(map, auraEffectArray, canvasToken)
     }
 }
 
-function UpdateToken(map, auraEffectArray, canvasToken){
-    for( let auraEffect of auraEffectArray) {
+function UpdateToken(map, auraEffectArray, canvasToken) {
+    for (let auraEffect of auraEffectArray) {
         let auraTargets = auraEffect.data.flags.ActiveAuras.aura
         let MapKey = auraEffect.data.label + "-" + canvasToken.id;
         MapObject = map.get(MapKey);
@@ -85,27 +85,27 @@ function UpdateToken(map, auraEffectArray, canvasToken){
         if (auraEffect.parent.token) {
             auraToken = auraEffect.parent.token
         }
-        else if(auraEffect.parent.data.type === "character") {
+        else if (auraEffect.parent.data.type === "character") {
             auraToken = game.actors.get(auraEffect.parent.data._id).getActiveTokens()[0]
         }
-        if(auraTargets === "Allies"  && (auraToken.data.disposition !== canvasToken.data.disposition)) continue;
-        if(auraTargets === "Enemy"  && (auraToken.data.disposition === canvasToken.data.disposition)) continue;
+        if (auraTargets === "Allies" && (auraToken.data.disposition !== canvasToken.data.disposition)) continue;
+        if (auraTargets === "Enemy" && (auraToken.data.disposition === canvasToken.data.disposition)) continue;
 
         let distance = RayDistance(canvasToken, auraToken)
-        if(distance <= auraRadius){
-            if(MapObject) {
+        if (distance <= auraRadius) {
+            if (MapObject) {
                 MapObject.add = true
             }
             else {
-                map.set(MapKey, {add: true, token: canvasToken, effect: auraEffect})
+                map.set(MapKey, { add: true, token: canvasToken, effect: auraEffect })
             }
         }
-        else if(!MapObject?.add && canvasToken.actor.effects.entries.some(e => e.data.label === auraEffect.data.label)){
-            if(MapObject) {
+        else if (!MapObject?.add && canvasToken.actor.effects.entries.some(e => e.data.label === auraEffect.data.label)) {
+            if (MapObject) {
                 MapObject.add = false
             }
             else {
-                map.set(MapKey, {add: false, token: canvasToken, effect: auraEffect})
+                map.set(MapKey, { add: false, token: canvasToken, effect: auraEffect })
             }
         }
     }
@@ -122,13 +122,19 @@ function RayDistance(token1, token2) {
 
 async function createActiveEffect(token, effectData) {
     let newEffectData = duplicate(effectData.data)
-    newEffectData.flags.ActiveAuras= {
+    newEffectData.flags.ActiveAuras = {
         aura: "None"
     }
-    if(newEffectData.changes[0].value.includes("@")){
-        let dataPath = newEffectData.changes[0].value.substring(1)
-        let newValue = getProperty(effectData.parent.getRollData(), dataPath)
-        newEffectData.changes[0].value = newValue
+
+    for (let change of newEffectData.changes) {
+        if (typeof change.value === "string") {
+            if (change.value.includes("@")) {
+                let dataPath = change.value.substring(1)
+                let newValue = getProperty(effectData.parent.getRollData(), dataPath)
+                const changeIndex = newEffectData.changes.findIndex(i => i.value === change.value && i.key === change.key)
+                newEffectData.changes[changeIndex].value = newValue
+            }
+        }
     }
     console.log(newEffectData)
     if (token.actor.effects.entries.find(e => e.data.label === newEffectData.label)) return
