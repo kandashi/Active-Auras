@@ -49,7 +49,8 @@ function MainAura(movedToken) {
 
     for (let testToken of canvas.tokens.placeables) {
         for (let testEffect of testToken.actor.effects.entries) {
-            if (testEffect.data.flags.ActiveAuras.aura !== "None") {
+            let isAura = testEffect.getFlag('ActiveAuras', 'aura')
+            if (isAura && isAura !== "None") {
                 if (testToken.id === movedToken.id) movedToken_has_aura = true
                 auraEffectArray.push(testEffect)
             }
@@ -77,17 +78,18 @@ function UpdateAllTokens(map, auraEffectArray, tokens) {
 
 function UpdateToken(map, auraEffectArray, canvasToken) {
     for (let auraEffect of auraEffectArray) {
-        let auraTargets = auraEffect.data.flags.ActiveAuras.aura
+        let auraTargets = auraEffect.getFlag('ActiveAuras', 'aura')
         let MapKey = auraEffect.data.label + "-" + canvasToken.id;
         MapObject = map.get(MapKey);
         let auraToken;
-        let auraRadius = auraEffect.data.flags.ActiveAuras.radius
+        let auraRadius = auraEffect.getFlag('ActiveAuras', 'radius')
         if (auraEffect.parent.token) {
             auraToken = auraEffect.parent.token
         }
         else if (auraEffect.parent.data.type === "character") {
             auraToken = game.actors.get(auraEffect.parent.data._id).getActiveTokens()[0]
         }
+        //add self check here
         if (auraTargets === "Allies" && (auraToken.data.disposition !== canvasToken.data.disposition)) continue;
         if (auraTargets === "Enemy" && (auraToken.data.disposition === canvasToken.data.disposition)) continue;
 
