@@ -1,7 +1,7 @@
 # DAE-Auras
 
 This module attempts to automate Active Effects auras. Any "aura flagged" Active Effect will be pushed to any nearby tokens that are within the defined range. This measurement 
-follows the local system measurements for movement (5/5/5 and 5/10/5)
+follows the local system measurements for movement (5/5/5 and 5/10/5) you can enabled a "true euclidian" distance in the settings, though this is not recommended.
 
 This will only take Active Effects on a token, so any items with "castable" auras will not be applied until the effect is applied to a token.
 
@@ -9,4 +9,4 @@ This will only take Active Effects on a token, so any items with "castable" aura
 
 ## Compatability
 - DAE static fields should apply fine, ~~actor references will not work at present (they will refer to the applied token not the caster)~~ should now work fine
-- Macro fields have not been tested yet
+- Macro fields have not been tested yet, and will probably trigger as soon as applied
