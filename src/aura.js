@@ -1,5 +1,15 @@
 const MODULE_NAME = "ActiveAuras";
 
+
+Hooks.on('init', () => {
+    game.settings.register("ActiveAuras", "measurement", {
+        name: "Use movement measurement system rather than straight line, default on",
+        scope: "world",
+        config: true,
+        default: true,
+        type: Boolean,
+    });
+});
 Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
     await sheet.object.setFlag(`${MODULE_NAME}`, 'aura')
     const originHandle = html.find($('input[name="disabled"]'))
@@ -33,17 +43,37 @@ Hooks.on("createToken", (scene, token) => {
     MainAura(token)
 });
 
-Hooks.on("deleteToken", (scene, token) => {
+Hooks.on("preDeleteToken", async (scene, token) => {
     let oldEffects = []
-    for (let testEffect of token.actorData.effects.entries) {
-        let isAura = testEffect.getFlag('ActiveAuras', 'aura')
-        let appliedAura = testEffect.getFlag('ActiveAuras', 'applied')
-        if (isAura && isAura !== "None") {
-            //if (testToken.id === movedToken.id) movedToken_has_aura = true
-            oldEffects.push(testEffect)
+    if (token.actorLink) {
+        let actor = game.actors.get(token.actorId)
+        for (let testEffect of actor.effects) {
+            let isAura = testEffect.getFlag('ActiveAuras', 'aura')
+            let appliedAura = testEffect.getFlag('ActiveAuras', 'applied')
+            if (isAura && isAura !== "None") {
+                //if (testToken.id === movedToken.id) movedToken_has_aura = true
+                oldEffects.push(testEffect)
+            }
+            if (appliedAura) {
+                await testEffect.delete()
+            }
         }
     }
-    oldEffects.forEach(i => RemoveAura(i))
+    else {
+        let tokenEffects =[];
+        token.actorData?.effects?.forEach(a => tokenEffects.push(a))
+        game.actors.get(token.actorId).effects.forEach(a => tokenEffects.push(a))
+        for (let testEffect of tokenEffects) {
+            let isAura = testEffect.getFlag('ActiveAuras', 'aura')
+            let appliedAura = testEffect.getFlag('ActiveAuras', 'applied')
+            if (isAura && isAura !== "None" && !appliedAura) {
+                //if (testToken.id === movedToken.id) movedToken_has_aura = true
+                oldEffects.push(testEffect)
+            }
+        }
+    }
+    oldEffects.forEach(i => RemoveAura(i.data, token))
+
 });
 
 Hooks.on("updateToken", (scene, token, update, flags, id) => {
@@ -70,7 +100,7 @@ Hooks.on("preUpdateToken", (scene, token, update) => {
         RemoveAura(removed[0], token)
     }
     if (added.length > 0) {
-        Hooks.once("updateToken", () =>{
+        Hooks.once("updateToken", () => {
             MainAura()
         })
     }
@@ -79,8 +109,8 @@ Hooks.on("preUpdateToken", (scene, token, update) => {
 
 Hooks.on("createActiveEffect", (actor, effect) => {
     if (!effect.flags.ActiveAuras.applied && effect.flags.ActiveAuras.aura !== "None") {
-        Hooks.once("renderActorSheet5eCharacter", () =>{
-        MainAura();
+        Hooks.once("renderActorSheet5eCharacter", () => {
+            MainAura();
         });
     };
 });
@@ -139,13 +169,13 @@ async function RemoveAura(effect, token, actor) {
     if (token) {
         auraToken = canvas.tokens.get(token._id)
     }
-    else if (actor){
+    else if (actor) {
         auraToken = actor.getActiveTokens()[0]
     }
     let auraRadius = effect.flags.ActiveAuras.radius;
     for (let canvasToken of canvas.tokens.placeables) {
         let oldEffect = canvasToken.actor.effects.find(i => i.data.label === effect.label)
-        if(!oldEffect) continue;
+        if (!oldEffect) continue;
         let distance = RayDistance(canvasToken, auraToken)
         if (distance <= auraRadius) {
             if (oldEffect.getFlag('ActiveAuras', 'applied')) {
@@ -201,7 +231,13 @@ function UpdateToken(map, auraEffectArray, canvasToken) {
 function RayDistance(token1, token2) {
     const ray = new Ray(token1.center, token2.center)
     const segments = [{ ray }]
-    let distance = canvas.grid.measureDistances(segments, { gridSpaces: true })[0]
+    let distance;
+    if (game.settings.get('ActiveAuras', 'measurement') === false) {
+        distance = ray.distance
+    }
+    else if (game.settings.get('ActiveAuras', 'measurement') === true) {
+        distance = canvas.grid.measureDistances(segments, { gridSpaces: true })[0]
+    }
     return distance
 }
 
