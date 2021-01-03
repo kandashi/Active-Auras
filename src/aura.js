@@ -37,21 +37,28 @@ Hooks.on("deleteToken", (scene, token) => {
     MainAura(token)
 });
 
-Hooks.on("updateToken", async (scene, token, update, flags, id) => {
+Hooks.on("updateToken", (scene, token, update, flags, id) => {
     if (!("y" in update || "x" in update)) return;
     MainAura(token,)
 });
 
+Hooks.on("deleteActiveEffect", () => {
+    MainAura()
+});
+
+Hooks.on("createActiveEffect", () =>{
+    MainAura()
+});
 
 function MainAura(movedToken) {
-    let movedToken_has_aura = false;
+    //let movedToken_has_aura = false;
     let auraEffectArray = [];
 
     for (let testToken of canvas.tokens.placeables) {
         for (let testEffect of testToken.actor.effects.entries) {
             let isAura = testEffect.getFlag('ActiveAuras', 'aura')
             if (isAura && isAura !== "None") {
-                if (testToken.id === movedToken.id) movedToken_has_aura = true
+                //if (testToken.id === movedToken.id) movedToken_has_aura = true
                 auraEffectArray.push(testEffect)
             }
         }
@@ -60,12 +67,33 @@ function MainAura(movedToken) {
     let map = new Map();
     UpdateAllTokens(map, auraEffectArray, canvas.tokens.placeables)
 
+    for (let mapEffect of map) {
+        let MapKey = mapEffect[0]
+        let newEffectData = duplicate(mapEffect[1].effect.data)
+        newEffectData.flags.ActiveAuras = {
+            aura: "None"
+        }
+
+        for (let change of newEffectData.changes) {
+        
+            if (typeof change.value === "string") {
+                if (change.value.includes("@")) {
+                    let dataPath = change.value.substring(1)
+                    let newValue = getProperty(mapEffect[1].effect.parent.getRollData(), dataPath)
+                    const changeIndex = newEffectData.changes.findIndex(i => i.value === change.value && i.key === change.key)
+                    newEffectData.changes[changeIndex].value = newValue
+                }
+            }
+        }
+        map.set(MapKey, {add: mapEffect[1].add, token: mapEffect[1].token, effect: newEffectData })
+    }
+
     for (let update of map) {
         if (update[1].add) {
             createActiveEffect(update[1].token, update[1].effect)
         }
         else {
-            removeActiveEffects(update[1].token, update[1].effect.data.label)
+            removeActiveEffects(update[1].token, update[1].effect.label)
         }
     }
 }
@@ -89,7 +117,7 @@ function UpdateToken(map, auraEffectArray, canvasToken) {
         else if (auraEffect.parent.data.type === "character") {
             auraToken = game.actors.get(auraEffect.parent.data._id).getActiveTokens()[0]
         }
-        //add self check here
+        if (auraToken.id === canvasToken.id) continue;
         if (auraTargets === "Allies" && (auraToken.data.disposition !== canvasToken.data.disposition)) continue;
         if (auraTargets === "Enemy" && (auraToken.data.disposition === canvasToken.data.disposition)) continue;
 
@@ -120,27 +148,10 @@ function RayDistance(token1, token2) {
     return distance
 }
 
-
-
 async function createActiveEffect(token, effectData) {
-    let newEffectData = duplicate(effectData.data)
-    newEffectData.flags.ActiveAuras = {
-        aura: "None"
-    }
-
-    for (let change of newEffectData.changes) {
-        if (typeof change.value === "string") {
-            if (change.value.includes("@")) {
-                let dataPath = change.value.substring(1)
-                let newValue = getProperty(effectData.parent.getRollData(), dataPath)
-                const changeIndex = newEffectData.changes.findIndex(i => i.value === change.value && i.key === change.key)
-                newEffectData.changes[changeIndex].value = newValue
-            }
-        }
-    }
-    console.log(newEffectData)
-    if (token.actor.effects.entries.find(e => e.data.label === newEffectData.label)) return
-    await token.actor.createEmbeddedEntity("ActiveEffect", newEffectData);
+    if (token.actor.effects.entries.find(e => e.data.label === effectData.label)) return
+    await token.actor.createEmbeddedEntity("ActiveEffect", effectData);
+    console.log(`Active Auras: applied ${effectData.label} to ${token.name}`)
 
 }
 
@@ -148,6 +159,8 @@ function removeActiveEffects(token, effectLabel) {
     for (let tokenEffects of token.actor.effects) {
         if (tokenEffects.data.label === effectLabel) {
             tokenEffects.delete()
+            console.log(`Active Auras: remoed ${effectData.label} to ${token.name}`)
+
         }
     }
 }
