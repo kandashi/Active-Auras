@@ -73,6 +73,7 @@ Hooks.on("preDeleteToken", async (scene, token) => {
         }
     }
     oldEffects.forEach(i => RemoveAura(i.data, token))
+
 });
 
 Hooks.on("updateToken", (scene, token, update, flags, id) => {
