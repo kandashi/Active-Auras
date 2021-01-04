@@ -1,4 +1,4 @@
-# DAE-Auras
+# Active-Auras
 
 Active Auras will propigate Active Effects that are labeled as auras onto nearby tokens. 
 The distance and targeting of the aura are both configurable.
