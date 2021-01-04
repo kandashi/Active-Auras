@@ -9,7 +9,19 @@ Hooks.on('init', () => {
         default: true,
         type: Boolean,
     });
+    game.settings.register("ActiveAuras", "wall-block", {
+        name: "Walls Block Auras",
+        hint: "Interveneing walls will block aura effects",
+        scope: "world",
+        config: true,
+        default: false,
+        type: Boolean,
+    });
 });
+
+/**
+ * Hooks onto effect sheet to add aura configuration
+ */
 Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
     await sheet.object.setFlag(`${MODULE_NAME}`, 'aura')
     const originHandle = html.find($('input[name="disabled"]'))
@@ -39,10 +51,16 @@ Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
     originHandle.parent().after(aoeHTML)
 });
 
+/**
+ * Re-run aura detection on token creation
+ */
 Hooks.on("createToken", (scene, token) => {
     MainAura(token)
 });
 
+/**
+ * Filter for aura effects on deleted token and remove from canvas tokens
+ */
 Hooks.on("preDeleteToken", async (scene, token) => {
     let oldEffects = []
     if (token.actorLink) {
@@ -76,22 +94,18 @@ Hooks.on("preDeleteToken", async (scene, token) => {
 
 });
 
+/**
+ * On token movement run MainAura
+ */
 Hooks.on("updateToken", (scene, token, update, flags, id) => {
     if (!("y" in update || "x" in update)) return;
     MainAura(token,)
 });
 
-Hooks.on("deleteActiveEffect", (actor, effect) => {
-    let auraStatus = effect.flags.ActiveAuras.aura;
-    let applyStatus = effect.flags.ActiveAuras.applied;
-    let token = null
-    if (auraStatus !== "None" && !applyStatus) {
-        RemoveAura(effect, token, actor)
-    }
-});
 
-
-
+/**
+ * On addition/removal of active effect from unlinked actor, if aura update canvas.tokens
+ */
 Hooks.on("preUpdateToken", (scene, token, update) => {
     if (!(update.actorData?.effects)) return;
     let removed = token.actorData.effects.filter(x => !update.actorData.effects.includes(x));
@@ -107,7 +121,22 @@ Hooks.on("preUpdateToken", (scene, token, update) => {
 
 })
 
-Hooks.on("createActiveEffect", (actor, effect) => {
+/**
+ * On removal of active effect from linked actor, if aura remove from canvas.tokens
+ */
+Hooks.on("deleteActiveEffect", (actor, effect) => {
+    let auraStatus = effect.flags.ActiveAuras.aura;
+    let applyStatus = effect.flags.ActiveAuras.applied;
+    let token = null
+    if (auraStatus !== "None" && !applyStatus) {
+        RemoveAura(effect, token, actor)
+    }
+});
+
+/**
+ * On creation of active effect on linked actor, run MainAura
+ */
+Hooks.on("CreateActiveEffect", (actor, effect) => {
     if (!effect.flags.ActiveAuras.applied && effect.flags.ActiveAuras.aura !== "None") {
         Hooks.once("renderActorSheet5eCharacter", () => {
             MainAura();
@@ -115,6 +144,12 @@ Hooks.on("createActiveEffect", (actor, effect) => {
     };
 });
 
+
+/**
+ * 
+ * @param {Token} movedToken - optional value for further extension, currently unused
+ * Locate all auras on the canvas, create map of tokens to update, update tokens 
+ */
 function MainAura(movedToken) {
     //let movedToken_has_aura = false;
     let auraEffectArray = [];
@@ -130,6 +165,7 @@ function MainAura(movedToken) {
     }
 
     let map = new Map();
+
     UpdateAllTokens(map, auraEffectArray, canvas.tokens.placeables)
 
     for (let mapEffect of map) {
@@ -156,14 +192,22 @@ function MainAura(movedToken) {
 
     for (let update of map) {
         if (update[1].add) {
-            createActiveEffect(update[1].token, update[1].effect)
+            CreateActiveEffect(update[1].token, update[1].effect)
         }
         else {
-            removeActiveEffects(update[1].token, update[1].effect.label)
+            RemoveActiveEffects(update[1].token, update[1].effect.label)
         }
     }
 }
 
+
+/**
+ * Remove applied auras from deleted aura effect
+ * @param {ActiveEffect} effect - effect to remove
+ * @param {Token} token - token instance that provided the aura
+ * @param {Actor5e} actor - actor instance that provided the aura
+ * 
+ */
 async function RemoveAura(effect, token, actor) {
     let auraToken;
     if (token) {
@@ -185,12 +229,24 @@ async function RemoveAura(effect, token, actor) {
     }
 }
 
+/**
+ * Loop over canvas tokens for individual tests
+ * @param {Map} map - empty map to populate 
+ * @param {Array} auraEffectArray - array of auras to test against
+ * @param {Token} tokens - array of tokens to test against
+ */
 function UpdateAllTokens(map, auraEffectArray, tokens) {
     for (let canvasToken of tokens) {
         UpdateToken(map, auraEffectArray, canvasToken)
     }
 }
 
+/**
+ * Test individual token against aura array
+* @param {Map} map - empty map to populate 
+ * @param {Array} auraEffectArray - array of auras to test against 
+ * @param {Token} canvasToken - single token to test
+ */
 function UpdateToken(map, auraEffectArray, canvasToken) {
     for (let auraEffect of auraEffectArray) {
         let auraTargets = auraEffect.getFlag('ActiveAuras', 'aura')
@@ -209,7 +265,7 @@ function UpdateToken(map, auraEffectArray, canvasToken) {
         if (auraTargets === "Enemy" && (auraToken.data.disposition === canvasToken.data.disposition)) continue;
 
         let distance = RayDistance(canvasToken, auraToken)
-        if (distance <= auraRadius) {
+        if ((distance !== false ) && (distance <= auraRadius)) {
             if (MapObject) {
                 MapObject.add = true
             }
@@ -228,27 +284,44 @@ function UpdateToken(map, auraEffectArray, canvasToken) {
     }
 }
 
+/**
+ * 
+ * @param {Token} token1 - test token
+ * @param {Token} token2 - aura token
+ */
 function RayDistance(token1, token2) {
     const ray = new Ray(token1.center, token2.center)
     const segments = [{ ray }]
     let distance;
     if (game.settings.get('ActiveAuras', 'measurement') === false) {
-        distance = ray.distance
+        distance = (ray.distance/canvas.grid.grid.options.dimensions.size)*canvas.grid.grid.options.dimensions.distance
     }
     else if (game.settings.get('ActiveAuras', 'measurement') === true) {
         distance = canvas.grid.measureDistances(segments, { gridSpaces: true })[0]
     }
+    let collision = canvas.walls.checkCollision(ray)
+    if(collision && game.settings.get("ActiveAuras", "wall-block")===true) return false
     return distance
 }
 
-async function createActiveEffect(token, effectData) {
+/**
+ * 
+ * @param {Token} token - token to apply effect too
+ * @param {ActiveEffect} effectData - effect data to generate effect
+ */
+async function CreateActiveEffect(token, effectData) {
     if (token.actor.effects.entries.find(e => e.data.label === effectData.label)) return
     await token.actor.createEmbeddedEntity("ActiveEffect", effectData);
     console.log(`Active Auras: applied ${effectData.label} to ${token.name}`)
 
 }
 
-function removeActiveEffects(token, effectLabel) {
+/**
+ * 
+ * @param {Token} token - token instance to remove effect from
+ * @param {String} effectLabel - label of effect to remove
+ */
+function RemoveActiveEffects(token, effectLabel) {
     for (let tokenEffects of token.actor.effects) {
         if (tokenEffects.data.label === effectLabel) {
             tokenEffects.delete()
