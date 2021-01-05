@@ -110,7 +110,11 @@ Hooks.on("preUpdateToken", (scene, token, update) => {
     let removed = token.actorData.effects.filter(x => !update.actorData.effects.includes(x));
     let added = update.actorData.effects.filter(x => !token.actorData.effects.includes(x));
     if (removed.length > 0) {
+        let auraStatus = removed[0].flags?.ActiveAuras?.aura;
+        let applyStatus = removed[0].flags?.ActiveAuras?.applied;
+        if(auraStatus !== "None" && auraStatus !== undefined && !applyStatus){
         RemoveAura(removed[0], token)
+        }
     }
     if (added.length > 0) {
         Hooks.once("updateToken", () => {
@@ -124,8 +128,8 @@ Hooks.on("preUpdateToken", (scene, token, update) => {
  * On removal of active effect from linked actor, if aura remove from canvas.tokens
  */
 Hooks.on("deleteActiveEffect", (actor, effect) => {
-    let auraStatus = effect.flags.ActiveAuras.aura;
-    let applyStatus = effect.flags.ActiveAuras.applied;
+    let auraStatus = effect.flags?.ActiveAuras?.aura;
+    let applyStatus = effect.flags?.ActiveAuras?.applied;
     let token = null
     if (auraStatus !== "None" && !applyStatus) {
         RemoveAura(effect, token, actor)
