@@ -169,7 +169,9 @@ function MainAura(movedToken) {
     //let movedToken_has_aura = false;
     let auraEffectArray = [];
     for (let testToken of canvas.tokens.placeables) {
-        if (GetAllFlags(testToken, 'multilevel-tokens')) continue;
+        if (game.modules.get("multilevel-tokens")?.active) {
+            if (GetAllFlags(testToken, 'multilevel-tokens')) continue;
+        }
         for (let testEffect of testToken?.actor?.effects.entries) {
             let isAura = testEffect.getFlag('ActiveAuras', 'aura')
             let appliedAura = testEffect.getFlag('ActiveAuras', 'applied')
