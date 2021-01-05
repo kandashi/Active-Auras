@@ -80,7 +80,7 @@ Hooks.on("preDeleteToken", async (scene, token) => {
     else {
         let tokenEffects =[];
         token.actorData?.effects?.forEach(a => tokenEffects.push(a))
-        game.actors.get(token.actorId).effects.forEach(a => tokenEffects.push(a))
+        game.actors.get(token.actorId)?.effects.forEach(a => tokenEffects.push(a))
         for (let testEffect of tokenEffects) {
             let isAura = testEffect.getFlag('ActiveAuras', 'aura')
             let appliedAura = testEffect.getFlag('ActiveAuras', 'applied')
@@ -91,7 +91,6 @@ Hooks.on("preDeleteToken", async (scene, token) => {
         }
     }
     oldEffects.forEach(i => RemoveAura(i.data, token))
-
 });
 
 /**
@@ -145,6 +144,14 @@ Hooks.on("CreateActiveEffect", (actor, effect) => {
 });
 
 
+function GetAllFlags(entity, scope){
+    {
+        const scopes = SetupConfiguration.getPackageScopes();
+        if(!scopes.includes(scope)) throw new Error(`Invalid scope`);
+        return getProperty(entity.data.flags, scope);
+      }
+}
+
 /**
  * 
  * @param {Token} movedToken - optional value for further extension, currently unused
@@ -154,7 +161,8 @@ function MainAura(movedToken) {
     //let movedToken_has_aura = false;
     let auraEffectArray = [];
     for (let testToken of canvas.tokens.placeables) {
-        for (let testEffect of testToken.actor.effects.entries) {
+       if(GetAllFlags(testToken, 'multilevel-tokens'))continue;
+        for (let testEffect of testToken?.actor?.effects.entries) {
             let isAura = testEffect.getFlag('ActiveAuras', 'aura')
             let appliedAura = testEffect.getFlag('ActiveAuras', 'applied')
             if (isAura && !appliedAura) {
@@ -241,6 +249,8 @@ function UpdateAllTokens(map, auraEffectArray, tokens) {
     }
 }
 
+
+
 /**
  * Test individual token against aura array
 * @param {Map} map - empty map to populate 
@@ -248,6 +258,7 @@ function UpdateAllTokens(map, auraEffectArray, tokens) {
  * @param {Token} canvasToken - single token to test
  */
 function UpdateToken(map, auraEffectArray, canvasToken) {
+    if(GetAllFlags(canvasToken, 'multilevel-tokens') )return;
     for (let auraEffect of auraEffectArray) {
         let auraTargets = auraEffect.getFlag('ActiveAuras', 'aura')
         let MapKey = auraEffect.data.label + "-" + canvasToken.id;
@@ -273,7 +284,7 @@ function UpdateToken(map, auraEffectArray, canvasToken) {
                 map.set(MapKey, { add: true, token: canvasToken, effect: auraEffect })
             }
         }
-        else if (!MapObject?.add && canvasToken.actor.effects.entries.some(e => e.data.label === auraEffect.data.label)) {
+        else if (!MapObject?.add && canvasToken?.actor?.effects.entries.some(e => e.data.label === auraEffect.data.label)) {
             if (MapObject) {
                 MapObject.add = false
             }

@@ -8,3 +8,6 @@ Macros from DAE will fire once when applied and once when removed (work is being
 
 ![Active Auras setup](https://github.com/kandashi/Active-Auras/blob/main/Images/Active%20Auras%20AE.PNG)
 
+## Compatability
+- Works with DAE as far as I know
+- Multi Level Token should work fine, clones actors are ignored for purposes of calculating auras
