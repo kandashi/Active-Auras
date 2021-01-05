@@ -78,7 +78,7 @@ Hooks.on("preDeleteToken", async (scene, token) => {
         }
     }
     else {
-        let tokenEffects =[];
+        let tokenEffects = [];
         token.actorData?.effects?.forEach(a => tokenEffects.push(a))
         game.actors.get(token.actorId)?.effects.forEach(a => tokenEffects.push(a))
         for (let testEffect of tokenEffects) {
@@ -112,14 +112,18 @@ Hooks.on("preUpdateToken", (scene, token, update) => {
     if (removed.length > 0) {
         let auraStatus = removed[0].flags?.ActiveAuras?.aura;
         let applyStatus = removed[0].flags?.ActiveAuras?.applied;
-        if(auraStatus !== "None" && auraStatus !== undefined && !applyStatus){
-        RemoveAura(removed[0], token)
+        if (auraStatus !== "None" && auraStatus !== undefined && !applyStatus) {
+            RemoveAura(removed[0], token)
         }
     }
     if (added.length > 0) {
-        Hooks.once("updateToken", () => {
-            MainAura()
-        })
+        let auraStatus = added[0].flags?.ActiveAuras?.aura;
+        let applyStatus = added[0].flags?.ActiveAuras?.applied;
+        if (auraStatus !== "None" && applyStatus) {
+            Hooks.once("updateToken", () => {
+                MainAura()
+            })
+        }
     }
 
 })
@@ -148,12 +152,12 @@ Hooks.on("CreateActiveEffect", (actor, effect) => {
 });
 
 
-function GetAllFlags(entity, scope){
+function GetAllFlags(entity, scope) {
     {
         const scopes = SetupConfiguration.getPackageScopes();
-        if(!scopes.includes(scope)) throw new Error(`Invalid scope`);
+        if (!scopes.includes(scope)) throw new Error(`Invalid scope`);
         return getProperty(entity.data.flags, scope);
-      }
+    }
 }
 
 /**
@@ -165,7 +169,7 @@ function MainAura(movedToken) {
     //let movedToken_has_aura = false;
     let auraEffectArray = [];
     for (let testToken of canvas.tokens.placeables) {
-       if(GetAllFlags(testToken, 'multilevel-tokens'))continue;
+        if (GetAllFlags(testToken, 'multilevel-tokens')) continue;
         for (let testEffect of testToken?.actor?.effects.entries) {
             let isAura = testEffect.getFlag('ActiveAuras', 'aura')
             let appliedAura = testEffect.getFlag('ActiveAuras', 'applied')
@@ -262,7 +266,7 @@ function UpdateAllTokens(map, auraEffectArray, tokens) {
  * @param {Token} canvasToken - single token to test
  */
 function UpdateToken(map, auraEffectArray, canvasToken) {
-    if(GetAllFlags(canvasToken, 'multilevel-tokens') )return;
+    if (GetAllFlags(canvasToken, 'multilevel-tokens')) return;
     for (let auraEffect of auraEffectArray) {
         let auraTargets = auraEffect.getFlag('ActiveAuras', 'aura')
         let MapKey = auraEffect.data.label + "-" + canvasToken.id;
@@ -280,7 +284,7 @@ function UpdateToken(map, auraEffectArray, canvasToken) {
         if (auraTargets === "Enemy" && (auraToken.data.disposition === canvasToken.data.disposition)) continue;
 
         let distance = RayDistance(canvasToken, auraToken)
-        if ((distance !== false ) && (distance <= auraRadius)) {
+        if ((distance !== false) && (distance <= auraRadius)) {
             if (MapObject) {
                 MapObject.add = true
             }
@@ -309,13 +313,13 @@ function RayDistance(token1, token2) {
     const segments = [{ ray }]
     let distance;
     if (game.settings.get('ActiveAuras', 'measurement') === false) {
-        distance = (ray.distance/canvas.grid.grid.options.dimensions.size)*canvas.grid.grid.options.dimensions.distance
+        distance = (ray.distance / canvas.grid.grid.options.dimensions.size) * canvas.grid.grid.options.dimensions.distance
     }
     else if (game.settings.get('ActiveAuras', 'measurement') === true) {
         distance = canvas.grid.measureDistances(segments, { gridSpaces: true })[0]
     }
     let collision = canvas.walls.checkCollision(ray)
-    if(collision && game.settings.get("ActiveAuras", "wall-block")===true) return false
+    if (collision && game.settings.get("ActiveAuras", "wall-block") === true) return false
     return distance
 }
 
