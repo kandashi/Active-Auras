@@ -13,3 +13,7 @@ Macros from DAE will fire once when applied and once when removed (work is being
 ## Compatability
 - Works with DAE as far as I know
 - Multi Level Token should work fine, clones actors are ignored for purposes of calculating auras
+
+
+## Notes
+- Only works with a GM account currently connected
