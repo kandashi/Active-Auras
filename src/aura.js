@@ -51,10 +51,12 @@ Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
     originHandle.parent().after(aoeHTML)
 });
 
+let newToken;
 /**
  * Re-run aura detection on token creation
  */
 Hooks.on("createToken", (scene, token) => {
+    newToken = canvas.tokens.get(token._id)
     MainAura(token)
 });
 
@@ -107,6 +109,7 @@ Hooks.on("updateToken", (scene, token, update, flags, id) => {
  */
 Hooks.on("preUpdateToken", (scene, token, update) => {
     if (!(update.actorData?.effects)) return;
+
     let removed = token.actorData.effects.filter(x => !update.actorData.effects.includes(x));
     let added = update.actorData.effects.filter(x => !token.actorData.effects.includes(x));
     if (removed.length > 0) {
@@ -126,6 +129,16 @@ Hooks.on("preUpdateToken", (scene, token, update) => {
         }
     }
 
+})
+
+let effectDisabled;
+Hooks.on("updateActiveEffect", (actor, effect, update) => {
+    if (effect.flags?.ActiveAuras?.aura !== "None") {
+        if (update?.disabled === true) effectDisabled = true;
+        if (update?.disabled === false) effectDisabled = false;
+
+        MainAura()
+    }
 })
 
 /**
@@ -167,7 +180,7 @@ function GetAllFlags(entity, scope) {
  */
 function MainAura(movedToken) {
     let gm = game.user === game.users.find((u) => u.isGM && u.active)
-    if(!gm) return;
+    if (!gm) return;
     //let movedToken_has_aura = false;
     let auraEffectArray = [];
     for (let testToken of canvas.tokens.placeables) {
@@ -177,7 +190,7 @@ function MainAura(movedToken) {
         for (let testEffect of testToken?.actor?.effects.entries) {
             let isAura = testEffect.getFlag('ActiveAuras', 'aura')
             let appliedAura = testEffect.getFlag('ActiveAuras', 'applied')
-            if (isAura && !appliedAura) {
+            if (isAura && !appliedAura && (!testEffect.data.disabled || effectDisabled === false)) {
                 //if (testToken.id === movedToken.id) movedToken_has_aura = true
                 auraEffectArray.push(testEffect)
             }
@@ -218,6 +231,7 @@ function MainAura(movedToken) {
             RemoveActiveEffects(update[1].token, update[1].effect.label)
         }
     }
+    effectDisabled = undefined;
 }
 
 
@@ -280,15 +294,16 @@ function UpdateToken(map, auraEffectArray, canvasToken) {
         if (auraEffect.parent.token) {
             auraToken = auraEffect.parent.token
         }
-        else if (auraEffect.parent.data.type === "character") {
+        else if (auraEffect.parent.data.token.actorLink) {
             auraToken = game.actors.get(auraEffect.parent.data._id).getActiveTokens()[0]
         }
+        else if (newToken) auraToken = newToken;
         if (auraToken.id === canvasToken.id) continue;
         if (auraTargets === "Allies" && (auraToken.data.disposition !== canvasToken.data.disposition)) continue;
         if (auraTargets === "Enemy" && (auraToken.data.disposition === canvasToken.data.disposition)) continue;
 
         let distance = RayDistance(canvasToken, auraToken)
-        if ((distance !== false) && (distance <= auraRadius)) {
+        if ((distance !== false) && (distance <= auraRadius) && !effectDisabled) {
             if (MapObject) {
                 MapObject.add = true
             }
