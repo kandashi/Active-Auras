@@ -184,6 +184,7 @@ function MainAura(movedToken) {
     //let movedToken_has_aura = false;
     let auraEffectArray = [];
     for (let testToken of canvas.tokens.placeables) {
+        if(testToken.actor === null || testToken.actor === undefined) return;
         if (game.modules.get("multilevel-tokens")?.active) {
             if (GetAllFlags(testToken, 'multilevel-tokens')) continue;
         }
