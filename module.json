@@ -3,7 +3,7 @@
 	"title": "Active-Auras",
 	"description": "Active-Auras",
 	"author": "Kandashi",
-	"version": "0.0.45",
+	"version": "0.0.47",
 	"systems": ["dnd5e"],
 	"minimumCoreVersion": "0.7.5",
 	"compatibleCoreVersion": "0.7.9",
