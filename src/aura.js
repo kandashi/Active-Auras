@@ -138,7 +138,7 @@ Hooks.on("updateActiveEffect", (actor, effect, update) => {
         if (update?.disabled === true) effectDisabled = true; disabledEffect = actor.effects.find(i => i.data._id === effect._id);
         if (update?.disabled === false) effectDisabled = false;
         setTimeout(() => {
-        MainAura()
+            MainAura()
         }, 50)
     }
 })
@@ -185,7 +185,7 @@ function MainAura(movedToken) {
     if (!gm) return;
     //let movedToken_has_aura = false;
     let auraEffectArray = [];
-    if(effectDisabled) auraEffectArray.push(disabledEffect)
+    if (effectDisabled) auraEffectArray.push(disabledEffect)
     for (let testToken of canvas.tokens.placeables) {
         if (game.modules.get("multilevel-tokens")?.active) {
             if (GetAllFlags(testToken, 'multilevel-tokens')) continue;
@@ -288,7 +288,9 @@ function UpdateAllTokens(map, auraEffectArray, tokens) {
  * @param {Token} canvasToken - single token to test
  */
 function UpdateToken(map, auraEffectArray, canvasToken) {
-    if (GetAllFlags(canvasToken, 'multilevel-tokens')) return;
+    if (game.modules.get("multilevel-tokens")) {
+        if (GetAllFlags(canvasToken, 'multilevel-tokens')) return;
+    }
     for (let auraEffect of auraEffectArray) {
         let auraTargets = auraEffect.getFlag('ActiveAuras', 'aura')
         let MapKey = auraEffect.data.label + "-" + canvasToken.id;
