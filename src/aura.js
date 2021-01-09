@@ -108,7 +108,7 @@ Hooks.on("updateToken", (scene, token, update, flags, id) => {
  * On addition/removal of active effect from unlinked actor, if aura update canvas.tokens
  */
 Hooks.on("preUpdateToken", (scene, token, update) => {
-    if (!(update.actorData?.effects)) return;
+    if (!(update?.actorData?.effects)) return;
 
     let removed = token.actorData.effects.filter(x => !update.actorData.effects.includes(x));
     let added = update.actorData.effects.filter(x => !token.actorData.effects.includes(x));
@@ -132,12 +132,14 @@ Hooks.on("preUpdateToken", (scene, token, update) => {
 })
 
 let effectDisabled;
+let disabledEffect;
 Hooks.on("updateActiveEffect", (actor, effect, update) => {
     if (effect.flags?.ActiveAuras?.aura !== "None") {
-        if (update?.disabled === true) effectDisabled = true;
+        if (update?.disabled === true) effectDisabled = true; disabledEffect = actor.effects.find(i => i.data._id === effect._id);
         if (update?.disabled === false) effectDisabled = false;
-
-        MainAura()
+        setTimeout(() => {
+            MainAura()
+        }, 50)
     }
 })
 
@@ -183,6 +185,7 @@ function MainAura(movedToken) {
     if (!gm) return;
     //let movedToken_has_aura = false;
     let auraEffectArray = [];
+    if (effectDisabled) auraEffectArray.push(disabledEffect)
     for (let testToken of canvas.tokens.placeables) {
         if(testToken.actor === null || testToken.actor === undefined) return;
         if (game.modules.get("multilevel-tokens")?.active) {
@@ -214,10 +217,10 @@ function MainAura(movedToken) {
 
             if (typeof change.value === "string") {
                 if (change.value.includes("@")) {
-                    let dataPath = change.value.substring(1)
+                    let dataPath = change.value.substring(2)
                     let newValue = getProperty(mapEffect[1].effect.parent.getRollData(), dataPath)
                     const changeIndex = newEffectData.changes.findIndex(i => i.value === change.value && i.key === change.key)
-                    newEffectData.changes[changeIndex].value = newValue
+                    newEffectData.changes[changeIndex].value = `+ ${newValue}`
                 }
             }
         }
@@ -233,6 +236,7 @@ function MainAura(movedToken) {
         }
     }
     effectDisabled = undefined;
+    disabledEffect = undefined;
 }
 
 
@@ -285,7 +289,9 @@ function UpdateAllTokens(map, auraEffectArray, tokens) {
  * @param {Token} canvasToken - single token to test
  */
 function UpdateToken(map, auraEffectArray, canvasToken) {
-    if (GetAllFlags(canvasToken, 'multilevel-tokens')) return;
+    if (game.modules.get("multilevel-tokens")) {
+        if (GetAllFlags(canvasToken, 'multilevel-tokens')) return;
+    }
     for (let auraEffect of auraEffectArray) {
         let auraTargets = auraEffect.getFlag('ActiveAuras', 'aura')
         let MapKey = auraEffect.data.label + "-" + canvasToken.id;
@@ -362,7 +368,7 @@ async function CreateActiveEffect(token, effectData) {
  */
 function RemoveActiveEffects(token, effectLabel) {
     for (let tokenEffects of token.actor.effects) {
-        if (tokenEffects.data.label === effectLabel) {
+        if (tokenEffects.data.label === effectLabel && tokenEffects.data.flags?.ActiveAuras.applied === true) {
             tokenEffects.delete()
             console.log(`Active Auras: removed ${effectLabel} to ${token.name}`)
 
