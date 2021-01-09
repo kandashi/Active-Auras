@@ -108,7 +108,7 @@ Hooks.on("updateToken", (scene, token, update, flags, id) => {
  * On addition/removal of active effect from unlinked actor, if aura update canvas.tokens
  */
 Hooks.on("preUpdateToken", (scene, token, update) => {
-    if (!(update.actorData?.effects)) return;
+    if (!(update?.actorData?.effects)) return;
 
     let removed = token.actorData.effects.filter(x => !update.actorData.effects.includes(x));
     let added = update.actorData.effects.filter(x => !token.actorData.effects.includes(x));
@@ -187,6 +187,7 @@ function MainAura(movedToken) {
     let auraEffectArray = [];
     if (effectDisabled) auraEffectArray.push(disabledEffect)
     for (let testToken of canvas.tokens.placeables) {
+        if(testToken.actor === null || testToken.actor === undefined) return;
         if (game.modules.get("multilevel-tokens")?.active) {
             if (GetAllFlags(testToken, 'multilevel-tokens')) continue;
         }
@@ -367,7 +368,7 @@ async function CreateActiveEffect(token, effectData) {
  */
 function RemoveActiveEffects(token, effectLabel) {
     for (let tokenEffects of token.actor.effects) {
-        if (tokenEffects.data.label === effectLabel) {
+        if (tokenEffects.data.label === effectLabel && tokenEffects.data.flags?.ActiveAuras.applied === true) {
             tokenEffects.delete()
             console.log(`Active Auras: removed ${effectLabel} to ${token.name}`)
 
