@@ -132,12 +132,14 @@ Hooks.on("preUpdateToken", (scene, token, update) => {
 })
 
 let effectDisabled;
+let disabledEffect;
 Hooks.on("updateActiveEffect", (actor, effect, update) => {
     if (effect.flags?.ActiveAuras?.aura !== "None") {
-        if (update?.disabled === true) effectDisabled = true;
+        if (update?.disabled === true) effectDisabled = true; disabledEffect = actor.effects.find(i => i.data._id === effect._id);
         if (update?.disabled === false) effectDisabled = false;
-
+        setTimeout(() => {
         MainAura()
+        }, 50)
     }
 })
 
@@ -183,6 +185,7 @@ function MainAura(movedToken) {
     if (!gm) return;
     //let movedToken_has_aura = false;
     let auraEffectArray = [];
+    if(effectDisabled) auraEffectArray.push(disabledEffect)
     for (let testToken of canvas.tokens.placeables) {
         if (game.modules.get("multilevel-tokens")?.active) {
             if (GetAllFlags(testToken, 'multilevel-tokens')) continue;
@@ -213,10 +216,10 @@ function MainAura(movedToken) {
 
             if (typeof change.value === "string") {
                 if (change.value.includes("@")) {
-                    let dataPath = change.value.substring(1)
+                    let dataPath = change.value.substring(2)
                     let newValue = getProperty(mapEffect[1].effect.parent.getRollData(), dataPath)
                     const changeIndex = newEffectData.changes.findIndex(i => i.value === change.value && i.key === change.key)
-                    newEffectData.changes[changeIndex].value = newValue
+                    newEffectData.changes[changeIndex].value = `+ ${newValue}`
                 }
             }
         }
@@ -232,6 +235,7 @@ function MainAura(movedToken) {
         }
     }
     effectDisabled = undefined;
+    disabledEffect = undefined;
 }
 
 
