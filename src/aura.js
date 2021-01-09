@@ -302,7 +302,12 @@ function UpdateToken(map, auraEffectArray, canvasToken) {
             auraToken = auraEffect.parent.token
         }
         else if (auraEffect.parent.data.token.actorLink) {
-            auraToken = game.actors.get(auraEffect.parent.data._id).getActiveTokens()[0]
+            let auraTokenArray = game.actors.get(auraEffect.parent.data._id).getActiveTokens()
+            auraToken = auraTokenArray.reduce(FindClosestToken, auraTokenArray[0])
+            function FindClosestToken(tokenA, tokenB) {
+                return RayDistance(tokenA, canvasToken) < RayDistance(tokenB, canvasToken) ? tokenA : tokenB
+            }
+            
         }
         else if (newToken) auraToken = newToken;
         if (auraToken.id === canvasToken.id) continue;
