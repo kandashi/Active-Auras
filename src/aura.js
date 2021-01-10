@@ -200,7 +200,8 @@ Hooks.on("ready", () => {
             for (let testEffect of testToken?.actor?.effects.entries) {
                 if (!testEffect.getFlag('ActiveAuras', 'isAura')) continue;
                 let inactiveApply = testEffect.getFlag('ActiveAuras', 'inactive')
-                if ((!effectDisabled && !inactiveApply) || (!inactiveApply && !testEffect.data.disabled)) continue
+                let disabled = effectDisabled ? effectDisabled : testEffect.data.disabled
+                if (disabled && !inactiveApply) continue
                 //if (testToken.id === movedToken.id) movedToken_has_aura = true
                 auraEffectArray.push(testEffect)
             }
