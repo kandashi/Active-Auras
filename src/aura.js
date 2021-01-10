@@ -29,24 +29,28 @@ Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
 
     const aoeHTML = `
     <div class="form-group">
-          <label>Aura Targets:</label>
-          <label></label>
-          <div class="aura">
-            <select name="flags.${MODULE_NAME}.aura" data-dtype="String" value=${flags[MODULE_NAME]?.aura}>
+        <label>Effect is Aura</label>
+        <input name="flags.${MODULE_NAME}.isAura" type="checkbox" ${flags[MODULE_NAME].isAura ? 'checked' : ''} </input>
+        <label></label>
+            </select>
+        <label> Apply while inactive?</label>
+        <input name="flags.${MODULE_NAME}.inactive" type="checkbox" ${flags[MODULE_NAME].inactive ? 'checked' : ''} </input>
+            </select>
+    </div>
+    <div class="form-group">
+            <label>Aura Targets:</label>
+             <select name="flags.${MODULE_NAME}.aura" data-dtype="String" value=${flags[MODULE_NAME]?.aura}>
               <option value="None" ${flags[MODULE_NAME].aura === 'None' ? 'selected' : ''}></option>
               <option value="Enemy"${flags[MODULE_NAME].aura === 'Enemy' ? 'selected' : ''}>Enemies</option>
               <option value="Allies"${flags[MODULE_NAME].aura === 'Allies' ? 'selected' : ''}>Allies</option>
                <option value="All"${flags[MODULE_NAME].aura === 'All' ? 'selected' : ''}>All</option>
             </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Aura radius (from token center)</label>
-          <input id="radius" name="flags.${MODULE_NAME}.radius" type="number" min="0" value="${flags[MODULE_NAME].radius}"></input>
+            <label></label>
+            <label>Aura radius</label>
+            <input id="radius" name="flags.${MODULE_NAME}.radius" type="number" min="0" value="${flags[MODULE_NAME].radius}"></input>
             </select>
-          </div>
         </div>
-    `
+    </div>`
     html.css("height", "auto");
     originHandle.parent().after(aoeHTML)
 });
@@ -187,17 +191,16 @@ function MainAura(movedToken) {
     let auraEffectArray = [];
     if (effectDisabled) auraEffectArray.push(disabledEffect)
     for (let testToken of canvas.tokens.placeables) {
-        if(testToken.actor === null || testToken.actor === undefined) return;
+        if (testToken.actor === null || testToken.actor === undefined) continue;
         if (game.modules.get("multilevel-tokens")?.active) {
             if (GetAllFlags(testToken, 'multilevel-tokens')) continue;
         }
         for (let testEffect of testToken?.actor?.effects.entries) {
-            let isAura = testEffect.getFlag('ActiveAuras', 'aura')
-            let appliedAura = testEffect.getFlag('ActiveAuras', 'applied')
-            if (isAura && !appliedAura && (!testEffect.data.disabled || effectDisabled === false)) {
-                //if (testToken.id === movedToken.id) movedToken_has_aura = true
-                auraEffectArray.push(testEffect)
-            }
+            if (!testEffect.getFlag('ActiveAuras', 'isAura')) continue;
+            let inactiveApply = testEffect.getFlag('ActiveAuras', 'inactive')
+            if ((!effectDisabled && !inactiveApply) || (!inactiveApply && !testEffect.data.disabled)) continue
+            //if (testToken.id === movedToken.id) movedToken_has_aura = true
+            auraEffectArray.push(testEffect)
         }
     }
 
@@ -209,13 +212,14 @@ function MainAura(movedToken) {
         let MapKey = mapEffect[0]
         let newEffectData = duplicate(mapEffect[1].effect.data)
         newEffectData.flags.ActiveAuras = {
-            aura: "None",
+            isAura: false,
             applied: true
         }
+        newEffectData.disabled = false
 
         for (let change of newEffectData.changes) {
 
-            if (typeof change.value === "string") {
+            if (typeof change.value === "string" && change.key !== "macro.execute") {
                 if (change.value.includes("@")) {
                     let dataPath = change.value.substring(2)
                     let newValue = getProperty(mapEffect[1].effect.parent.getRollData(), dataPath)
@@ -307,7 +311,7 @@ function UpdateToken(map, auraEffectArray, canvasToken) {
             function FindClosestToken(tokenA, tokenB) {
                 return RayDistance(tokenA, canvasToken) < RayDistance(tokenB, canvasToken) ? tokenA : tokenB
             }
-            
+
         }
         else if (newToken) auraToken = newToken;
         if (auraToken.id === canvasToken.id) continue;
