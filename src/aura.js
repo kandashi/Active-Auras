@@ -196,13 +196,11 @@ function MainAura(movedToken) {
             if (GetAllFlags(testToken, 'multilevel-tokens')) continue;
         }
         for (let testEffect of testToken?.actor?.effects.entries) {
-            let isAura = testEffect.getFlag('ActiveAuras', 'isAura')
-            let appliedAura = testEffect.getFlag('ActiveAuras', 'applied')
+            if (!testEffect.getFlag('ActiveAuras', 'isAura')) continue;
             let inactiveApply = testEffect.getFlag('ActiveAuras', 'inactive')
-            if (isAura && ((!testEffect.data.disabled && !inactiveApply) || effectDisabled === false)) {
-                //if (testToken.id === movedToken.id) movedToken_has_aura = true
-                auraEffectArray.push(testEffect)
-            }
+            if ((!effectDisabled && !inactiveApply) || (!inactiveApply && !testEffect.data.disabled)) continue
+            //if (testToken.id === movedToken.id) movedToken_has_aura = true
+            auraEffectArray.push(testEffect)
         }
     }
 
@@ -217,10 +215,11 @@ function MainAura(movedToken) {
             isAura: false,
             applied: true
         }
+        newEffectData.disabled = false
 
         for (let change of newEffectData.changes) {
 
-            if (typeof change.value === "string") {
+            if (typeof change.value === "string" && change.key !== "macro.execute") {
                 if (change.value.includes("@")) {
                     let dataPath = change.value.substring(2)
                     let newValue = getProperty(mapEffect[1].effect.parent.getRollData(), dataPath)
@@ -298,7 +297,7 @@ function UpdateToken(map, auraEffectArray, canvasToken) {
         if (GetAllFlags(canvasToken, 'multilevel-tokens')) return;
     }
     for (let auraEffect of auraEffectArray) {
-        let auraTargets = auraEffect.getFlag('ActiveAuras', 'isAura')
+        let auraTargets = auraEffect.getFlag('ActiveAuras', 'aura')
         let MapKey = auraEffect.data.label + "-" + canvasToken.id;
         MapObject = map.get(MapKey);
         let auraToken;
