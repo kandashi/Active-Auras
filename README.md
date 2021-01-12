@@ -5,6 +5,8 @@ The distance and targeting of the aura are both configurable.
 Any ```@``` fields from DAE will be correctly parsed before being applied to the effected token.
 Macros from DAE will fire once when applied and once when removed (work is being done for damage over time effects)
 
+The "Apply while inactive" option allows for effects to propagate to other tokens while not applying to the Aura Token. This is usefull for debuff style effects that should not effect the owner of the effect
+
 ## Demo setup for Aura of Protection
 - We setup the aura status as Allies, as we only want the aura to effect allied tokens
 - We set the radius as 10 (measure in ft)
