@@ -4,7 +4,6 @@
 	"description": "Active-Auras",
 	"author": "Kandashi",
 	"version": "0.1.0",
-	"systems": ["dnd5e"],
 	"minimumCoreVersion": "0.7.5",
 	"compatibleCoreVersion": "0.7.9",
 	"scripts": [
