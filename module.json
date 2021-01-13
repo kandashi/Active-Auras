@@ -10,12 +10,20 @@
 		{
 			"name": "Active Auras premade",
 			"label": "Active Auras premade",
+			"path" : "packs/AuraItems",
 			"entity": "Item",
 			"module": "ActiveAuras"
 		}
 		],
 	"scripts": [
 		"src/aura.js"
+	],
+	"language": [
+		{
+			"lang": "en",
+			"name": "English",
+			"path": "lang/en.json"
+		  }
 	],
 	 "url": "https://github.com/kandashi/Active-Auras",
          "manifest": "https://raw.githubusercontent.com/kandashi/Active-Auras/main/module.json",
