@@ -40,6 +40,9 @@ Hooks.on("ready", () => {
         <label> Apply while inactive?</label>
         <input name="flags.${MODULE_NAME}.inactive" type="checkbox" ${flags[MODULE_NAME].inactive ? 'checked' : ''} </input>
             </select>
+        <label> Disable while hidden?</label>
+        <input name="flags.${MODULE_NAME}.hidden" type="checkbox" ${flags[MODULE_NAME].hidden ? 'checked' : ''} </input>
+            </select>
     </div>
     <div class="form-group">
             <label>Aura Targets:</label>
@@ -90,8 +93,10 @@ Hooks.on("ready", () => {
      * On token movement run MainAura
      */
     Hooks.on("updateToken", (scene, token, update, flags, id) => {
-        if (!("y" in update || "x" in update)) return;
-        MainAura(token,)
+        if (("y" in update || "x" in update))
+            MainAura(token,)
+        if("hidden" in update )
+            CollateAuras(scene, true, true)
     });
 
 
@@ -179,7 +184,19 @@ Hooks.on("ready", () => {
             }
             for (let testEffect of testToken?.actor?.effects.entries) {
                 if (testEffect.getFlag('ActiveAuras', 'isAura')) {
-                    effectArray.push(testEffect)
+                    if (testEffect.getFlag('ActiveAuras', 'hidden') && testToken.data.hidden) continue;
+                    let newEffect = duplicate(testEffect)
+                    for (let change of newEffect.data.changes) {
+                        if (typeof change.value === "string" && change.key !== "macro.execute") {
+                            if (change.value.includes("@")) {
+                                let dataPath = change.value.substring(2)
+                                let newValue = getProperty(testToken.actor.getRollData(), dataPath)
+                                const changeIndex = newEffect.data.changes.findIndex(i => i.value === change.value && i.key === change.key)
+                                newEffect.data.changes[changeIndex].value = `+ ${newValue}`
+                            }
+                        }
+                    }
+                    effectArray.push(newEffect)
                 }
             }
         }
@@ -229,7 +246,7 @@ Hooks.on("ready", () => {
                 applied: true
             }
             newEffectData.disabled = false
-
+            /*
             for (let change of newEffectData.changes) {
 
                 if (typeof change.value === "string" && change.key !== "macro.execute") {
@@ -241,6 +258,7 @@ Hooks.on("ready", () => {
                     }
                 }
             }
+            */
             map.set(MapKey, { add: mapEffect[1].add, token: mapEffect[1].token, effect: newEffectData })
         }
 
@@ -283,18 +301,15 @@ Hooks.on("ready", () => {
         let MapKey = canvasToken.scene._id;
         MapObject = AuraMap.get(MapKey)
         for (let auraEffect of MapObject.effects) {
-            let effectDisabled = false
+            let effectDisabled = false;
             if (!auraEffect.data.flags?.ActiveAuras?.inactive && auraEffect.data.disabled) effectDisabled = true;
-            let auraTargets = auraEffect.getFlag('ActiveAuras', 'aura')
+            let auraTargets = auraEffect.data.flags?.ActiveAuras?.aura
             let MapKey = auraEffect.data.label + "-" + canvasToken.id;
             MapObject = map.get(MapKey);
             let auraToken;
-            let auraRadius = auraEffect.getFlag('ActiveAuras', 'radius')
-            if (auraEffect.parent.token) {
-                auraToken = auraEffect.parent.token
-            }
-            else if (auraEffect.parent.data.token.actorLink) {
-                let auraTokenArray = game.actors.get(auraEffect.parent.data._id).getActiveTokens()
+            let auraRadius = auraEffect.data.flags?.ActiveAuras?.radius
+            if (auraEffect.parent.token.actorLink) {
+                let auraTokenArray = game.actors.get(auraEffect.parent._id).getActiveTokens()
                 if (auraTokenArray.length > 1) {
                     auraToken = auraTokenArray.reduce(FindClosestToken, auraTokenArray[0])
                     function FindClosestToken(tokenA, tokenB) {
@@ -303,7 +318,9 @@ Hooks.on("ready", () => {
                 }
                 else auraToken = auraTokenArray[0]
             }
-            else if (newToken) auraToken = newToken;
+            else if (auraEffect.parent.token) {
+                auraToken = auraEffect.parent.token
+            }
             if (auraToken.id === canvasToken.id) continue;
             if (auraTargets === "Allies" && (auraToken.data.disposition !== canvasToken.data.disposition)) continue;
             if (auraTargets === "Enemy" && (auraToken.data.disposition === canvasToken.data.disposition)) continue;
