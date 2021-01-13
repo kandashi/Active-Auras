@@ -1,24 +1,21 @@
-
-
 Hooks.on('init', () => {
     game.settings.register("ActiveAuras", "measurement", {
-        name: game.i18n.format("ACTIVEAURAS_measurmentoptions_name"),
-        hint: game.i18n.format("ACTIVEAURAS_measurmentoptions_hint"),
+        name: game.i18n.format("ACTIVEAURAS.measurmentoptions_name"),
+        hint: game.i18n.format("ACTIVEAURAS.measurmentoptions_hint"),
         scope: "world",
         config: true,
         default: true,
         type: Boolean,
     });
     game.settings.register("ActiveAuras", "wall-block", {
-        name: game.i18n.format("ACTIVEAURAS_walltoptions_name"),
-        hint: game.i18n.format("ACTIVEAURAS_walltoptions_hint"),
+        name: game.i18n.format("ACTIVEAURAS.walltoptions_name"),
+        hint: game.i18n.format("ACTIVEAURAS.walltoptions_hint"),
         scope: "world",
         config: true,
         default: false,
         type: Boolean,
     });
 });
-
 
 
 Hooks.on("ready", () => {
@@ -32,26 +29,26 @@ Hooks.on("ready", () => {
         const originHandle = html.find($('input[name="disabled"]'))
         const flags = sheet.object.data.flags;
 
-        const FormIsAura = game.i18n.format("ACTIVEAURAS_FORM_IsAura"),
-        const FormInactive = game.i18n.format("ACTIVEAURAS_FORM_Inactive"),
-        const FormHidden = game.i18n.format("ACTIVEAURAS_FORM_Hidden"),
-        const FormTargetsName = game.i18n.format("ACTIVEAURAS_FORM_TargetsName"),
-        const FormTargetsNone =game.i18n.format("ACTIVEAURAS_FORM_TargetsNone"),
-        const FormTargetsEnemy = game.i18n.format("ACTIVEAURAS_FORM_TargetsEnemy"),
-        const FormTargetsAllies = game.i18n.format("ACTIVEAURAS_FORM_TargetsAllies"),
-        const FormTargetsAll = game.i18n.format("ACTIVEAURAS_FORM_TargetsAll"),
-        const FormRadius = game.i18n.format("ACTIVEAURAS_FORM_Radius"),
+        const FormIsAura = game.i18n.format("ACTIVEAURAS.FORM_IsAura");
+        const FormInactive = game.i18n.format("ACTIVEAURAS.FORM_Inactive");
+        const FormHidden = game.i18n.format("ACTIVEAURAS.FORM_Hidden");
+        const FormTargetsName = game.i18n.format("ACTIVEAURAS.FORM_TargetsName");
+        const FormTargetsNone =game.i18n.format("ACTIVEAURAS.FORM_TargetsNone");
+        const FormTargetsEnemy = game.i18n.format("ACTIVEAURAS.FORM_TargetsEnemy");
+        const FormTargetsAllies = game.i18n.format("ACTIVEAURAS.FORM_TargetsAllies");
+        const FormTargetsAll = game.i18n.format("ACTIVEAURAS.FORM_TargetsAll");
+        const FormRadius = game.i18n.format("ACTIVEAURAS.FORM_Radius");
 
         const aoeHTML = `
     <div class="form-group">
         <label>${FormIsAura}?</label>
         <input name="flags.${MODULE_NAME}.isAura" type="checkbox" ${flags[MODULE_NAME].isAura ? 'checked' : ''} </input>
-        <label></label>
             </select>
+            <label></label>
         <label>${FormInactive}?</label>
         <input name="flags.${MODULE_NAME}.inactive" type="checkbox" ${flags[MODULE_NAME].inactive ? 'checked' : ''} </input>
             </select>
-            <label></label>
+              <label></label>
         <label>${FormHidden}?</label>
         <input name="flags.${MODULE_NAME}.hidden" type="checkbox" ${flags[MODULE_NAME].hidden ? 'checked' : ''} </input>
             </select>
@@ -59,10 +56,10 @@ Hooks.on("ready", () => {
     <div class="form-group">
             <label>${FormTargetsName}:</label>
              <select name="flags.${MODULE_NAME}.aura" data-dtype="String" value=${flags[MODULE_NAME]?.aura}>
-              <option value="None" ${flags[MODULE_NAME].aura === `${FormTargetsNone}` ? 'selected' : ''}></option>
-              <option value="Enemy"${flags[MODULE_NAME].aura === `${FormTargetsEnemy}` ? 'selected' : ''}>Enemies</option>
-              <option value="Allies"${flags[MODULE_NAME].aura === `${FormTargetsAllies}` ? 'selected' : ''}>Allies</option>
-               <option value="All"${flags[MODULE_NAME].aura === `${FormTargetsAll}` ? 'selected' : ''}>All</option>
+              <option value="None" ${flags[MODULE_NAME].aura === 'None' ? 'selected' : ''}></option>
+              <option value="Enemy"${flags[MODULE_NAME].aura === 'Enemy' ? 'selected' : ''}>${FormTargetsEnemy}</option>
+              <option value="Allies"${flags[MODULE_NAME].aura === 'Allies' ? 'selected' : ''}>${FormTargetsAllies}</option>
+               <option value="All"${flags[MODULE_NAME].aura === 'All' ? 'selected' : ''}>${FormTargetsAll}</option>
             </select>
             <label></label>
             <label>${FormRadius}</label>
@@ -385,7 +382,7 @@ Hooks.on("ready", () => {
     async function CreateActiveEffect(token, effectData) {
         if (token.actor.effects.entries.find(e => e.data.label === effectData.label)) return
         await token.actor.createEmbeddedEntity("ActiveEffect", effectData);
-        console.log(game.i18n.format("ACTIVEAURAS_ApplyLog", {effectDataLabel: effectData.label, tokenName : token.name}))
+        console.log(game.i18n.format("ACTIVEAURAS.ApplyLog", {effectDataLabel: effectData.label, tokenName : token.name}))
     }
 
     /**
@@ -397,7 +394,7 @@ Hooks.on("ready", () => {
         for (let tokenEffects of token.actor.effects) {
             if (tokenEffects.data.label === effectLabel && tokenEffects.data.flags?.ActiveAuras.applied === true) {
                 tokenEffects.delete()
-                console.log(game.i18n.format("ACTIVEAURAS_RemoveLog", {effectDataLabel: effectData.label, tokenName : token.name}))
+                console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", {effectDataLabel: effectData.label, tokenName : token.name}))
 
             }
         }

@@ -18,7 +18,7 @@
 	"scripts": [
 		"src/aura.js"
 	],
-	"language": [
+	"languages": [
 		{
 			"lang": "en",
 			"name": "English",

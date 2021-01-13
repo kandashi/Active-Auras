@@ -1,21 +1,21 @@
 {
-    "ACTIVEAURAS_measurmentoptions_name":"Measurement system",
-    "ACTIVEAURAS_measurmentoptions_hint":"Use system defined movement measurement system rather than straight line (euclidean), default on",
+    "ACTIVEAURAS.measurmentoptions_name":"Measurement system",
+    "ACTIVEAURAS.measurmentoptions_hint":"Use system defined movement measurement system rather than straight line (euclidean), default on",
 
-    "ACTIVEAURAS_walltoptions_name": "Walls Block Auras",
-    "ACTIVEAURAS_walltoptions_hint":"Interveneing walls will block aura effects",
+    "ACTIVEAURAS.walltoptions_name": "Walls Block Auras",
+    "ACTIVEAURAS.walltoptions_hint":"Interveneing walls will block aura effects",
 
-    "ACTIVEAURAS_FORM_IsAura" : "Effect is Aura",
-    "ACTIVEAURAS_FORM_Inactive": "Apply while inactive",
-    "ACTIVEAURAS_FORM_Hidden":"Disable while hidden",
-    "ACTIVEAURAS_FORM_TargetsName":"Aura Targets",
-    "ACTIVEAURAS_FORM_TargetsNone":"None",
-    "ACTIVEAURAS_FORM_TargetsEnemy":"Enemy",
-    "ACTIVEAURAS_FORM_TargetsAllies":"Allies",
-    "ACTIVEAURAS_FORM_TargetsAll":"All",
-    "ACTIVEAURAS_FORM_Radius": "Aura radius",
+    "ACTIVEAURAS.FORM_IsAura" : "Effect is Aura",
+    "ACTIVEAURAS.FORM_Inactive": "Apply while inactive",
+    "ACTIVEAURAS.FORM_Hidden":"Disable while hidden",
+    "ACTIVEAURAS.FORM_TargetsName":"Aura Targets",
+    "ACTIVEAURAS.FORM_TargetsNone":"None",
+    "ACTIVEAURAS.FORM_TargetsEnemy":"Enemy",
+    "ACTIVEAURAS.FORM_TargetsAllies":"Allies",
+    "ACTIVEAURAS.FORM_TargetsAll":"All",
+    "ACTIVEAURAS.FORM_Radius": "Aura radius",
 
-    "ACTIVEAURAS_ApplyLog":"Active Auras: applied {effectDataLabel} to {tokenName}",
-    "ACTIVEAURAS_RemoveLog":"Active Auras: removed {effectDataLabel} to {tokenName}"
+    "ACTIVEAURAS.ApplyLog":"Active Auras: applied {effectDataLabel} to {tokenName}",
+    "ACTIVEAURAS.RemoveLog":"Active Auras: removed {effectDataLabel} to {tokenName}"
 
 }
