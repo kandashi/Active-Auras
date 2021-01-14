@@ -1,7 +1,8 @@
 {
     "ACTIVEAURAS.measurmentoptions_name":"Measurement system",
     "ACTIVEAURAS.measurmentoptions_hint":"Use system defined movement measurement system rather than straight line (euclidean), default on",
-
+    "ACTIVEAURAS.tabname": "Auras",
+    
     "ACTIVEAURAS.walltoptions_name": "Walls Block Auras",
     "ACTIVEAURAS.walltoptions_hint":"Interveneing walls will block aura effects",
 

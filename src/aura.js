@@ -26,7 +26,6 @@ Hooks.on("ready", () => {
      */
     Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
         await sheet.object.setFlag(`${MODULE_NAME}`, 'aura')
-        const originHandle = html.find($('input[name="disabled"]'))
         const flags = sheet.object.data.flags;
 
         const FormIsAura = game.i18n.format("ACTIVEAURAS.FORM_IsAura");
@@ -38,37 +37,43 @@ Hooks.on("ready", () => {
         const FormTargetsAllies = game.i18n.format("ACTIVEAURAS.FORM_TargetsAllies");
         const FormTargetsAll = game.i18n.format("ACTIVEAURAS.FORM_TargetsAll");
         const FormRadius = game.i18n.format("ACTIVEAURAS.FORM_Radius");
+        const AuraTab = game.i18n.format("ACTIVEAURAS.tabname");
 
-        const aoeHTML = `
-    <div class="form-group">
-        <label>${FormIsAura}?</label>
-        <input name="flags.${MODULE_NAME}.isAura" type="checkbox" ${flags[MODULE_NAME].isAura ? 'checked' : ''} </input>
-            </select>
-            <label></label>
-        <label>${FormInactive}?</label>
-        <input name="flags.${MODULE_NAME}.inactive" type="checkbox" ${flags[MODULE_NAME].inactive ? 'checked' : ''} </input>
-            </select>
-              <label></label>
-        <label>${FormHidden}?</label>
-        <input name="flags.${MODULE_NAME}.hidden" type="checkbox" ${flags[MODULE_NAME].hidden ? 'checked' : ''} </input>
-            </select>
-    </div>
-    <div class="form-group">
+        const tab = `<a class="item" data-tab="ActiveAuras">
+      <i class="fas fa-broadcast-tower"></i> ${AuraTab}
+    </a>`;
+
+        const contents = `
+        <div class="tab" data-tab="ActiveAuras">
+            <div class="form-group">
+                <label>${FormIsAura}?</label>
+                <input name="flags.${MODULE_NAME}.isAura" type="checkbox" ${flags[MODULE_NAME].isAura ? 'checked' : ''} </input>
+             </div>
+        <div class="form-group">
+            <label>${FormInactive}?</label>
+            <input name="flags.${MODULE_NAME}.inactive" type="checkbox" ${flags[MODULE_NAME].inactive ? 'checked' : ''} </input>
+        </div>
+        <div class="form-group">
+            <label>${FormHidden}?</label>
+            <input name="flags.${MODULE_NAME}.hidden" type="checkbox" ${flags[MODULE_NAME].hidden ? 'checked' : ''} </input>
+        </div>
+        <div class="form-group">
             <label>${FormTargetsName}:</label>
-             <select name="flags.${MODULE_NAME}.aura" data-dtype="String" value=${flags[MODULE_NAME]?.aura}>
-              <option value="None" ${flags[MODULE_NAME].aura === 'None' ? 'selected' : ''}></option>
-              <option value="Enemy"${flags[MODULE_NAME].aura === 'Enemy' ? 'selected' : ''}>${FormTargetsEnemy}</option>
-              <option value="Allies"${flags[MODULE_NAME].aura === 'Allies' ? 'selected' : ''}>${FormTargetsAllies}</option>
-               <option value="All"${flags[MODULE_NAME].aura === 'All' ? 'selected' : ''}>${FormTargetsAll}</option>
-            </select>
-            <label></label>
-            <label>${FormRadius}</label>
-            <input id="radius" name="flags.${MODULE_NAME}.radius" type="number" min="0" value="${flags[MODULE_NAME].radius}"></input>
+            <select name="flags.${MODULE_NAME}.aura" data-dtype="String" value=${flags[MODULE_NAME]?.aura}>
+                <option value="None" ${flags[MODULE_NAME].aura === 'None' ? 'selected' : ''}></option>
+                <option value="Enemy"${flags[MODULE_NAME].aura === 'Enemy' ? 'selected' : ''}>${FormTargetsEnemy}</option>
+                <option value="Allies"${flags[MODULE_NAME].aura === 'Allies' ? 'selected' : ''}>${FormTargetsAllies}</option>
+                <option value="All"${flags[MODULE_NAME].aura === 'All' ? 'selected' : ''}>${FormTargetsAll}</option>
             </select>
         </div>
-    </div>`
-        html.css("height", "auto");
-        originHandle.parent().after(aoeHTML)
+        <div class="form-group">
+            <label>${FormRadius}</label>
+            <input id="radius" name="flags.${MODULE_NAME}.radius" type="number" min="0" value="${flags[MODULE_NAME].radius}"></input>
+         </select>
+        </div>
+    </div>`;
+    html.find(".tabs .item").last().after(tab);
+    html.find(".tab").last().after(contents);
     });
 
     let AuraMap = new Map()
@@ -137,12 +142,16 @@ Hooks.on("ready", () => {
      */
     Hooks.on("createActiveEffect", (actor, effect) => {
         if (!effect.flags.ActiveAuras.applied && effect.flags.ActiveAuras.isAura) {
-            CollateAuras(canvas, true, false);
+            setTimeout(() => {
+                CollateAuras(canvas, true, false)
+            }, 20)
         };
     });
 
     Hooks.on("canvasReady", (canvas) => {
-        CollateAuras(canvas, true, false)
+        setTimeout(() => {
+            CollateAuras(canvas, true, false)
+        }, 20)
     })
 
     function GetAllFlags(entity, scope) {
@@ -192,10 +201,12 @@ Hooks.on("ready", () => {
             AuraMap.set(MapKey, { effects: effectArray })
         }
         if (checkAuras) {
-            MainAura()
+            setTimeout(() => {
+            MainAura()}, 20)
         }
         if (removeAuras) {
-            RemoveAppliedAuras(canvas)
+            setTimeout(() => {
+            RemoveAppliedAuras(canvas)}, 20)
         }
     }
 
