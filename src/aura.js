@@ -33,7 +33,7 @@ Hooks.on("ready", () => {
         const FormInactive = game.i18n.format("ACTIVEAURAS.FORM_Inactive");
         const FormHidden = game.i18n.format("ACTIVEAURAS.FORM_Hidden");
         const FormTargetsName = game.i18n.format("ACTIVEAURAS.FORM_TargetsName");
-        const FormTargetsNone =game.i18n.format("ACTIVEAURAS.FORM_TargetsNone");
+        const FormTargetsNone = game.i18n.format("ACTIVEAURAS.FORM_TargetsNone");
         const FormTargetsEnemy = game.i18n.format("ACTIVEAURAS.FORM_TargetsEnemy");
         const FormTargetsAllies = game.i18n.format("ACTIVEAURAS.FORM_TargetsAllies");
         const FormTargetsAll = game.i18n.format("ACTIVEAURAS.FORM_TargetsAll");
@@ -79,7 +79,9 @@ Hooks.on("ready", () => {
      */
     Hooks.on("createToken", (scene, token) => {
         newToken = canvas.tokens.get(token._id)
-        CollateAuras(canvas, true, false)
+        setTimeout(() => {
+            CollateAuras(canvas, true, false)
+        }, 20)
     });
 
     /**
@@ -87,14 +89,9 @@ Hooks.on("ready", () => {
      * Filter for aura effects on deleted token and remove from canvas tokens
      */
     Hooks.on("preDeleteToken", async (scene, token) => {
-        if (token.actorLink) {
-            let auraActor = false
-            for (let testEffect of actor.effects) {
-                if (testEffect.data.flags?.ActiveAuras?.applied) await testEffect.delete()
-                if (testEffect.data.flags?.ActiveAuras?.isAura) auraActor = true
-            }
-            if (auraActor) CollateAuras(scene, false, true)
-        }
+        setTimeout(() => {
+            CollateAuras(canvas, false, true)
+        }, 20)
 
     });
 
@@ -104,34 +101,13 @@ Hooks.on("ready", () => {
     Hooks.on("updateToken", (scene, token, update, flags, id) => {
         if (("y" in update || "x" in update))
             MainAura(token,)
-        if("hidden" in update )
-            CollateAuras(scene, true, true)
+        if ((update?.actorData?.effects) || ("hidden" in update)) {
+            setTimeout(() => {
+                CollateAuras(canvas, true, true)
+            }, 20)
+        }
     });
 
-
-    /**
-     * On addition/removal of active effect from unlinked actor, if aura update canvas.tokens
-     * @todo
-     */
-    Hooks.on("preUpdateToken", (scene, token, update) => {
-        if (!(update?.actorData?.effects)) return;
-
-        let removed = token.actorData.effects.filter(x => !update.actorData.effects.includes(x));
-        let added = update.actorData.effects.filter(x => !token.actorData.effects.includes(x));
-        if (removed.length > 0) {
-            let isAura = removed[0].flags?.ActiveAuras?.isAura;
-            let applyStatus = removed[0].flags?.ActiveAuras?.applied;
-            if (isAura && !applyStatus) {
-                CollateAuras(scene, false, true)
-            }
-        }
-        if (added.length > 0) {
-            let isAura = added[0].flags?.ActiveAuras?.isAura;
-            let applyStatus = added[0].flags?.ActiveAuras?.applied;
-            if (isAura && !applyStatus)
-                CollateAuras(scene, true, false)
-        }
-    })
 
     /**
      * @todo
@@ -194,7 +170,7 @@ Hooks.on("ready", () => {
             for (let testEffect of testToken?.actor?.effects.entries) {
                 if (testEffect.getFlag('ActiveAuras', 'isAura')) {
                     if (testEffect.getFlag('ActiveAuras', 'hidden') && testToken.data.hidden) continue;
-                    let newEffect = duplicate(testEffect)
+                    let newEffect = { data: testEffect.data, parentActorLink: testEffect.parent.data.token.actorLink, parentActorId: testEffect.parent._id, tokenId: testToken.id }
                     for (let change of newEffect.data.changes) {
                         if (typeof change.value === "string" && change.key !== "macro.execute") {
                             if (change.value.includes("@")) {
@@ -317,8 +293,9 @@ Hooks.on("ready", () => {
             MapObject = map.get(MapKey);
             let auraToken;
             let auraRadius = auraEffect.data.flags?.ActiveAuras?.radius
-            if (auraEffect.parent.token.actorLink) {
-                let auraTokenArray = game.actors.get(auraEffect.parent._id).getActiveTokens()
+            //{data: testEffect.data, parentActorLink :testEffect.parent.data.token.actorLink, parentActorId : testEffect.parent._id, tokenId: testToken.id}
+            if (auraEffect.parentActorLink) {
+                let auraTokenArray = game.actors.get(auraEffect.parentActorId).getActiveTokens()
                 if (auraTokenArray.length > 1) {
                     auraToken = auraTokenArray.reduce(FindClosestToken, auraTokenArray[0])
                     function FindClosestToken(tokenA, tokenB) {
@@ -327,8 +304,8 @@ Hooks.on("ready", () => {
                 }
                 else auraToken = auraTokenArray[0]
             }
-            else if (auraEffect.parent.token) {
-                auraToken = auraEffect.parent.token
+            else if (auraEffect.tokenId) {
+                auraToken = canvas.tokens.get(auraEffect.tokenId)
             }
             if (auraToken.id === canvasToken.id) continue;
             if (auraTargets === "Allies" && (auraToken.data.disposition !== canvasToken.data.disposition)) continue;
@@ -382,7 +359,7 @@ Hooks.on("ready", () => {
     async function CreateActiveEffect(token, effectData) {
         if (token.actor.effects.entries.find(e => e.data.label === effectData.label)) return
         await token.actor.createEmbeddedEntity("ActiveEffect", effectData);
-        console.log(game.i18n.format("ACTIVEAURAS.ApplyLog", {effectDataLabel: effectData.label, tokenName : token.name}))
+        console.log(game.i18n.format("ACTIVEAURAS.ApplyLog", { effectDataLabel: effectData.label, tokenName: token.name }))
     }
 
     /**
@@ -394,7 +371,7 @@ Hooks.on("ready", () => {
         for (let tokenEffects of token.actor.effects) {
             if (tokenEffects.data.label === effectLabel && tokenEffects.data.flags?.ActiveAuras.applied === true) {
                 tokenEffects.delete()
-                console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", {effectDataLabel: effectData.label, tokenName : token.name}))
+                console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: effectLabel, tokenName: token.name }))
 
             }
         }
