@@ -1,6 +1,7 @@
 {
     "ACTIVEAURAS.measurmentoptions_name":"Sistema de medida",
     "ACTIVEAURAS.measurmentoptions_hint":"Usar el sistema de medida de movimiento definido por el sistema, en lugar de una línea recta (euclídeo), por defecto activado",
+    "ACTIVEAURAS.tabname": "Auras",
 
     "ACTIVEAURAS.walltoptions_name": "Paredes bloquean auras",
     "ACTIVEAURAS.walltoptions_hint":"Las paredes bloquearán el efecto de las auras",
