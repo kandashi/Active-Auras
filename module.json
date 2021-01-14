@@ -3,7 +3,7 @@
 	"title": "Active-Auras",
 	"description": "Active-Auras",
 	"author": "Kandashi",
-	"version": "0.1.21",
+	"version": "0.1.22",
 	"minimumCoreVersion": "0.7.5",
 	"compatibleCoreVersion": "0.7.9",
 	"packs": [
@@ -23,6 +23,11 @@
 			"lang": "en",
 			"name": "English",
 			"path": "lang/en.json"
+		  },
+		  {
+			"lang": "es",
+			"name": "Español",
+			"path": "lang/es.json"
 		  }
 	],
 	 "url": "https://github.com/kandashi/Active-Auras",
