@@ -141,7 +141,7 @@ Hooks.on("ready", () => {
      * On creation of active effect on linked actor, run MainAura
      */
     Hooks.on("createActiveEffect", (actor, effect) => {
-        if (!effect.flags.ActiveAuras.applied && effect.flags.ActiveAuras.isAura) {
+        if (!effect.flags?.ActiveAuras?.applied && effect.flags?.ActiveAuras?.isAura) {
             setTimeout(() => {
                 CollateAuras(canvas, true, false)
             }, 20)
