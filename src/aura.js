@@ -229,7 +229,9 @@ Hooks.on("ready", () => {
      * Locate all auras on the canvas, create map of tokens to update, update tokens 
      */
     function MainAura(movedToken) {
-
+        let gm = game.user === game.users.find((u) => u.isGM && u.active)
+        if (!gm) return;
+        
         let map = new Map();
 
         UpdateAllTokens(map, canvas.tokens.placeables)
