@@ -15,6 +15,14 @@ Hooks.on('init', () => {
         default: false,
         type: Boolean,
     });
+    game.settings.register("ActiveAuras", "vertical-euclidean", {
+        name: game.i18n.format("ACTIVEAURAS.measurementHeight_name"),
+        hint: game.i18n.format("ACTIVEAURAS.measurementHeight_hint"),
+        scope: "world",
+        config: true,
+        default: true,
+        type: Boolean,
+    });
 });
 
 
@@ -38,6 +46,7 @@ Hooks.on("ready", () => {
         const FormTargetsAll = game.i18n.format("ACTIVEAURAS.FORM_TargetsAll");
         const FormRadius = game.i18n.format("ACTIVEAURAS.FORM_Radius");
         const AuraTab = game.i18n.format("ACTIVEAURAS.tabname");
+        const FormCheckHeight = game.i18n.format("ACTIVEAURAS.FORM_Height");
 
         const tab = `<a class="item" data-tab="ActiveAuras">
       <i class="fas fa-broadcast-tower"></i> ${AuraTab}
@@ -58,6 +67,11 @@ Hooks.on("ready", () => {
             <input name="flags.${MODULE_NAME}.hidden" type="checkbox" ${flags[MODULE_NAME].hidden ? 'checked' : ''} </input>
         </div>
         <div class="form-group">
+            <label>${FormCheckHeight}</label>
+            <input name="flags.${MODULE_NAME}.height" type="checkbox" ${flags[MODULE_NAME].height ? 'checked' : ''} </input>
+         </select>
+        </div>
+        <div class="form-group">
             <label>${FormTargetsName}:</label>
             <select name="flags.${MODULE_NAME}.aura" data-dtype="String" value=${flags[MODULE_NAME]?.aura}>
                 <option value="None" ${flags[MODULE_NAME].aura === 'None' ? 'selected' : ''}></option>
@@ -71,6 +85,7 @@ Hooks.on("ready", () => {
             <input id="radius" name="flags.${MODULE_NAME}.radius" type="number" min="0" value="${flags[MODULE_NAME].radius}"></input>
          </select>
         </div>
+        
     </div>`;
         html.find(".tabs .item").last().after(tab);
         html.find(".tab").last().after(contents);
@@ -104,7 +119,7 @@ Hooks.on("ready", () => {
      * On token movement run MainAura
      */
     Hooks.on("updateToken", (scene, token, update, flags, id) => {
-        if (("y" in update || "x" in update))
+        if (("y" in update || "x" in update || "elevation" in update))
             MainAura(token,)
         if ((update?.actorData?.effects) || ("hidden" in update)) {
             setTimeout(() => {
@@ -189,6 +204,7 @@ Hooks.on("ready", () => {
                                 newEffect.data.changes[changeIndex].value = `+ ${newValue}`
                             }
                         }
+                        if(change.key === "macro.execute") newEffect.data.flags.ActiveAuras.isMacro = true
                     }
                     effectArray.push(newEffect)
                 }
@@ -243,24 +259,15 @@ Hooks.on("ready", () => {
         for (let mapEffect of map) {
             let MapKey = mapEffect[0]
             let newEffectData = duplicate(mapEffect[1].effect.data)
-            newEffectData.flags.ActiveAuras = {
-                isAura: false,
-                applied: true
-            }
+            
             newEffectData.disabled = false
-            /*
-            for (let change of newEffectData.changes) {
+            let macro = newEffectData.flags.ActiveAuras.isMacro
 
-                if (typeof change.value === "string" && change.key !== "macro.execute") {
-                    if (change.value.includes("@")) {
-                        let dataPath = change.value.substring(2)
-                        let newValue = getProperty(mapEffect[1].effect.parent.getRollData(), dataPath)
-                        const changeIndex = newEffectData.changes.findIndex(i => i.value === change.value && i.key === change.key)
-                        newEffectData.changes[changeIndex].value = `+ ${newValue}`
-                    }
-                }
-            }
-            */
+           newEffectData.flags.ActiveAuras = {
+            isAura: false,
+            applied: true,
+            isMacro: macro
+        }
             map.set(MapKey, { add: mapEffect[1].add, token: mapEffect[1].token, effect: newEffectData })
         }
 
@@ -309,7 +316,9 @@ Hooks.on("ready", () => {
             let MapKey = auraEffect.data.label + "-" + canvasToken.id;
             MapObject = map.get(MapKey);
             let auraToken;
-            let auraRadius = auraEffect.data.flags?.ActiveAuras?.radius
+            let auraRadius = auraEffect.data.flags?.ActiveAuras?.radius;
+            let auraHeight = auraEffect.data.flags?.ActiveAuras?.height
+
             //{data: testEffect.data, parentActorLink :testEffect.parent.data.token.actorLink, parentActorId : testEffect.parent._id, tokenId: testToken.id}
             if (auraEffect.parentActorLink) {
                 let auraTokenArray = game.actors.get(auraEffect.parentActorId).getActiveTokens()
@@ -328,7 +337,7 @@ Hooks.on("ready", () => {
             if (auraTargets === "Allies" && (auraToken.data.disposition !== canvasToken.data.disposition)) continue;
             if (auraTargets === "Enemy" && (auraToken.data.disposition === canvasToken.data.disposition)) continue;
 
-            let distance = RayDistance(canvasToken, auraToken)
+            let distance = RayDistance(canvasToken, auraToken, auraHeight)
             if ((distance !== false) && (distance <= auraRadius) && !effectDisabled) {
                 if (MapObject) {
                     MapObject.add = true
@@ -353,7 +362,7 @@ Hooks.on("ready", () => {
      * @param {Token} token1 - test token
      * @param {Token} token2 - aura token
      */
-    function RayDistance(token1, token2) {
+    function RayDistance(token1, token2, auraHeight) {
         const ray = new Ray(token1.center, token2.center)
         const segments = [{ ray }]
         let distance;
@@ -365,6 +374,18 @@ Hooks.on("ready", () => {
         }
         let collision = canvas.walls.checkCollision(ray)
         if (collision && game.settings.get("ActiveAuras", "wall-block") === true) return false
+        if(auraHeight === true) {
+            if(game.settings.get("ActiveAuras", "vertical-euclidean") === true) {
+                let heightChange =  Math.abs(token1.data.elevation - token2.data.elevation)
+                distance = distance > heightChange ? distance : heightChange
+            }
+            if(game.settings.get("ActiveAuras", "vertical-euclidean") === false) {
+            let a = distance;
+            let b = (token1.data.elevation - token2.data.elevation)
+            let c = (a*a) + (b*b)
+            distance = Math.sqrt(c)
+            }
+        }
         return distance
     }
 
@@ -375,7 +396,21 @@ Hooks.on("ready", () => {
      */
     async function CreateActiveEffect(token, effectData) {
         if (token.actor.effects.entries.find(e => e.data.label === effectData.label)) return
+        if(effectData.flags.ActiveAuras?.isMacro){
+        for (let change of effectData.changes) {
+            if (change.key === "macro.execute") {
+                if (change.value.includes("@token")) {
+                    let re = /(\s@token)/gms
+                    let newValue = change.value.replaceAll(re, ` ${token.data._id}`)
+                    const changeIndex = effectData.changes.findIndex(i => i.value === change.value && i.key === change.key)
+                    effectData.changes[changeIndex].value = `${newValue}`
+                }
+            }
+        }
+    }
+
         await token.actor.createEmbeddedEntity("ActiveEffect", effectData);
+
         console.log(game.i18n.format("ACTIVEAURAS.ApplyLog", { effectDataLabel: effectData.label, tokenName: token.name }))
     }
 
