@@ -219,8 +219,10 @@ Hooks.on("ready", () => {
         MapObject.effects.forEach(i => EffectsArray.push(i.data.origin))
 
         for (let removeToken of canvas.tokens.placeables) {
-            for (let testEffect of removeToken.actor.effects) {
-                if (!EffectsArray.includes(testEffect.data.origin) && testEffect.data?.flags?.ActiveAuras?.applied) await testEffect.delete()
+            if (removeToken?.actor?.effects) {
+                for (let testEffect of removeToken.actor.effects) {
+                    if (!EffectsArray.includes(testEffect.data.origin) && testEffect.data?.flags?.ActiveAuras?.applied) await testEffect.delete()
+                }
             }
         }
     }
@@ -383,16 +385,15 @@ Hooks.on("ready", () => {
      * @param {String} effectLabel - label of effect to remove
      */
     function RemoveActiveEffects(token, effectLabel) {
-        if (removeToken?.actor?.effects) {
-            for (let tokenEffects of token.actor.effects) {
-                if (tokenEffects.data.label === effectLabel && tokenEffects.data.flags?.ActiveAuras.applied === true) {
-                    tokenEffects.delete()
-                    console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: effectLabel, tokenName: token.name }))
+        for (let tokenEffects of token.actor.effects) {
+            if (tokenEffects.data.label === effectLabel && tokenEffects.data.flags?.ActiveAuras.applied === true) {
+                tokenEffects.delete()
+                console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: effectLabel, tokenName: token.name }))
 
-                }
             }
         }
     }
+
     CollateAuras(canvas, true, false)
 
 })
