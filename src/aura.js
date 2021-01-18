@@ -72,8 +72,8 @@ Hooks.on("ready", () => {
          </select>
         </div>
     </div>`;
-    html.find(".tabs .item").last().after(tab);
-    html.find(".tab").last().after(contents);
+        html.find(".tabs .item").last().after(tab);
+        html.find(".tab").last().after(contents);
     });
 
     let AuraMap = new Map()
@@ -202,11 +202,13 @@ Hooks.on("ready", () => {
         }
         if (checkAuras) {
             setTimeout(() => {
-            MainAura()}, 20)
+                MainAura()
+            }, 20)
         }
         if (removeAuras) {
             setTimeout(() => {
-            RemoveAppliedAuras(canvas)}, 20)
+                RemoveAppliedAuras(canvas)
+            }, 20)
         }
     }
 
@@ -231,7 +233,7 @@ Hooks.on("ready", () => {
     function MainAura(movedToken) {
         let gm = game.user === game.users.find((u) => u.isGM && u.active)
         if (!gm) return;
-        
+
         let map = new Map();
 
         UpdateAllTokens(map, canvas.tokens.placeables)
@@ -381,11 +383,13 @@ Hooks.on("ready", () => {
      * @param {String} effectLabel - label of effect to remove
      */
     function RemoveActiveEffects(token, effectLabel) {
-        for (let tokenEffects of token.actor.effects) {
-            if (tokenEffects.data.label === effectLabel && tokenEffects.data.flags?.ActiveAuras.applied === true) {
-                tokenEffects.delete()
-                console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: effectLabel, tokenName: token.name }))
+        if (removeToken?.actor?.effects) {
+            for (let tokenEffects of token.actor.effects) {
+                if (tokenEffects.data.label === effectLabel && tokenEffects.data.flags?.ActiveAuras.applied === true) {
+                    tokenEffects.delete()
+                    console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: effectLabel, tokenName: token.name }))
 
+                }
             }
         }
     }
