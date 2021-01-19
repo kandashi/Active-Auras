@@ -204,7 +204,7 @@ Hooks.on("ready", () => {
                                 newEffect.data.changes[changeIndex].value = `+ ${newValue}`
                             }
                         }
-                        if(change.key === "macro.execute") newEffect.data.flags.ActiveAuras.isMacro = true
+                        if (change.key === "macro.execute") newEffect.data.flags.ActiveAuras.isMacro = true
                     }
                     effectArray.push(newEffect)
                 }
@@ -259,15 +259,15 @@ Hooks.on("ready", () => {
         for (let mapEffect of map) {
             let MapKey = mapEffect[0]
             let newEffectData = duplicate(mapEffect[1].effect.data)
-            
+
             newEffectData.disabled = false
             let macro = newEffectData.flags.ActiveAuras.isMacro
 
-           newEffectData.flags.ActiveAuras = {
-            isAura: false,
-            applied: true,
-            isMacro: macro
-        }
+            newEffectData.flags.ActiveAuras = {
+                isAura: false,
+                applied: true,
+                isMacro: macro
+            }
             map.set(MapKey, { add: mapEffect[1].add, token: mapEffect[1].token, effect: newEffectData })
         }
 
@@ -374,43 +374,50 @@ Hooks.on("ready", () => {
         }
         let collision = canvas.walls.checkCollision(ray)
         if (collision && game.settings.get("ActiveAuras", "wall-block") === true) return false
-        if(auraHeight === true) {
-            if(game.settings.get("ActiveAuras", "vertical-euclidean") === true) {
-                let heightChange =  Math.abs(token1.data.elevation - token2.data.elevation)
+        if (auraHeight === true) {
+            if (game.settings.get("ActiveAuras", "vertical-euclidean") === true) {
+                let heightChange = Math.abs(token1.data.elevation - token2.data.elevation)
                 distance = distance > heightChange ? distance : heightChange
             }
-            if(game.settings.get("ActiveAuras", "vertical-euclidean") === false) {
-            let a = distance;
-            let b = (token1.data.elevation - token2.data.elevation)
-            let c = (a*a) + (b*b)
-            distance = Math.sqrt(c)
+            if (game.settings.get("ActiveAuras", "vertical-euclidean") === false) {
+                let a = distance;
+                let b = (token1.data.elevation - token2.data.elevation)
+                let c = (a * a) + (b * b)
+                distance = Math.sqrt(c)
             }
         }
         return distance
     }
 
     /**
-     * 
-     * @param {Token} token - token to apply effect too
-     * @param {ActiveEffect} effectData - effect data to generate effect
-     */
+  * 
+  * @param {Token} token - token to apply effect too
+  * @param {ActiveEffect} effectData - effect data to generate effect
+  */
     async function CreateActiveEffect(token, effectData) {
-        if (token.actor.effects.entries.find(e => e.data.label === effectData.label)) return
-        if(effectData.flags.ActiveAuras?.isMacro){
-        for (let change of effectData.changes) {
-            if (change.key === "macro.execute") {
-                if (change.value.includes("@token")) {
-                    let re = /(\s@token)/gms
-                    let newValue = change.value.replaceAll(re, ` ${token.data._id}`)
-                    const changeIndex = effectData.changes.findIndex(i => i.value === change.value && i.key === change.key)
-                    effectData.changes[changeIndex].value = `${newValue}`
+        if (token.actor.effects.entries.find(e => e.data.label === effectData.label)) return;
+        if (effectData.flags.ActiveAuras?.isMacro) {
+            for (let change of effectData.changes) {
+                let newValue = change.value;
+                if (change.key === "macro.execute") {
+                    if (typeof newValue === "string") {
+                        newValue = [newValue]
+                    }
+                    newValue = newValue.map(val => {
+                        if (typeof val === "string" && val.includes("@token")) {
+                            let re = /([\s]*@token)/gms
+                            return val.replaceAll(re, ` ${token.data._id}`)
+                        }
+                        return val;
+                    });
+                    if (typeof change.value === "string")
+                        change.value = newValue[0];
+                    else
+                        change.value = newValue;
                 }
             }
         }
-    }
-
         await token.actor.createEmbeddedEntity("ActiveEffect", effectData);
-
         console.log(game.i18n.format("ACTIVEAURAS.ApplyLog", { effectDataLabel: effectData.label, tokenName: token.name }))
     }
 
