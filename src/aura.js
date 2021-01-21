@@ -33,7 +33,9 @@ Hooks.on("ready", () => {
      * Hooks onto effect sheet to add aura configuration
      */
     Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
-        await sheet.object.setFlag(`${MODULE_NAME}`, 'aura')
+        if(!sheet.object.data.flags?.ActiveAuras?.aura) {
+            await sheet.object.setFlag(`${MODULE_NAME}`, 'aura')
+        }
         const flags = sheet.object.data.flags;
 
         const FormIsAura = game.i18n.format("ACTIVEAURAS.FORM_IsAura");
