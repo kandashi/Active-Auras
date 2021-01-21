@@ -120,7 +120,7 @@ Hooks.on("ready", () => {
      */
     Hooks.on("updateToken", (scene, token, update, flags, id) => {
         if (("y" in update || "x" in update || "elevation" in update))
-            MainAura(token,)
+            MainAura(token)
         if ((update?.actorData?.effects) || ("hidden" in update)) {
             setTimeout(() => {
                 CollateAuras(canvas, true, true)
@@ -177,7 +177,13 @@ Hooks.on("ready", () => {
         }
     }
 
-
+    function IsAuraToken(token,canvas){
+        let MapKey = canvas.scene._id;
+        MapObject = AuraMap.get(MapKey);
+        for (let effect of MapObject.effects){
+            if(effect.tokenId === token._id) return true;
+        }
+    }
 
     function CollateAuras(canvas, checkAuras, removeAuras) {
         let gm = game.user === game.users.find((u) => u.isGM && u.active)
@@ -253,8 +259,14 @@ Hooks.on("ready", () => {
         if (!gm) return;
 
         let map = new Map();
-
-        UpdateAllTokens(map, canvas.tokens.placeables)
+        let updateTokens = canvas.tokens.placeables
+        if(movedToken !== undefined){
+            if(!IsAuraToken(movedToken, canvas)) {
+                updateTokens = [];
+                updateTokens.push(canvas.tokens.get(movedToken._id))
+            }
+        }
+        UpdateAllTokens(map, updateTokens)
 
         for (let mapEffect of map) {
             let MapKey = mapEffect[0]
