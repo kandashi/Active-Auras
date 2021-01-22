@@ -10,6 +10,7 @@
 
     "ACTIVEAURAS.FORM_IsAura" : "Efecto es aura",
     "ACTIVEAURAS.FORM_Inactive": "Aplicar mientras esté inactivo",
+    "ACTIVEAURAS.FORM_IgnoreSelf": "Ignorarse a sí mismo",
     "ACTIVEAURAS.FORM_Hidden":"Desactivar mientras esté oculto",
     "ACTIVEAURAS.FORM_TargetsName":"Objetivos del aura",
     "ACTIVEAURAS.FORM_TargetsNone":"Ninguno",
@@ -19,7 +20,7 @@
     "ACTIVEAURAS.FORM_Radius": "Radio del aura",
     "ACTIVEAURAS.FORM_Height": "Comprobar altura del token",
 
-    "ACTIVEAURAS.ApplyLog":"Active Auras: {effectDataLabel} aplicado a {tokenName}",
-    "ACTIVEAURAS.RemoveLog":"Active Auras: {effectDataLabel} quitado de {tokenName}"
-
+    "ACTIVEAURAS.ApplyLog":"ActiveAuras | '{effectDataLabel}' aplicado a {tokenName}",
+    "ACTIVEAURAS.RemoveLog":"ActiveAuras | '{effectDataLabel}' quitado de {tokenName}",
+    "ACTIVEAURAS.IgnoreSelfLog":"ActiveAuras | Igrnorando '{effectDataLabel}' cambiar {changeKey} a {actorName}"
 }
