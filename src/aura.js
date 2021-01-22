@@ -25,9 +25,16 @@ Hooks.on('init', () => {
     });
 });
 
+let existingActiveEffectsApply;
 
 Hooks.on("ready", () => {
     const MODULE_NAME = "ActiveAuras";
+
+    /**
+     * Bind a filter to the ActiveEffect.apply() prototype chain
+     */
+    existingActiveEffectsApply = CONFIG.ActiveEffect.entityClass.prototype.apply;
+    CONFIG.ActiveEffect.entityClass.prototype.apply = ActiveAurasApply;
 
     /**
      * Hooks onto effect sheet to add aura configuration
@@ -171,6 +178,14 @@ Hooks.on("ready", () => {
         }, 20)
     })
 
+    function ActiveAurasApply(actor, change) {
+        if (actor._id == change.effect.data.origin.split('.')[1] && change.effect.data.flags?.ActiveAuras?.ignoreSelf) {
+            console.log(`ActiveAuras | Ignoring '${change.effect.data.label}' change ${change.key} to ${actor.name}`);
+            return null;
+        }
+        return existingActiveEffectsApply.bind(this)(actor, change);
+    }
+
     function GetAllFlags(entity, scope) {
         {
             const scopes = SetupConfiguration.getPackageScopes();
@@ -313,7 +328,7 @@ Hooks.on("ready", () => {
 
     /**
      * Test individual token against aura array
-    * @param {Map} map - empty map to populate 
+     * @param {Map} map - empty map to populate 
      * @param {Array} auraEffectArray - array of auras to test against 
      * @param {Token} canvasToken - single token to test
      */
