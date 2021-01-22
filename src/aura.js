@@ -40,10 +40,7 @@ Hooks.on("ready", () => {
      * Hooks onto effect sheet to add aura configuration
      */
     Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
-        if(!sheet.object.data.flags?.ActiveAuras?.aura) {
-            await sheet.object.setFlag(`${MODULE_NAME}`, 'aura')
-        }
-        const flags = sheet.object.data.flags;
+        const flags = sheet.object.data.flags ?? {};
 
         const FormIsAura = game.i18n.format("ACTIVEAURAS.FORM_IsAura");
         const FormInactive = game.i18n.format("ACTIVEAURAS.FORM_Inactive");
@@ -64,36 +61,36 @@ Hooks.on("ready", () => {
         <div class="tab" data-tab="ActiveAuras">
             <div class="form-group">
                 <label>${FormIsAura}?</label>
-                <input name="flags.${MODULE_NAME}.isAura" type="checkbox" ${flags[MODULE_NAME].isAura ? 'checked' : ''}></input>
+                <input name="flags.${MODULE_NAME}.isAura" type="checkbox" ${flags[MODULE_NAME]?.isAura ? 'checked' : ''}></input>
              </div>
              <div class="form-group">
                 <label>${FormIgnoreSelf}?</label>
-                <input name="flags.${MODULE_NAME}.ignoreSelf" type="checkbox" ${flags[MODULE_NAME].ignoreSelf ? 'checked' : ''}></input>
+                <input name="flags.${MODULE_NAME}.ignoreSelf" type="checkbox" ${flags[MODULE_NAME]?.ignoreSelf ? 'checked' : ''}></input>
             </div>
             <div class="form-group">
                 <label>${FormInactive}?</label>
-                <input name="flags.${MODULE_NAME}.inactive" type="checkbox" ${flags[MODULE_NAME].inactive ? 'checked' : ''}></input>
+                <input name="flags.${MODULE_NAME}.inactive" type="checkbox" ${flags[MODULE_NAME]?.inactive ? 'checked' : ''}></input>
             </div>
             <div class="form-group">
                 <label>${FormHidden}?</label>
-                <input name="flags.${MODULE_NAME}.hidden" type="checkbox" ${flags[MODULE_NAME].hidden ? 'checked' : ''}></input>
+                <input name="flags.${MODULE_NAME}.hidden" type="checkbox" ${flags[MODULE_NAME]?.hidden ? 'checked' : ''}></input>
             </div>
             <div class="form-group">
                 <label>${FormCheckHeight}</label>
-                <input name="flags.${MODULE_NAME}.height" type="checkbox" ${flags[MODULE_NAME].height ? 'checked' : ''}></input>
+                <input name="flags.${MODULE_NAME}.height" type="checkbox" ${flags[MODULE_NAME]?.height ? 'checked' : ''}></input>
             </div>
             <div class="form-group">
                 <label>${FormTargetsName}:</label>
                 <select name="flags.${MODULE_NAME}.aura" data-dtype="String" value=${flags[MODULE_NAME]?.aura}>
-                    <option value="None" ${flags[MODULE_NAME].aura === 'None' ? 'selected' : ''}></option>
-                    <option value="Enemy"${flags[MODULE_NAME].aura === 'Enemy' ? 'selected' : ''}>${FormTargetsEnemy}</option>
-                    <option value="Allies"${flags[MODULE_NAME].aura === 'Allies' ? 'selected' : ''}>${FormTargetsAllies}</option>
-                    <option value="All"${flags[MODULE_NAME].aura === 'All' ? 'selected' : ''}>${FormTargetsAll}</option>
+                    <option value="None" ${flags[MODULE_NAME]?.aura === 'None' ? 'selected' : ''}></option>
+                    <option value="Enemy"${flags[MODULE_NAME]?.aura === 'Enemy' ? 'selected' : ''}>${FormTargetsEnemy}</option>
+                    <option value="Allies"${flags[MODULE_NAME]?.aura === 'Allies' ? 'selected' : ''}>${FormTargetsAllies}</option>
+                    <option value="All"${flags[MODULE_NAME]?.aura === 'All' ? 'selected' : ''}>${FormTargetsAll}</option>
                 </select>
             </div>
             <div class="form-group">
                 <label>${FormRadius}</label>
-                <input id="radius" name="flags.${MODULE_NAME}.radius" type="number" min="0" value="${flags[MODULE_NAME].radius}"></input>
+                <input id="radius" name="flags.${MODULE_NAME}.radius" type="number" min="0" value="${flags[MODULE_NAME]?.radius}"></input>
             </div> 
         </div>`;
 
