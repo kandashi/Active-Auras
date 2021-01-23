@@ -26,6 +26,9 @@ The "Apply while inactive" option allows for effects to propagate to other token
 
 ![Active Aura Test](https://github.com/kandashi/Active-Auras/blob/main/Images/ActiveAuras%20test2.gif)
 
+## DAE Macro Executes
+- Using `@token` as a macro argument will now refer to the token the aura is applied to, you can use this in any DAE auras as normal 
+
 
 ## Compatability
 - Works with DAE as far as I know

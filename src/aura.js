@@ -216,6 +216,7 @@ Hooks.on("ready", () => {
         MapObject = AuraMap.get(MapKey);
         for (let effect of MapObject.effects) {
             if (effect.tokenId === token._id) return true;
+
         }
     }
 
@@ -301,6 +302,7 @@ Hooks.on("ready", () => {
 
         let map = new Map();
         let updateTokens = canvas.tokens.placeables
+                
         if (movedToken !== undefined) {
             if (!IsAuraToken(movedToken, canvas)) {
                 updateTokens = [];
