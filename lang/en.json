@@ -9,17 +9,16 @@
     "ACTIVEAURAS.walltoptions_hint":"Interveneing walls will block aura effects",
 
     "ACTIVEAURAS.FORM_IsAura" : "Effect is Aura",
-    "ACTIVEAURAS.FORM_Inactive": "Apply while inactive",
+    "ACTIVEAURAS.FORM_IgnoreSelf": "Ignore self",
     "ACTIVEAURAS.FORM_Hidden":"Disable while hidden",
     "ACTIVEAURAS.FORM_TargetsName":"Aura Targets",
-    "ACTIVEAURAS.FORM_TargetsNone":"None",
     "ACTIVEAURAS.FORM_TargetsEnemy":"Enemy",
     "ACTIVEAURAS.FORM_TargetsAllies":"Allies",
     "ACTIVEAURAS.FORM_TargetsAll":"All",
     "ACTIVEAURAS.FORM_Radius": "Aura radius",
     "ACTIVEAURAS.FORM_Height": "Check Token Height",
 
-    "ACTIVEAURAS.ApplyLog":"Active Auras: applied {effectDataLabel} to {tokenName}",
-    "ACTIVEAURAS.RemoveLog":"Active Auras: removed {effectDataLabel} to {tokenName}"
-
+    "ACTIVEAURAS.ApplyLog":"ActiveAuras | Applied '{effectDataLabel}' to {tokenName}",
+    "ACTIVEAURAS.RemoveLog":"ActiveAuras | Removed '{effectDataLabel}' from {tokenName}",
+    "ACTIVEAURAS.IgnoreSelfLog":"ActiveAuras | Ignoring '{effectDataLabel}' change {changeKey} to {actorName}"
 }

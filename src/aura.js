@@ -25,24 +25,27 @@ Hooks.on('init', () => {
     });
 });
 
+let existingActiveEffectsApply;
 
 Hooks.on("ready", () => {
     const MODULE_NAME = "ActiveAuras";
 
     /**
+     * Bind a filter to the ActiveEffect.apply() prototype chain
+     */
+    existingActiveEffectsApply = CONFIG.ActiveEffect.entityClass.prototype.apply;
+    CONFIG.ActiveEffect.entityClass.prototype.apply = ActiveAurasApply;
+
+    /**
      * Hooks onto effect sheet to add aura configuration
      */
     Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
-        if (!sheet.object.data.flags?.ActiveAuras?.aura) {
-            await sheet.object.setFlag(`${MODULE_NAME}`, 'aura')
-        }
-        const flags = sheet.object.data.flags;
+        const flags = sheet.object.data.flags ?? {};
 
         const FormIsAura = game.i18n.format("ACTIVEAURAS.FORM_IsAura");
-        const FormInactive = game.i18n.format("ACTIVEAURAS.FORM_Inactive");
+        const FormIgnoreSelf = game.i18n.format("ACTIVEAURAS.FORM_IgnoreSelf");
         const FormHidden = game.i18n.format("ACTIVEAURAS.FORM_Hidden");
         const FormTargetsName = game.i18n.format("ACTIVEAURAS.FORM_TargetsName");
-        const FormTargetsNone = game.i18n.format("ACTIVEAURAS.FORM_TargetsNone");
         const FormTargetsEnemy = game.i18n.format("ACTIVEAURAS.FORM_TargetsEnemy");
         const FormTargetsAllies = game.i18n.format("ACTIVEAURAS.FORM_TargetsAllies");
         const FormTargetsAll = game.i18n.format("ACTIVEAURAS.FORM_TargetsAll");
@@ -50,51 +53,46 @@ Hooks.on("ready", () => {
         const AuraTab = game.i18n.format("ACTIVEAURAS.tabname");
         const FormCheckHeight = game.i18n.format("ACTIVEAURAS.FORM_Height");
 
-        const tab = `<a class="item" data-tab="ActiveAuras">
-      <i class="fas fa-broadcast-tower"></i> ${AuraTab}
-    </a>`;
+        const tab = `<a class="item" data-tab="ActiveAuras"><i class="fas fa-broadcast-tower"></i> ${AuraTab}</a>`;
 
         const contents = `
         <div class="tab" data-tab="ActiveAuras">
             <div class="form-group">
                 <label>${FormIsAura}?</label>
-                <input name="flags.${MODULE_NAME}.isAura" type="checkbox" ${flags[MODULE_NAME].isAura ? 'checked' : ''} </input>
+                <input name="flags.${MODULE_NAME}.isAura" type="checkbox" ${flags[MODULE_NAME]?.isAura ? 'checked' : ''}></input>
              </div>
-        <div class="form-group">
-            <label>${FormInactive}?</label>
-            <input name="flags.${MODULE_NAME}.inactive" type="checkbox" ${flags[MODULE_NAME].inactive ? 'checked' : ''} </input>
-        </div>
-        <div class="form-group">
-            <label>${FormHidden}?</label>
-            <input name="flags.${MODULE_NAME}.hidden" type="checkbox" ${flags[MODULE_NAME].hidden ? 'checked' : ''} </input>
-        </div>
-        <div class="form-group">
-            <label>${FormCheckHeight}</label>
-            <input name="flags.${MODULE_NAME}.height" type="checkbox" ${flags[MODULE_NAME].height ? 'checked' : ''} </input>
-         </select>
-        </div>
-        <div class="form-group">
-            <label>${FormTargetsName}:</label>
-            <select name="flags.${MODULE_NAME}.aura" data-dtype="String" value=${flags[MODULE_NAME]?.aura}>
-                <option value="None" ${flags[MODULE_NAME].aura === 'None' ? 'selected' : ''}></option>
-                <option value="Enemy"${flags[MODULE_NAME].aura === 'Enemy' ? 'selected' : ''}>${FormTargetsEnemy}</option>
-                <option value="Allies"${flags[MODULE_NAME].aura === 'Allies' ? 'selected' : ''}>${FormTargetsAllies}</option>
-                <option value="All"${flags[MODULE_NAME].aura === 'All' ? 'selected' : ''}>${FormTargetsAll}</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>${FormRadius}</label>
-            <input id="radius" name="flags.${MODULE_NAME}.radius" type="number" min="0" value="${flags[MODULE_NAME].radius}"></input>
-         </select>
-        </div>
-        
-    </div>`;
+             <div class="form-group">
+                <label>${FormIgnoreSelf}?</label>
+                <input name="flags.${MODULE_NAME}.ignoreSelf" type="checkbox" ${flags[MODULE_NAME]?.ignoreSelf ? 'checked' : ''}></input>
+            </div>
+            <div class="form-group">
+                <label>${FormHidden}?</label>
+                <input name="flags.${MODULE_NAME}.hidden" type="checkbox" ${flags[MODULE_NAME]?.hidden ? 'checked' : ''}></input>
+            </div>
+            <div class="form-group">
+                <label>${FormCheckHeight}</label>
+                <input name="flags.${MODULE_NAME}.height" type="checkbox" ${flags[MODULE_NAME]?.height ? 'checked' : ''}></input>
+            </div>
+            <div class="form-group">
+                <label>${FormTargetsName}:</label>
+                <select name="flags.${MODULE_NAME}.aura" data-dtype="String" value=${flags[MODULE_NAME]?.aura}>
+                    <option value="None" ${flags[MODULE_NAME]?.aura === 'None' ? 'selected' : ''}></option>
+                    <option value="Enemy"${flags[MODULE_NAME]?.aura === 'Enemy' ? 'selected' : ''}>${FormTargetsEnemy}</option>
+                    <option value="Allies"${flags[MODULE_NAME]?.aura === 'Allies' ? 'selected' : ''}>${FormTargetsAllies}</option>
+                    <option value="All"${flags[MODULE_NAME]?.aura === 'All' ? 'selected' : ''}>${FormTargetsAll}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>${FormRadius}</label>
+                <input id="radius" name="flags.${MODULE_NAME}.radius" type="number" min="0" value="${flags[MODULE_NAME]?.radius}"></input>
+            </div> 
+        </div>`;
+
         html.find(".tabs .item").last().after(tab);
         html.find(".tab").last().after(contents);
     });
 
     let AuraMap = new Map()
-
 
     /**
      * Re-run aura detection on token creation
@@ -234,6 +232,7 @@ Hooks.on("ready", () => {
             }
             for (let testEffect of testToken?.actor?.effects.entries) {
                 if (testEffect.getFlag('ActiveAuras', 'isAura')) {
+                    if(testEffect.data.disabled) continue;
                     if (testEffect.getFlag('ActiveAuras', 'hidden') && testToken.data.hidden) continue;
                     let newEffect = { data: duplicate(testEffect.data), parentActorLink: testEffect.parent.data.token.actorLink, parentActorId: testEffect.parent._id, tokenId: testToken.id }
                     for (let change of newEffect.data.changes) {
@@ -345,7 +344,7 @@ Hooks.on("ready", () => {
 
     /**
      * Test individual token against aura array
-    * @param {Map} map - empty map to populate 
+     * @param {Map} map - empty map to populate 
      * @param {Array} auraEffectArray - array of auras to test against 
      * @param {Token} canvasToken - single token to test
      */
@@ -356,8 +355,7 @@ Hooks.on("ready", () => {
         let MapKey = canvasToken.scene._id;
         MapObject = AuraMap.get(MapKey)
         for (let auraEffect of MapObject.effects) {
-            let effectDisabled = false;
-            if (!auraEffect.data.flags?.ActiveAuras?.inactive && auraEffect.data.disabled) effectDisabled = true;
+
             let auraTargets = auraEffect.data.flags?.ActiveAuras?.aura
             let MapKey = auraEffect.data.label + "-" + canvasToken.id;
             MapObject = map.get(MapKey);
@@ -384,7 +382,7 @@ Hooks.on("ready", () => {
             if (auraTargets === "Enemy" && (auraToken.data.disposition === canvasToken.data.disposition)) continue;
 
             let distance = RayDistance(canvasToken, auraToken, auraHeight)
-            if ((distance !== false) && (distance <= auraRadius) && !effectDisabled) {
+            if ((distance !== false) && (distance <= auraRadius)) {
                 if (MapObject) {
                     MapObject.add = true
                 }
@@ -480,6 +478,19 @@ Hooks.on("ready", () => {
 
             }
         }
+    }
+
+    /**
+     * 
+     * @param {Actor} actor 
+     * @param {ActiveEffect} change 
+     */
+    function ActiveAurasApply(actor, change) {
+        if (actor._id == change.effect.data.origin?.split('.')[1] && change.effect.data.flags?.ActiveAuras?.ignoreSelf) {
+            console.log(game.i18n.format("ACTIVEAURAS.IgnoreSelfLog", { effectDataLabel: change.effect.data.label, changeKey: change.key, actorName: actor.name }));
+            return null;
+        }
+        return existingActiveEffectsApply.bind(this)(actor, change);
     }
 
     CollateAuras(canvas, true, false)
