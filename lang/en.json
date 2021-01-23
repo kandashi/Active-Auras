@@ -9,11 +9,9 @@
     "ACTIVEAURAS.walltoptions_hint":"Interveneing walls will block aura effects",
 
     "ACTIVEAURAS.FORM_IsAura" : "Effect is Aura",
-    "ACTIVEAURAS.FORM_Inactive": "Apply while inactive",
     "ACTIVEAURAS.FORM_IgnoreSelf": "Ignore self",
     "ACTIVEAURAS.FORM_Hidden":"Disable while hidden",
     "ACTIVEAURAS.FORM_TargetsName":"Aura Targets",
-    "ACTIVEAURAS.FORM_TargetsNone":"None",
     "ACTIVEAURAS.FORM_TargetsEnemy":"Enemy",
     "ACTIVEAURAS.FORM_TargetsAllies":"Allies",
     "ACTIVEAURAS.FORM_TargetsAll":"All",

@@ -9,11 +9,9 @@
     "ACTIVEAURAS.walltoptions_hint":"Las paredes bloquearán el efecto de las auras",
 
     "ACTIVEAURAS.FORM_IsAura" : "Efecto es aura",
-    "ACTIVEAURAS.FORM_Inactive": "Aplicar mientras esté inactivo",
     "ACTIVEAURAS.FORM_IgnoreSelf": "Ignorarse a sí mismo",
     "ACTIVEAURAS.FORM_Hidden":"Desactivar mientras esté oculto",
     "ACTIVEAURAS.FORM_TargetsName":"Objetivos del aura",
-    "ACTIVEAURAS.FORM_TargetsNone":"Ninguno",
     "ACTIVEAURAS.FORM_TargetsEnemy":"Enemigos",
     "ACTIVEAURAS.FORM_TargetsAllies":"Aliados",
     "ACTIVEAURAS.FORM_TargetsAll":"Todos",
