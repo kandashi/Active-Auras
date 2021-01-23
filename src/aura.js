@@ -116,6 +116,7 @@ Hooks.on("ready", () => {
     });
 
     Hooks.on("preUpdateToken", (_scene, token, update, _flags, _id) => {
+        if(!update.actorData?.effects)return;
         let removed = token.actorData?.effects?.filter(x => !update.actorData?.effects?.includes(x));
         let added = update.actorData?.effects?.filter(x => !token.actorData?.effect?.includes(x))
         if (added?.length > 0) {
