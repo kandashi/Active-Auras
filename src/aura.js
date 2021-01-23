@@ -15,6 +15,14 @@ Hooks.on('init', () => {
         default: false,
         type: Boolean,
     });
+    game.settings.register("ActiveAuras", "vertical-euclidean", {
+        name: game.i18n.format("ACTIVEAURAS.measurementHeight_name"),
+        hint: game.i18n.format("ACTIVEAURAS.measurementHeight_hint"),
+        scope: "world",
+        config: true,
+        default: true,
+        type: Boolean,
+    });
 });
 
 
@@ -25,7 +33,9 @@ Hooks.on("ready", () => {
      * Hooks onto effect sheet to add aura configuration
      */
     Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
-        await sheet.object.setFlag(`${MODULE_NAME}`, 'aura')
+        if (!sheet.object.data.flags?.ActiveAuras?.aura) {
+            await sheet.object.setFlag(`${MODULE_NAME}`, 'aura')
+        }
         const flags = sheet.object.data.flags;
 
         const FormIsAura = game.i18n.format("ACTIVEAURAS.FORM_IsAura");
@@ -38,6 +48,7 @@ Hooks.on("ready", () => {
         const FormTargetsAll = game.i18n.format("ACTIVEAURAS.FORM_TargetsAll");
         const FormRadius = game.i18n.format("ACTIVEAURAS.FORM_Radius");
         const AuraTab = game.i18n.format("ACTIVEAURAS.tabname");
+        const FormCheckHeight = game.i18n.format("ACTIVEAURAS.FORM_Height");
 
         const tab = `<a class="item" data-tab="ActiveAuras">
       <i class="fas fa-broadcast-tower"></i> ${AuraTab}
@@ -58,6 +69,11 @@ Hooks.on("ready", () => {
             <input name="flags.${MODULE_NAME}.hidden" type="checkbox" ${flags[MODULE_NAME].hidden ? 'checked' : ''} </input>
         </div>
         <div class="form-group">
+            <label>${FormCheckHeight}</label>
+            <input name="flags.${MODULE_NAME}.height" type="checkbox" ${flags[MODULE_NAME].height ? 'checked' : ''} </input>
+         </select>
+        </div>
+        <div class="form-group">
             <label>${FormTargetsName}:</label>
             <select name="flags.${MODULE_NAME}.aura" data-dtype="String" value=${flags[MODULE_NAME]?.aura}>
                 <option value="None" ${flags[MODULE_NAME].aura === 'None' ? 'selected' : ''}></option>
@@ -71,6 +87,7 @@ Hooks.on("ready", () => {
             <input id="radius" name="flags.${MODULE_NAME}.radius" type="number" min="0" value="${flags[MODULE_NAME].radius}"></input>
          </select>
         </div>
+        
     </div>`;
         html.find(".tabs .item").last().after(tab);
         html.find(".tab").last().after(contents);
@@ -82,7 +99,7 @@ Hooks.on("ready", () => {
     /**
      * Re-run aura detection on token creation
      */
-    Hooks.on("createToken", (scene, token) => {
+    Hooks.on("createToken", (_scene, token) => {
         newToken = canvas.tokens.get(token._id)
         setTimeout(() => {
             CollateAuras(canvas, true, false)
@@ -93,20 +110,52 @@ Hooks.on("ready", () => {
      * @todo
      * Filter for aura effects on deleted token and remove from canvas tokens
      */
-    Hooks.on("preDeleteToken", async (scene, token) => {
+    Hooks.on("preDeleteToken", async (_scene, _token) => {
         setTimeout(() => {
             CollateAuras(canvas, false, true)
         }, 20)
 
     });
 
+    Hooks.on("preUpdateToken", (_scene, token, update, _flags, _id) => {
+        let removed = token.actorData?.effects?.filter(x => !update.actorData?.effects?.includes(x));
+        let added = update.actorData?.effects?.filter(x => !token.actorData?.effect?.includes(x))
+        if (added?.length > 0) {
+            for (let effect of added) {
+                if (effect.flags?.ActiveAuras?.isAura) {
+                    setTimeout(() => {
+                        CollateAuras(canvas, true, false)
+                    }, 50)
+                    return;
+                }
+            }
+        }
+        if (removed?.length > 0) {
+            for (let effect of removed) {
+                if (effect.flags?.ActiveAuras?.isAura) {
+                    setTimeout(() => {
+                        CollateAuras(canvas, true, true)
+                    }, 50)
+                    return;
+                }
+            }
+        }
+
+    })
+
     /**
      * On token movement run MainAura
      */
-    Hooks.on("updateToken", (scene, token, update, flags, id) => {
-        if (("y" in update || "x" in update))
-            MainAura(token,)
-        if ((update?.actorData?.effects) || ("hidden" in update)) {
+    Hooks.on("updateToken", (_scene, token, update, _flags, _id) => {
+        if (("y" in update || "x" in update || "elevation" in update))
+            MainAura(token)
+        let auraToken = false
+        if (token.actorData?.effects?.length > 0) {
+            for (let effect of token.actorData?.effects) {
+                if (effect.flags?.ActiveAuras?.isAura) auraToken = true; break;
+            }
+        }
+        if ("hidden" in update && auraToken) {
             setTimeout(() => {
                 CollateAuras(canvas, true, true)
             }, 20)
@@ -117,7 +166,7 @@ Hooks.on("ready", () => {
     /**
      * @todo
      */
-    Hooks.on("updateActiveEffect", (actor, effect, update) => {
+    Hooks.on("updateActiveEffect", (_actor, effect, _update) => {
         if (effect.flags?.ActiveAuras?.isAura) {
             setTimeout(() => {
                 CollateAuras(canvas, true, false)
@@ -128,7 +177,7 @@ Hooks.on("ready", () => {
     /**
      * On removal of active effect from linked actor, if aura remove from canvas.tokens
      */
-    Hooks.on("deleteActiveEffect", (actor, effect) => {
+    Hooks.on("deleteActiveEffect", (_actor, effect) => {
         let applyStatus = effect.flags?.ActiveAuras?.applied;
         if (!applyStatus) {
             setTimeout(() => {
@@ -140,7 +189,7 @@ Hooks.on("ready", () => {
     /**
      * On creation of active effect on linked actor, run MainAura
      */
-    Hooks.on("createActiveEffect", (actor, effect) => {
+    Hooks.on("createActiveEffect", (_actor, effect) => {
         if (!effect.flags?.ActiveAuras?.applied && effect.flags?.ActiveAuras?.isAura) {
             setTimeout(() => {
                 CollateAuras(canvas, true, false)
@@ -162,7 +211,13 @@ Hooks.on("ready", () => {
         }
     }
 
-
+    function IsAuraToken(token, canvas) {
+        let MapKey = canvas.scene._id;
+        MapObject = AuraMap.get(MapKey);
+        for (let effect of MapObject.effects) {
+            if (effect.tokenId === token._id) return true;
+        }
+    }
 
     function CollateAuras(canvas, checkAuras, removeAuras) {
         let gm = game.user === game.users.find((u) => u.isGM && u.active)
@@ -179,7 +234,7 @@ Hooks.on("ready", () => {
             for (let testEffect of testToken?.actor?.effects.entries) {
                 if (testEffect.getFlag('ActiveAuras', 'isAura')) {
                     if (testEffect.getFlag('ActiveAuras', 'hidden') && testToken.data.hidden) continue;
-                    let newEffect = { data: testEffect.data, parentActorLink: testEffect.parent.data.token.actorLink, parentActorId: testEffect.parent._id, tokenId: testToken.id }
+                    let newEffect = { data: duplicate(testEffect.data), parentActorLink: testEffect.parent.data.token.actorLink, parentActorId: testEffect.parent._id, tokenId: testToken.id }
                     for (let change of newEffect.data.changes) {
                         if (typeof change.value === "string" && change.key !== "macro.execute") {
                             if (change.value.includes("@")) {
@@ -189,7 +244,15 @@ Hooks.on("ready", () => {
                                 newEffect.data.changes[changeIndex].value = `+ ${newValue}`
                             }
                         }
+                        if (change.key === "macro.execute") newEffect.data.flags.ActiveAuras.isMacro = true
                     }
+                    newEffect.data.disabled = false
+                    let macro = newEffect.data.flags.ActiveAuras.isMacro !== undefined ? false : newEffect.data.flags.ActiveAuras.isMacro
+
+                    newEffect.data.flags.ActiveAuras.isAura = false;
+                    newEffect.data.flags.ActiveAuras.applied = true;
+                    newEffect.data.flags.ActiveAuras.isMacro = macro;
+
                     effectArray.push(newEffect)
                 }
             }
@@ -219,8 +282,10 @@ Hooks.on("ready", () => {
         MapObject.effects.forEach(i => EffectsArray.push(i.data.origin))
 
         for (let removeToken of canvas.tokens.placeables) {
-            for (let testEffect of removeToken.actor.effects) {
-                if (!EffectsArray.includes(testEffect.data.origin) && testEffect.data?.flags?.ActiveAuras?.applied) await testEffect.delete()
+            if (removeToken?.actor?.effects) {
+                for (let testEffect of removeToken.actor.effects) {
+                    if (!EffectsArray.includes(testEffect.data.origin) && testEffect.data?.flags?.ActiveAuras?.applied) await testEffect.delete()
+                }
             }
         }
     }
@@ -235,31 +300,18 @@ Hooks.on("ready", () => {
         if (!gm) return;
 
         let map = new Map();
-
-        UpdateAllTokens(map, canvas.tokens.placeables)
+        let updateTokens = canvas.tokens.placeables
+        if (movedToken !== undefined) {
+            if (!IsAuraToken(movedToken, canvas)) {
+                updateTokens = [];
+                updateTokens.push(canvas.tokens.get(movedToken._id))
+            }
+        }
+        UpdateAllTokens(map, updateTokens)
 
         for (let mapEffect of map) {
             let MapKey = mapEffect[0]
-            let newEffectData = duplicate(mapEffect[1].effect.data)
-            newEffectData.flags.ActiveAuras = {
-                isAura: false,
-                applied: true
-            }
-            newEffectData.disabled = false
-            /*
-            for (let change of newEffectData.changes) {
-
-                if (typeof change.value === "string" && change.key !== "macro.execute") {
-                    if (change.value.includes("@")) {
-                        let dataPath = change.value.substring(2)
-                        let newValue = getProperty(mapEffect[1].effect.parent.getRollData(), dataPath)
-                        const changeIndex = newEffectData.changes.findIndex(i => i.value === change.value && i.key === change.key)
-                        newEffectData.changes[changeIndex].value = `+ ${newValue}`
-                    }
-                }
-            }
-            */
-            map.set(MapKey, { add: mapEffect[1].add, token: mapEffect[1].token, effect: newEffectData })
+            map.set(MapKey, { add: mapEffect[1].add, token: mapEffect[1].token, effect: mapEffect[1].effect.data })
         }
 
         for (let update of map) {
@@ -270,6 +322,7 @@ Hooks.on("ready", () => {
                 RemoveActiveEffects(update[1].token, update[1].effect.label)
             }
         }
+        sequencialUpdate = false
     }
 
 
@@ -307,7 +360,9 @@ Hooks.on("ready", () => {
             let MapKey = auraEffect.data.label + "-" + canvasToken.id;
             MapObject = map.get(MapKey);
             let auraToken;
-            let auraRadius = auraEffect.data.flags?.ActiveAuras?.radius
+            let auraRadius = auraEffect.data.flags?.ActiveAuras?.radius;
+            let auraHeight = auraEffect.data.flags?.ActiveAuras?.height
+
             //{data: testEffect.data, parentActorLink :testEffect.parent.data.token.actorLink, parentActorId : testEffect.parent._id, tokenId: testToken.id}
             if (auraEffect.parentActorLink) {
                 let auraTokenArray = game.actors.get(auraEffect.parentActorId).getActiveTokens()
@@ -326,7 +381,7 @@ Hooks.on("ready", () => {
             if (auraTargets === "Allies" && (auraToken.data.disposition !== canvasToken.data.disposition)) continue;
             if (auraTargets === "Enemy" && (auraToken.data.disposition === canvasToken.data.disposition)) continue;
 
-            let distance = RayDistance(canvasToken, auraToken)
+            let distance = RayDistance(canvasToken, auraToken, auraHeight)
             if ((distance !== false) && (distance <= auraRadius) && !effectDisabled) {
                 if (MapObject) {
                     MapObject.add = true
@@ -351,7 +406,7 @@ Hooks.on("ready", () => {
      * @param {Token} token1 - test token
      * @param {Token} token2 - aura token
      */
-    function RayDistance(token1, token2) {
+    function RayDistance(token1, token2, auraHeight) {
         const ray = new Ray(token1.center, token2.center)
         const segments = [{ ray }]
         let distance;
@@ -363,16 +418,49 @@ Hooks.on("ready", () => {
         }
         let collision = canvas.walls.checkCollision(ray)
         if (collision && game.settings.get("ActiveAuras", "wall-block") === true) return false
+        if (auraHeight === true) {
+            if (game.settings.get("ActiveAuras", "vertical-euclidean") === true) {
+                let heightChange = Math.abs(token1.data.elevation - token2.data.elevation)
+                distance = distance > heightChange ? distance : heightChange
+            }
+            if (game.settings.get("ActiveAuras", "vertical-euclidean") === false) {
+                let a = distance;
+                let b = (token1.data.elevation - token2.data.elevation)
+                let c = (a * a) + (b * b)
+                distance = Math.sqrt(c)
+            }
+        }
         return distance
     }
 
     /**
-     * 
-     * @param {Token} token - token to apply effect too
-     * @param {ActiveEffect} effectData - effect data to generate effect
-     */
+  * 
+  * @param {Token} token - token to apply effect too
+  * @param {ActiveEffect} effectData - effect data to generate effect
+  */
     async function CreateActiveEffect(token, effectData) {
-        if (token.actor.effects.entries.find(e => e.data.label === effectData.label)) return
+        if (token.actor.effects.entries.find(e => e.data.label === effectData.label)) return;
+        if (effectData.flags.ActiveAuras?.isMacro) {
+            for (let change of effectData.changes) {
+                let newValue = change.value;
+                if (change.key === "macro.execute") {
+                    if (typeof newValue === "string") {
+                        newValue = [newValue]
+                    }
+                    newValue = newValue.map(val => {
+                        if (typeof val === "string" && val.includes("@token")) {
+                            let re = /([\s]*@token)/gms
+                            return val.replaceAll(re, ` ${token.data._id}`)
+                        }
+                        return val;
+                    });
+                    if (typeof change.value === "string")
+                        change.value = newValue[0];
+                    else
+                        change.value = newValue;
+                }
+            }
+        }
         await token.actor.createEmbeddedEntity("ActiveEffect", effectData);
         console.log(game.i18n.format("ACTIVEAURAS.ApplyLog", { effectDataLabel: effectData.label, tokenName: token.name }))
     }
@@ -383,16 +471,15 @@ Hooks.on("ready", () => {
      * @param {String} effectLabel - label of effect to remove
      */
     function RemoveActiveEffects(token, effectLabel) {
-        if (removeToken?.actor?.effects) {
-            for (let tokenEffects of token.actor.effects) {
-                if (tokenEffects.data.label === effectLabel && tokenEffects.data.flags?.ActiveAuras.applied === true) {
-                    tokenEffects.delete()
-                    console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: effectLabel, tokenName: token.name }))
+        for (let tokenEffects of token.actor.effects) {
+            if (tokenEffects.data.label === effectLabel && tokenEffects.data.flags?.ActiveAuras.applied === true) {
+                tokenEffects.delete()
+                console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: effectLabel, tokenName: token.name }))
 
-                }
             }
         }
     }
+
     CollateAuras(canvas, true, false)
 
 })
