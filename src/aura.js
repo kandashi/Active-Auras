@@ -68,10 +68,6 @@ Hooks.on("ready", () => {
                 <input name="flags.${MODULE_NAME}.ignoreSelf" type="checkbox" ${flags[MODULE_NAME]?.ignoreSelf ? 'checked' : ''}></input>
             </div>
             <div class="form-group">
-                <label>${FormInactive}?</label>
-                <input name="flags.${MODULE_NAME}.inactive" type="checkbox" ${flags[MODULE_NAME]?.inactive ? 'checked' : ''}></input>
-            </div>
-            <div class="form-group">
                 <label>${FormHidden}?</label>
                 <input name="flags.${MODULE_NAME}.hidden" type="checkbox" ${flags[MODULE_NAME]?.hidden ? 'checked' : ''}></input>
             </div>
@@ -238,6 +234,7 @@ Hooks.on("ready", () => {
             }
             for (let testEffect of testToken?.actor?.effects.entries) {
                 if (testEffect.getFlag('ActiveAuras', 'isAura')) {
+                    if(testEffect.data.disabled) continue;
                     if (testEffect.getFlag('ActiveAuras', 'hidden') && testToken.data.hidden) continue;
                     let newEffect = { data: duplicate(testEffect.data), parentActorLink: testEffect.parent.data.token.actorLink, parentActorId: testEffect.parent._id, tokenId: testToken.id }
                     for (let change of newEffect.data.changes) {
@@ -360,8 +357,7 @@ Hooks.on("ready", () => {
         let MapKey = canvasToken.scene._id;
         MapObject = AuraMap.get(MapKey)
         for (let auraEffect of MapObject.effects) {
-            let effectDisabled = false;
-            if (!auraEffect.data.flags?.ActiveAuras?.inactive && auraEffect.data.disabled) effectDisabled = true;
+
             let auraTargets = auraEffect.data.flags?.ActiveAuras?.aura
             let MapKey = auraEffect.data.label + "-" + canvasToken.id;
             MapObject = map.get(MapKey);
@@ -388,7 +384,7 @@ Hooks.on("ready", () => {
             if (auraTargets === "Enemy" && (auraToken.data.disposition === canvasToken.data.disposition)) continue;
 
             let distance = RayDistance(canvasToken, auraToken, auraHeight)
-            if ((distance !== false) && (distance <= auraRadius) && !effectDisabled) {
+            if ((distance !== false) && (distance <= auraRadius)) {
                 if (MapObject) {
                     MapObject.add = true
                 }
