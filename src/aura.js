@@ -248,7 +248,7 @@ Hooks.on("ready", () => {
                         if (change.key === "macro.execute") newEffect.data.flags.ActiveAuras.isMacro = true
                     }
                     newEffect.data.disabled = false
-                    let macro = newEffect.data.flags.ActiveAuras.isMacro !== undefined ? false : newEffect.data.flags.ActiveAuras.isMacro
+                    let macro = newEffect.data.flags.ActiveAuras.isMacro !== undefined ?  newEffect.data.flags.ActiveAuras.isMacro : false;
 
                     newEffect.data.flags.ActiveAuras.isAura = false;
                     newEffect.data.flags.ActiveAuras.applied = true;
@@ -439,8 +439,9 @@ Hooks.on("ready", () => {
   * @param {Token} token - token to apply effect too
   * @param {ActiveEffect} effectData - effect data to generate effect
   */
-    async function CreateActiveEffect(token, effectData) {
-        if (token.actor.effects.entries.find(e => e.data.label === effectData.label)) return;
+    async function CreateActiveEffect(token, oldEffectData) {
+        if (token.actor.effects.entries.find(e => e.data.label === oldEffectData.label)) return;
+        let effectData = duplicate(oldEffectData)
         if (effectData.flags.ActiveAuras?.isMacro) {
             for (let change of effectData.changes) {
                 let newValue = change.value;
