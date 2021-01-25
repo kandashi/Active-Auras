@@ -43,11 +43,9 @@ Hooks.on("ready", () => {
         const flags = sheet.object.data.flags ?? {};
 
         const FormIsAura = game.i18n.format("ACTIVEAURAS.FORM_IsAura");
-        const FormInactive = game.i18n.format("ACTIVEAURAS.FORM_Inactive");
         const FormIgnoreSelf = game.i18n.format("ACTIVEAURAS.FORM_IgnoreSelf");
         const FormHidden = game.i18n.format("ACTIVEAURAS.FORM_Hidden");
         const FormTargetsName = game.i18n.format("ACTIVEAURAS.FORM_TargetsName");
-        const FormTargetsNone = game.i18n.format("ACTIVEAURAS.FORM_TargetsNone");
         const FormTargetsEnemy = game.i18n.format("ACTIVEAURAS.FORM_TargetsEnemy");
         const FormTargetsAllies = game.i18n.format("ACTIVEAURAS.FORM_TargetsAllies");
         const FormTargetsAll = game.i18n.format("ACTIVEAURAS.FORM_TargetsAll");
