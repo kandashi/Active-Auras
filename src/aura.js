@@ -23,6 +23,14 @@ Hooks.on('init', () => {
         default: true,
         type: Boolean,
     });
+    game.settings.register("ActiveAuras", "debug", {
+        name: game.i18n.format("ACTIVEAURAS.debug_name"),
+        hint: game.i18n.format("ACTIVEAURAS.debug_hint"),
+        scope: "world",
+        config: true,
+        default: false,
+        type: Boolean,
+    });
 });
 
 let existingActiveEffectsApply;
@@ -93,6 +101,9 @@ Hooks.on("ready", () => {
     });
 
     let AuraMap = new Map()
+    let debug = false
+    if (game.settings.get("ActiveAuras", "debug")) debug = true
+
 
     /**
      * Re-run aura detection on token creation
@@ -100,7 +111,8 @@ Hooks.on("ready", () => {
     Hooks.on("createToken", (_scene, token) => {
         newToken = canvas.tokens.get(token._id)
         setTimeout(() => {
-            CollateAuras(canvas, true, false)
+            if (debug) console.log("createToken, collate auras true false")
+            CollateAuras(canvas, true, false, "createToken")
         }, 20)
     });
 
@@ -109,54 +121,57 @@ Hooks.on("ready", () => {
      * Filter for aura effects on deleted token and remove from canvas tokens
      */
     Hooks.on("preDeleteToken", async (_scene, _token) => {
-        setTimeout(() => {
-            CollateAuras(canvas, false, true)
-        }, 20)
-
+        if (IsAuraToken) {
+            setTimeout(() => {
+                if (debug) console.log("preDelete, collate auras false true")
+                CollateAuras(canvas, false, true, "preDeleteToken")
+            }, 20)
+        }
     });
 
     Hooks.on("preUpdateToken", (_scene, token, update, _flags, _id) => {
-        if(!update.actorData?.effects)return;
+        if (!update.actorData?.effects) return;
         let removed = token.actorData?.effects?.filter(x => !update.actorData?.effects?.includes(x));
         let added = update.actorData?.effects?.filter(x => !token.actorData?.effect?.includes(x))
-        if (added?.length > 0) {
-            for (let effect of added) {
-                if (effect.flags?.ActiveAuras?.isAura) {
-                    setTimeout(() => {
-                        CollateAuras(canvas, true, false)
-                    }, 50)
-                    return;
-                }
-            }
-        }
         if (removed?.length > 0) {
             for (let effect of removed) {
                 if (effect.flags?.ActiveAuras?.isAura) {
                     setTimeout(() => {
-                        CollateAuras(canvas, true, true)
+                        if (debug) console.log("preupdate, collate auras true true")
+                        CollateAuras(canvas, true, true, "preUpdateToken, removal")
                     }, 50)
                     return;
                 }
             }
         }
+        else if (added?.length > 0) {
+            for (let effect of added) {
+                if (effect.flags?.ActiveAuras?.isAura) {
+                    setTimeout(() => {
+                        if (debug) console.log("preupdate, collate auras true false")
+                        CollateAuras(canvas, true, false, "preUpdateToken, addition")
+                    }, 50)
+                    return;
+                }
+            }
+        }
+        
 
     })
 
     /**
      * On token movement run MainAura
      */
-    Hooks.on("updateToken", (_scene, token, update, _flags, _id) => {
-        if (("y" in update || "x" in update || "elevation" in update))
-            MainAura(token)
-        let auraToken = false
-        if (token.actorData?.effects?.length > 0) {
-            for (let effect of token.actorData?.effects) {
-                if (effect.flags?.ActiveAuras?.isAura) auraToken = true; break;
-            }
+    Hooks.on("updateToken", async (_scene, token, update, _flags, _id) => {
+        if (("y" in update || "x" in update || "elevation" in update)) {
+            if (debug) console.log("movement, main aura")
+            await MainAura(token, "movement update")
         }
-        if ("hidden" in update && auraToken) {
+
+        if ("hidden" in update && IsAuraToken) {
             setTimeout(() => {
-                CollateAuras(canvas, true, true)
+                if (debug) console.log("hidden, collate auras true true")
+                CollateAuras(canvas, true, true, "updateToken")
             }, 20)
         }
     });
@@ -168,7 +183,8 @@ Hooks.on("ready", () => {
     Hooks.on("updateActiveEffect", (_actor, effect, _update) => {
         if (effect.flags?.ActiveAuras?.isAura) {
             setTimeout(() => {
-                CollateAuras(canvas, true, false)
+                if (debug) console.log("updateAE, collate auras true true")
+                CollateAuras(canvas, true, true, "updateActiveEffect")
             }, 20)
         }
     })
@@ -177,10 +193,11 @@ Hooks.on("ready", () => {
      * On removal of active effect from linked actor, if aura remove from canvas.tokens
      */
     Hooks.on("deleteActiveEffect", (_actor, effect) => {
-        let applyStatus = effect.flags?.ActiveAuras?.applied;
-        if (!applyStatus) {
+        let applyStatus = effect.flags?.ActiveAuras?.isAura;
+        if (applyStatus) {
             setTimeout(() => {
-                CollateAuras(canvas, false, true)
+                if (debug) console.log("deleteAE, collate auras true true")
+                CollateAuras(canvas, true, true, "deleteActiveEffect")
             }, 20)
         }
     });
@@ -191,14 +208,15 @@ Hooks.on("ready", () => {
     Hooks.on("createActiveEffect", (_actor, effect) => {
         if (!effect.flags?.ActiveAuras?.applied && effect.flags?.ActiveAuras?.isAura) {
             setTimeout(() => {
-                CollateAuras(canvas, true, false)
+                if (debug) console.log("deleteAE, collate auras true false")
+                CollateAuras(canvas, true, false, "createActiveEffect")
             }, 20)
         };
     });
 
     Hooks.on("canvasReady", (canvas) => {
         setTimeout(() => {
-            CollateAuras(canvas, true, false)
+            CollateAuras(canvas, true, true)
         }, 20)
     })
 
@@ -219,7 +237,8 @@ Hooks.on("ready", () => {
         }
     }
 
-    function CollateAuras(canvas, checkAuras, removeAuras) {
+    function CollateAuras(canvas, checkAuras, removeAuras, source) {
+        if (debug) console.log(source)
         let gm = game.user === game.users.find((u) => u.isGM && u.active)
         if (!gm) return;
         let MapKey = canvas.scene._id;
@@ -233,11 +252,11 @@ Hooks.on("ready", () => {
             }
             for (let testEffect of testToken?.actor?.effects.entries) {
                 if (testEffect.getFlag('ActiveAuras', 'isAura')) {
-                    if(testEffect.data.disabled) continue;
+                    if (testEffect.data.disabled) continue;
                     if (testEffect.getFlag('ActiveAuras', 'hidden') && testToken.data.hidden) continue;
                     let newEffect = { data: duplicate(testEffect.data), parentActorLink: testEffect.parent.data.token.actorLink, parentActorId: testEffect.parent._id, tokenId: testToken.id }
                     for (let change of newEffect.data.changes) {
-                        if (typeof change.value === "string" && change.key !== "macro.execute") {
+                        if (typeof change.value === "string" && change.key !== "macro.execute" && change.key !== "macro.itemMacro") {
                             if (change.value.includes("@")) {
                                 let dataPath = change.value.substring(2)
                                 let newValue = getProperty(testToken.actor.getRollData(), dataPath)
@@ -245,15 +264,16 @@ Hooks.on("ready", () => {
                                 newEffect.data.changes[changeIndex].value = `+ ${newValue}`
                             }
                         }
-                        if (change.key === "macro.execute") newEffect.data.flags.ActiveAuras.isMacro = true
+                        if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.data.flags.ActiveAuras.isMacro = true
                     }
                     newEffect.data.disabled = false
-                    let macro = newEffect.data.flags.ActiveAuras.isMacro !== undefined ?  newEffect.data.flags.ActiveAuras.isMacro : false;
+                    let macro = newEffect.data.flags.ActiveAuras.isMacro !== undefined ? newEffect.data.flags.ActiveAuras.isMacro : false;
 
                     newEffect.data.flags.ActiveAuras.isAura = false;
                     newEffect.data.flags.ActiveAuras.applied = true;
                     newEffect.data.flags.ActiveAuras.isMacro = macro;
-
+                    newEffect.data.flags.ActiveAuras.ignoreSelf = false
+                        ;
                     effectArray.push(newEffect)
                 }
             }
@@ -264,9 +284,10 @@ Hooks.on("ready", () => {
         else {
             AuraMap.set(MapKey, { effects: effectArray })
         }
+        if (debug) console.log(AuraMap)
         if (checkAuras) {
             setTimeout(() => {
-                MainAura()
+                MainAura(undefined, "Collate auras")
             }, 20)
         }
         if (removeAuras) {
@@ -285,7 +306,10 @@ Hooks.on("ready", () => {
         for (let removeToken of canvas.tokens.placeables) {
             if (removeToken?.actor?.effects) {
                 for (let testEffect of removeToken.actor.effects) {
-                    if (!EffectsArray.includes(testEffect.data.origin) && testEffect.data?.flags?.ActiveAuras?.applied) await testEffect.delete()
+                    if (!EffectsArray.includes(testEffect.data.origin) && testEffect.data?.flags?.ActiveAuras?.applied) {
+                        await removeToken.actor.deleteEmbeddedEntity("ActiveEffect", testEffect.id)
+                        console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: testEffect.data.label, tokenName: removeToken.name }))
+                    }
                 }
             }
         }
@@ -296,13 +320,14 @@ Hooks.on("ready", () => {
      * @param {Token} movedToken - optional value for further extension, currently unused
      * Locate all auras on the canvas, create map of tokens to update, update tokens 
      */
-    function MainAura(movedToken) {
+    async function MainAura(movedToken, source) {
+        if (debug) console.log(source)
         let gm = game.user === game.users.find((u) => u.isGM && u.active)
         if (!gm) return;
 
         let map = new Map();
         let updateTokens = canvas.tokens.placeables
-                
+
         if (movedToken !== undefined) {
             if (!IsAuraToken(movedToken, canvas)) {
                 updateTokens = [];
@@ -315,13 +340,13 @@ Hooks.on("ready", () => {
             let MapKey = mapEffect[0]
             map.set(MapKey, { add: mapEffect[1].add, token: mapEffect[1].token, effect: mapEffect[1].effect.data })
         }
-
+        if (debug) console.log(map)
         for (let update of map) {
             if (update[1].add) {
-                CreateActiveEffect(update[1].token, update[1].effect)
+                await CreateActiveEffect(update[1].token.id, update[1].effect)
             }
             else {
-                RemoveActiveEffects(update[1].token, update[1].effect.label)
+                await RemoveActiveEffects(update[1].token.id, update[1].effect.label)
             }
         }
         sequencialUpdate = false
@@ -336,7 +361,7 @@ Hooks.on("ready", () => {
      * @param {Array} auraEffectArray - array of auras to test against
      * @param {Token} tokens - array of tokens to test against
      */
-    function UpdateAllTokens(map, tokens) {
+    async function UpdateAllTokens(map, tokens) {
         for (let canvasToken of tokens) {
             UpdateToken(map, canvasToken)
         }
@@ -439,13 +464,14 @@ Hooks.on("ready", () => {
   * @param {Token} token - token to apply effect too
   * @param {ActiveEffect} effectData - effect data to generate effect
   */
-    async function CreateActiveEffect(token, oldEffectData) {
+    async function CreateActiveEffect(tokenID, oldEffectData) {
+        let token = canvas.tokens.get(tokenID)
         if (token.actor.effects.entries.find(e => e.data.label === oldEffectData.label)) return;
         let effectData = duplicate(oldEffectData)
         if (effectData.flags.ActiveAuras?.isMacro) {
             for (let change of effectData.changes) {
                 let newValue = change.value;
-                if (change.key === "macro.execute") {
+                if (change.key === "macro.execute" || change.key === "macro.itemMacro") {
                     if (typeof newValue === "string") {
                         newValue = [newValue]
                     }
@@ -472,10 +498,11 @@ Hooks.on("ready", () => {
      * @param {Token} token - token instance to remove effect from
      * @param {String} effectLabel - label of effect to remove
      */
-    function RemoveActiveEffects(token, effectLabel) {
+    async function RemoveActiveEffects(tokenID, effectLabel) {
+        let token = canvas.tokens.get(tokenID)
         for (let tokenEffects of token.actor.effects) {
             if (tokenEffects.data.label === effectLabel && tokenEffects.data.flags?.ActiveAuras.applied === true) {
-                tokenEffects.delete()
+                await token.actor.deleteEmbeddedEntity("ActiveEffect", tokenEffects.id)
                 console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: effectLabel, tokenName: token.name }))
 
             }
