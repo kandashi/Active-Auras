@@ -478,7 +478,11 @@ Hooks.on("ready", () => {
                         newValue = [newValue]
                     }
                     newValue = newValue.map(val => {
-                        if (typeof val === "string" && val.includes("@token")) {
+                        if(typeof val === "string" && val.includes("@@token")) {
+                            let re = /([\s]*@@token)/gms
+                            return val.replaceAll(re, ` @token`)
+                        }
+                        else if (typeof val === "string" && val.includes("@token")) {
                             let re = /([\s]*@token)/gms
                             return val.replaceAll(re, ` ${token.data._id}`)
                         }
