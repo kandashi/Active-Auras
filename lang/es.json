@@ -6,7 +6,9 @@
     "ACTIVEAURAS.debug_name" : "Debug",
     "ACTIVEAURAS.debug_hint" : "Additional console logs for debugging steps",
     "ACTIVEAURAS.tabname": "Auras",
-
+    "ACTIVEAURAS.removeDead": "Remove Auras on death",
+    "ACTIVEAURAS.removeDeadHint": "On tokens reaching 0 hp, remove any auras they would provide, default on",
+    
     "ACTIVEAURAS.walltoptions_name": "Paredes bloquean auras",
     "ACTIVEAURAS.walltoptions_hint":"Las paredes bloquearán el efecto de las auras",
 

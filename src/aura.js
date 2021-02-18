@@ -23,6 +23,14 @@ Hooks.on('init', () => {
         default: true,
         type: Boolean,
     });
+    game.settings.register("ActiveAuras", "dead-aura", {
+        name: game.i18n.format("ACTIVEAURAS.removeDead"),
+        hint: game.i18n.format("ACTIVEAURAS.removeDeadHint"),
+        scope: "world",
+        config: true,
+        default: true,
+        type: Boolean,
+    });
     game.settings.register("ActiveAuras", "debug", {
         name: game.i18n.format("ACTIVEAURAS.debug_name"),
         hint: game.i18n.format("ACTIVEAURAS.debug_hint"),
@@ -49,7 +57,6 @@ Hooks.on("ready", () => {
      */
     Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
         const flags = sheet.object.data.flags ?? {};
-
         const FormIsAura = game.i18n.format("ACTIVEAURAS.FORM_IsAura");
         const FormIgnoreSelf = game.i18n.format("ACTIVEAURAS.FORM_IgnoreSelf");
         const FormHidden = game.i18n.format("ACTIVEAURAS.FORM_Hidden");
@@ -60,13 +67,22 @@ Hooks.on("ready", () => {
         const FormRadius = game.i18n.format("ACTIVEAURAS.FORM_Radius");
         const AuraTab = game.i18n.format("ACTIVEAURAS.tabname");
         const FormCheckHeight = game.i18n.format("ACTIVEAURAS.FORM_Height");
-        const FormCheckAlignment = "Check Alignment";
-        const FormCheckType = "Check creature type";
-        const FormGood = "Good";
-        const FormNeutral = "Neutral";
-        const FormEvil = "Evil";
+        const FormCheckAlignment = game.i18n.format("ACTIVEAURAS.FORM_Alignment");
+        const FormCheckType = game.i18n.format("ACTIVEAURAS.FORM_Type")
+        const FormGood = game.i18n.format("ACTIVEAURAS.FORM_Good")
+        const FormNeutral = game.i18n.format("ACTIVEAURAS.FORM_Neutral")
+        const FormEvil = game.i18n.format("ACTIVEAURAS.FORM_Evil")
+        const FormSaveEnable = game.i18n.format("ACTIVEAURAS.FORM_SaveEnable")
+        const FormSaveDC = game.i18n.format("ACTIVEAURAS.FORM_SaveDC")
+        const FormTypePrompt = game.i18n.format("ACTIVEAURAS.FORM_TypePrompt")
+        const FormRadiusPrompt = game.i18n.format("ACTIVEAURAS.FORM_RadiusPrompt")
+        const FormSavePrompt = game.i18n.format("ACTIVEAURAS.FORM_SavePrompt")
+
 
         const tab = `<a class="item" data-tab="ActiveAuras"><i class="fas fa-broadcast-tower"></i> ${AuraTab}</a>`;
+        let type = flags[MODULE_NAME]?.type ? flags[MODULE_NAME]?.type : "";
+        let alignment = flags[MODULE_NAME]?.alignment ? flags[MODULE_NAME]?.alignment : "";
+        let save = flags[MODULE_NAME]?.save ? flags[MODULE_NAME]?.save : "";
 
         const contents = `
         <div class="tab" data-tab="ActiveAuras">
@@ -88,8 +104,8 @@ Hooks.on("ready", () => {
             </div>
             <div class="form-group">
                 <label>${FormCheckAlignment}:</label>
-                <select name="flags.${MODULE_NAME}.alignment" data-dtype="String" value=${flags[MODULE_NAME]?.alignment}>
-                    <option value="None" ${flags[MODULE_NAME]?.alignment === 'None' ? 'selected' : ''}></option>
+                <select name="flags.${MODULE_NAME}.alignment" data-dtype="String" value=${alignment}>
+                    <option value="" ${flags[MODULE_NAME]?.alignment === '' ? 'selected' : ''}></option>
                     <option value="good"${flags[MODULE_NAME]?.alignment === 'good' ? 'selected' : ''}>${FormGood}</option>
                     <option value="neutral"${flags[MODULE_NAME]?.alignment === 'neutral' ? 'selected' : ''}>${FormNeutral}</option>
                     <option value="evil"${flags[MODULE_NAME]?.alignment === 'evil' ? 'selected' : ''}>${FormEvil}</option>
@@ -97,7 +113,7 @@ Hooks.on("ready", () => {
             </div>
             <div class="form-group">
                 <label>${FormCheckType}</label>
-                <input id="type" name="flags.${MODULE_NAME}.type" type="text" value="${flags[MODULE_NAME]?.type}"></input>
+                <input id="type" name="flags.${MODULE_NAME}.type" type="text" value="${type}" placeholder="${FormTypePrompt}"></input>
             </div>
             <div class="form-group">
                 <label>${FormTargetsName}:</label>
@@ -110,12 +126,21 @@ Hooks.on("ready", () => {
             </div>
             <div class="form-group">
                 <label>${FormRadius}</label>
-                <input id="radius" name="flags.${MODULE_NAME}.radius" type="number" min="0" value="${flags[MODULE_NAME]?.radius}"></input>
+                <input id="radius" name="flags.${MODULE_NAME}.radius" type="number" min="0" value="${flags[MODULE_NAME]?.radius}" placeholder="${FormRadiusPrompt}"></input>
             </div> 
+            <div class="form-group">
+            <label>${FormSaveEnable}</label>
+            <input id="save" name="flags.${MODULE_NAME}.save" type="text" value="${save}" placeholder="${FormSavePrompt}"></input>
+        </div>
+            <div class="form-group">
+                <label>${FormSaveDC}</label>
+                <input id="savedc" name="flags.${MODULE_NAME}.savedc" type="number" min="0" value="${flags[MODULE_NAME]?.savedc}"></input>
+            </div> 
+            
         </div>`;
 
         html.find(".tabs .item").last().after(tab);
-        html.find(".tab").last().after(contents);
+        if (!flags[MODULE_NAME]?.applied) html.find(".tab").last().after(contents);
     });
 
     let AuraMap = new Map()
@@ -123,21 +148,21 @@ Hooks.on("ready", () => {
     if (game.settings.get("ActiveAuras", "debug")) debug = true
 
 
-     /**
-     * Re-run aura detection on token creation
-     */
+    /**
+    * Re-run aura detection on token creation
+    */
     Hooks.on("createToken", (_scene, token) => {
         let actor = game.actors.get(token.actorId)
-        if(actor.effects?.entries){
-        for (let effect of actor.effects?.entries) {
-            if (effect.getFlag('ActiveAuras', 'isAura')) {
-                setTimeout(() => {
-                    if (debug) console.log("createToken, collate auras true false")
-                    CollateAuras(canvas, true, false, "createToken")
-                }, 20)
-                break;
+        if (actor.effects?.entries) {
+            for (let effect of actor.effects?.entries) {
+                if (effect.getFlag('ActiveAuras', 'isAura')) {
+                    setTimeout(() => {
+                        if (debug) console.log("createToken, collate auras true false")
+                        CollateAuras(canvas, true, false, "createToken")
+                    }, 20)
+                    break;
+                }
             }
-        }
         }
     });
 
@@ -145,7 +170,7 @@ Hooks.on("ready", () => {
      * @todo
      * Filter for aura effects on deleted token and remove from canvas tokens
      */
-    Hooks.on("preDeleteToken", async (_scene, _token) => {
+    Hooks.on("preDeleteToken", async (_scene, token) => {
         if (IsAuraToken(token, canvas)) {
             setTimeout(() => {
                 if (debug) console.log("preDelete, collate auras false true")
@@ -180,8 +205,6 @@ Hooks.on("ready", () => {
                 }
             }
         }
-        
-
     })
 
     /**
@@ -198,6 +221,12 @@ Hooks.on("ready", () => {
                 if (debug) console.log("hidden, collate auras true true")
                 CollateAuras(canvas, true, true, "updateToken")
             }, 20)
+        }
+        if (IsAuraToken(token, canvas) && update?.actorData?.data?.attributes?.hp?.value <= 0) {
+            setTimeout(() => {
+                if (debug) console.log("0hp, collate auras true true")
+                CollateAuras(canvas, true, true, "updateToken, dead")
+            }, 50)
         }
     });
 
@@ -247,6 +276,22 @@ Hooks.on("ready", () => {
         }, 20)
     })
 
+    Hooks.on("preUpdateActor", (actor, update) => {
+        if (update.data?.attributes?.hp?.value <= 0) {
+            if (IsAuraToken(actor.getActiveTokens()[0].data, canvas)) {
+                if (debug) console.log("0hp, collate auras true true")
+                Hooks.once("updateActor", () => {
+                    CollateAuras(canvas, true, true, "updateActor, dead")
+                })
+            }
+        }
+        if (actor.data.data.attributes.hp.value === 0 && update?.data?.attributes?.hp?.value > 0) {
+            Hooks.once("updateActor", () => {
+                CollateAuras(canvas, true, false, "updateActor, revived")
+            })
+        }
+    })
+
     function GetAllFlags(entity, scope) {
         {
             const scopes = SetupConfiguration.getPackageScopes();
@@ -277,6 +322,7 @@ Hooks.on("ready", () => {
             if (game.modules.get("multilevel-tokens")?.active) {
                 if (GetAllFlags(testToken, 'multilevel-tokens')) continue;
             }
+            if ((testToken.data.actorData?.attributes?.hp?.value <= 0 || testToken.actor?.data.data.attributes.hp.value <= 0) && game.settings.get("ActiveAuras", "dead-aura")) continue;
             for (let testEffect of testToken?.actor?.effects.entries) {
                 if (testEffect.getFlag('ActiveAuras', 'isAura')) {
                     if (testEffect.data.disabled) continue;
@@ -405,8 +451,18 @@ Hooks.on("ready", () => {
         if (game.modules.get("multilevel-tokens")) {
             if (GetAllFlags(canvasToken, 'multilevel-tokens')) return;
         }
-        let tokenType = canvasToken.actor?.data.data.details.type.toLowerCase();
-        let tokenAlignment = canvasToken.actor?.data.data.alignment;
+        let tokenType;
+        switch (canvasToken.actor.data.type) {
+            case "npc":
+                tokenType = canvasToken.actor?.data.data.details.type.toLowerCase();
+                break;
+            case "character":
+                tokenType = canvasToken.actor?.data.data.details.race.toLowerCase()
+                break;
+        }
+        let humanoidRaces = ["human", "orc", "half orc", "elf", "half elf", "tiefling", "gnome", "aaracokra", "dragonborn", "dwarf", "halfing", "leonin", "satyr", "genasi", "goliath", "aasimar", "bugbear", "firbolg", "goblin", "lizardfolk", "tabxi", "triton", "yuan-ti", "tortle", "changling", "kalashtar", "shifter", "warforged", "gith", "centaur", "loxodon", "minotaur", "simic hybrid", "vedalken", "verdan", "locathah", "grung"]
+        if (humanoidRaces.includes(tokenType)) tokenType = "humanoid"
+        let tokenAlignment = canvasToken.actor?.data.data.details.alignment.toLowerCase();
         let MapKey = canvasToken.scene._id;
         MapObject = AuraMap.get(MapKey)
         for (let auraEffect of MapObject.effects) {
@@ -417,8 +473,8 @@ Hooks.on("ready", () => {
             let auraToken;
             let auraRadius = auraEffect.data.flags?.ActiveAuras?.radius;
             let auraHeight = auraEffect.data.flags?.ActiveAuras?.height;
-            let auraType = auraEffect.data.flags?.ActiveAuras?.type;
-            let auraAlignment = auraEffect.data.flags?.ActiveAuras?.alignment;
+            let auraType = auraEffect.data.flags?.ActiveAuras?.type.toLowerCase();
+            let auraAlignment = auraEffect.data.flags?.ActiveAuras?.alignment.toLowerCase();
 
             //{data: testEffect.data, parentActorLink :testEffect.parent.data.token.actorLink, parentActorId : testEffect.parent._id, tokenId: testToken.id}
             if (auraEffect.parentActorLink) {
@@ -437,8 +493,8 @@ Hooks.on("ready", () => {
             if (auraToken.id === canvasToken.id) continue;
             if (auraTargets === "Allies" && (auraToken.data.disposition !== canvasToken.data.disposition)) continue;
             if (auraTargets === "Enemy" && (auraToken.data.disposition === canvasToken.data.disposition)) continue;
-            if(!tokenAlignment.includes(auraAlignment)) continue;
-            if(!tokenType.includes(auraType)) continue;
+            if (!tokenAlignment.includes(auraAlignment) && !tokenAlignment.includes("any")) continue;
+            if (!tokenType.includes(auraType) && !tokenType.includes("any")) continue;
 
             let distance = RayDistance(canvasToken, auraToken, auraHeight)
             if ((distance !== false) && (distance <= auraRadius)) {
@@ -500,6 +556,14 @@ Hooks.on("ready", () => {
     async function CreateActiveEffect(tokenID, oldEffectData) {
         let token = canvas.tokens.get(tokenID)
         if (token.actor.effects.entries.find(e => e.data.label === oldEffectData.label)) return;
+        if (oldEffectData.flags[MODULE_NAME].save !== "") {
+            const flavor = `${CONFIG.DND5E.abilities[oldEffectData.flags[MODULE_NAME].save]} DC${oldEffectData.flags[MODULE_NAME].savedc} ${oldEffectData.label || ""}`;
+            let saveRoll = (await token.actor.rollAbilitySave(oldEffectData.flags[MODULE_NAME].save, { flavor }));
+            if (saveRoll && (saveRoll.total >= oldEffectData.flags[MODULE_NAME].savedc)) {
+                ui.notifications.notify(game.il8n.format("ACTIVEAURAS.saveNotify", { tokenName: token.data.name, oldEffectDataLabel: oldEffectData.label }))
+                return;
+            }
+        }
         let effectData = duplicate(oldEffectData)
         if (effectData.flags.ActiveAuras?.isMacro) {
             for (let change of effectData.changes) {
@@ -509,7 +573,7 @@ Hooks.on("ready", () => {
                         newValue = [newValue]
                     }
                     newValue = newValue.map(val => {
-                        if(typeof val === "string" && val.includes("@@token")) {
+                        if (typeof val === "string" && val.includes("@@token")) {
                             let re = /([\s]*@@token)/gms
                             return val.replaceAll(re, ` @token`)
                         }
@@ -526,6 +590,7 @@ Hooks.on("ready", () => {
                 }
             }
         }
+
         await token.actor.createEmbeddedEntity("ActiveEffect", effectData);
         console.log(game.i18n.format("ACTIVEAURAS.ApplyLog", { effectDataLabel: effectData.label, tokenName: token.name }))
     }
