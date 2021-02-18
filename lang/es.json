@@ -6,7 +6,9 @@
     "ACTIVEAURAS.debug_name" : "Debug",
     "ACTIVEAURAS.debug_hint" : "Additional console logs for debugging steps",
     "ACTIVEAURAS.tabname": "Auras",
-
+    "ACTIVEAURAS.removeDead": "Remove Auras on death",
+    "ACTIVEAURAS.removeDeadHint": "On tokens reaching 0 hp, remove any auras they would provide, default on",
+    
     "ACTIVEAURAS.walltoptions_name": "Paredes bloquean auras",
     "ACTIVEAURAS.walltoptions_hint":"Las paredes bloquearán el efecto de las auras",
 
@@ -19,8 +21,19 @@
     "ACTIVEAURAS.FORM_TargetsAll":"Todos",
     "ACTIVEAURAS.FORM_Radius": "Radio del aura",
     "ACTIVEAURAS.FORM_Height": "Comprobar altura del token",
+    "ACTIVEAURAS.FORM_Alignment": "Check Alignment",
+    "ACTIVEAURAS.FORM_Type": "Check creature type",
+    "ACTIVEAURAS.FORM_Good": "Good",
+    "ACTIVEAURAS.FORM_Neutral": "Neutral",
+    "ACTIVEAURAS.FORM_Evil": "Evil",
+    "ACTIVEAURAS.FORM_SaveEnable": "Save Type To Prevent",
+    "ACTIVEAURAS.FORM_SaveDC": "Save DC",
+    "ACTIVEAURAS.FORM_TypePrompt": "humanoid/beast etc",
+    "ACTIVEAURAS.FORM_RadiusPrompt": "Measured by your grid scale",
+    "ACTIVEAURAS.FORM_SavePrompt": "str/dex/con/wis/int/cha",   
 
     "ACTIVEAURAS.ApplyLog":"ActiveAuras | '{effectDataLabel}' aplicado a {tokenName}",
     "ACTIVEAURAS.RemoveLog":"ActiveAuras | '{effectDataLabel}' quitado de {tokenName}",
-    "ACTIVEAURAS.IgnoreSelfLog":"ActiveAuras | Igrnorando '{effectDataLabel}' cambiar {changeKey} a {actorName}"
+    "ACTIVEAURAS.IgnoreSelfLog":"ActiveAuras | Igrnorando '{effectDataLabel}' cambiar {changeKey} a {actorName}",
+    "ACTIVEAURAS.SaveNotify": "${tokenName} passes the save against ${oldEffectDataLabel}"
 }
