@@ -105,15 +105,22 @@ Hooks.on("ready", () => {
     if (game.settings.get("ActiveAuras", "debug")) debug = true
 
 
-    /**
+     /**
      * Re-run aura detection on token creation
      */
     Hooks.on("createToken", (_scene, token) => {
-        newToken = canvas.tokens.get(token._id)
-        setTimeout(() => {
-            if (debug) console.log("createToken, collate auras true false")
-            CollateAuras(canvas, true, false, "createToken")
-        }, 20)
+        let actor = game.actors.get(token.actorId)
+        if(actor.effects?.entries){
+        for (let effect of actor.effects?.entries) {
+            if (effect.getFlag('ActiveAuras', 'isAura')) {
+                setTimeout(() => {
+                    if (debug) console.log("createToken, collate auras true false")
+                    CollateAuras(canvas, true, false, "createToken")
+                }, 20)
+                break;
+            }
+        }
+        }
     });
 
     /**
@@ -121,7 +128,7 @@ Hooks.on("ready", () => {
      * Filter for aura effects on deleted token and remove from canvas tokens
      */
     Hooks.on("preDeleteToken", async (_scene, _token) => {
-        if (IsAuraToken) {
+        if (IsAuraToken(token, canvas)) {
             setTimeout(() => {
                 if (debug) console.log("preDelete, collate auras false true")
                 CollateAuras(canvas, false, true, "preDeleteToken")
@@ -133,23 +140,23 @@ Hooks.on("ready", () => {
         if (!update.actorData?.effects) return;
         let removed = token.actorData?.effects?.filter(x => !update.actorData?.effects?.includes(x));
         let added = update.actorData?.effects?.filter(x => !token.actorData?.effect?.includes(x))
-        if (added?.length > 0) {
-            for (let effect of added) {
-                if (effect.flags?.ActiveAuras?.isAura) {
-                    setTimeout(() => {
-                        if (debug) console.log("preupdate, collate auras true false")
-                        CollateAuras(canvas, true, false, "preUpdateToken, addition")
-                    }, 50)
-                    return;
-                }
-            }
-        }
-            for (let effect of added) {
+        if (removed?.length > 0) {
             for (let effect of removed) {
                 if (effect.flags?.ActiveAuras?.isAura) {
                     setTimeout(() => {
                         if (debug) console.log("preupdate, collate auras true true")
                         CollateAuras(canvas, true, true, "preUpdateToken, removal")
+                    }, 50)
+                    return;
+                }
+            }
+        }
+        else if (added?.length > 0) {
+            for (let effect of added) {
+                if (effect.flags?.ActiveAuras?.isAura) {
+                    setTimeout(() => {
+                        if (debug) console.log("preupdate, collate auras true false")
+                        CollateAuras(canvas, true, false, "preUpdateToken, addition")
                     }, 50)
                     return;
                 }
