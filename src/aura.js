@@ -60,6 +60,11 @@ Hooks.on("ready", () => {
         const FormRadius = game.i18n.format("ACTIVEAURAS.FORM_Radius");
         const AuraTab = game.i18n.format("ACTIVEAURAS.tabname");
         const FormCheckHeight = game.i18n.format("ACTIVEAURAS.FORM_Height");
+        const FormCheckAlignment = "Check Alignment";
+        const FormCheckType = "Check creature type";
+        const FormGood = "Good";
+        const FormNeutral = "Neutral";
+        const FormEvil = "Evil";
 
         const tab = `<a class="item" data-tab="ActiveAuras"><i class="fas fa-broadcast-tower"></i> ${AuraTab}</a>`;
 
@@ -80,6 +85,19 @@ Hooks.on("ready", () => {
             <div class="form-group">
                 <label>${FormCheckHeight}</label>
                 <input name="flags.${MODULE_NAME}.height" type="checkbox" ${flags[MODULE_NAME]?.height ? 'checked' : ''}></input>
+            </div>
+            <div class="form-group">
+                <label>${FormCheckAlignment}:</label>
+                <select name="flags.${MODULE_NAME}.alignment" data-dtype="String" value=${flags[MODULE_NAME]?.alignment}>
+                    <option value="None" ${flags[MODULE_NAME]?.alignment === 'None' ? 'selected' : ''}></option>
+                    <option value="good"${flags[MODULE_NAME]?.alignment === 'good' ? 'selected' : ''}>${FormGood}</option>
+                    <option value="neutral"${flags[MODULE_NAME]?.alignment === 'neutral' ? 'selected' : ''}>${FormNeutral}</option>
+                    <option value="evil"${flags[MODULE_NAME]?.alignment === 'evil' ? 'selected' : ''}>${FormEvil}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>${FormCheckType}</label>
+                <input id="type" name="flags.${MODULE_NAME}.type" type="text" value="${flags[MODULE_NAME]?.type}"></input>
             </div>
             <div class="form-group">
                 <label>${FormTargetsName}:</label>
@@ -387,6 +405,8 @@ Hooks.on("ready", () => {
         if (game.modules.get("multilevel-tokens")) {
             if (GetAllFlags(canvasToken, 'multilevel-tokens')) return;
         }
+        let tokenType = canvasToken.actor?.data.data.details.type.toLowerCase();
+        let tokenAlignment = canvasToken.actor?.data.data.alignment;
         let MapKey = canvasToken.scene._id;
         MapObject = AuraMap.get(MapKey)
         for (let auraEffect of MapObject.effects) {
@@ -396,7 +416,9 @@ Hooks.on("ready", () => {
             MapObject = map.get(MapKey);
             let auraToken;
             let auraRadius = auraEffect.data.flags?.ActiveAuras?.radius;
-            let auraHeight = auraEffect.data.flags?.ActiveAuras?.height
+            let auraHeight = auraEffect.data.flags?.ActiveAuras?.height;
+            let auraType = auraEffect.data.flags?.ActiveAuras?.type;
+            let auraAlignment = auraEffect.data.flags?.ActiveAuras?.alignment;
 
             //{data: testEffect.data, parentActorLink :testEffect.parent.data.token.actorLink, parentActorId : testEffect.parent._id, tokenId: testToken.id}
             if (auraEffect.parentActorLink) {
@@ -415,6 +437,8 @@ Hooks.on("ready", () => {
             if (auraToken.id === canvasToken.id) continue;
             if (auraTargets === "Allies" && (auraToken.data.disposition !== canvasToken.data.disposition)) continue;
             if (auraTargets === "Enemy" && (auraToken.data.disposition === canvasToken.data.disposition)) continue;
+            if(!tokenAlignment.includes(auraAlignment)) continue;
+            if(!tokenType.includes(auraType)) continue;
 
             let distance = RayDistance(canvasToken, auraToken, auraHeight)
             if ((distance !== false) && (distance <= auraRadius)) {
