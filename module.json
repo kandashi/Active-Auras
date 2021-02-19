@@ -3,7 +3,7 @@
 	"title": "Active-Auras",
 	"description": "Active-Auras",
 	"author": "Kandashi",
-	"version": "0.1.41",
+	"version": "0.1.42",
 	"minimumCoreVersion": "0.7.5",
 	"compatibleCoreVersion": "0.7.9",
 	"packs": [
@@ -32,5 +32,7 @@
 	],
 	 "url": "https://github.com/kandashi/Active-Auras",
          "manifest": "https://raw.githubusercontent.com/kandashi/Active-Auras/main/module.json",
-	"download": "https://github.com/kandashi/Active-Auras/archive/main.zip"
+	"download": "https://github.com/kandashi/Active-Auras/archive/main.zip",
+	"allowBugReporter": true,
+	"bugs": "https://github.com/kandashi/Active-Auras/issues"
 }

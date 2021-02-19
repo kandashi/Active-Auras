@@ -400,14 +400,18 @@ Hooks.on("ready", () => {
 
         let map = new Map();
         let updateTokens = canvas.tokens.placeables
+        let auraTokenId;
 
         if (movedToken !== undefined) {
             if (!IsAuraToken(movedToken, canvas)) {
                 updateTokens = [];
                 updateTokens.push(canvas.tokens.get(movedToken._id))
             }
+            if(IsAuraToken(movedToken, canvas)){
+                auraTokenId = movedToken._id
+            }
         }
-        UpdateAllTokens(map, updateTokens)
+        UpdateAllTokens(map, updateTokens, auraTokenId)
 
         for (let mapEffect of map) {
             let MapKey = mapEffect[0]
@@ -422,7 +426,6 @@ Hooks.on("ready", () => {
                 await RemoveActiveEffects(update[1].token.id, update[1].effect.label)
             }
         }
-        sequencialUpdate = false
     }
 
 
@@ -434,9 +437,9 @@ Hooks.on("ready", () => {
      * @param {Array} auraEffectArray - array of auras to test against
      * @param {Token} tokens - array of tokens to test against
      */
-    async function UpdateAllTokens(map, tokens) {
+    async function UpdateAllTokens(map, tokens, tokenId) {
         for (let canvasToken of tokens) {
-            UpdateToken(map, canvasToken)
+            UpdateToken(map, canvasToken, tokenId)
         }
     }
 
@@ -447,10 +450,11 @@ Hooks.on("ready", () => {
      * @param {Array} auraEffectArray - array of auras to test against 
      * @param {Token} canvasToken - single token to test
      */
-    function UpdateToken(map, canvasToken) {
+    function UpdateToken(map, canvasToken, tokenId) {
         if (game.modules.get("multilevel-tokens")) {
             if (GetAllFlags(canvasToken, 'multilevel-tokens')) return;
         }
+        if(canvasToken.actor === null) return;
         let tokenType;
         switch (canvasToken.actor.data.type) {
             case "npc":
@@ -465,7 +469,13 @@ Hooks.on("ready", () => {
         let tokenAlignment = canvasToken.actor?.data.data.details.alignment.toLowerCase();
         let MapKey = canvasToken.scene._id;
         MapObject = AuraMap.get(MapKey)
-        for (let auraEffect of MapObject.effects) {
+        let checkEffects = MapObject.effects;
+        if(tokenId){
+            checkEffects = checkEffects.filter(i => i.tokenId === tokenId)
+        }
+
+
+        for (let auraEffect of checkEffects) {
 
             let auraTargets = auraEffect.data.flags?.ActiveAuras?.aura
             let MapKey = auraEffect.data.label + "-" + canvasToken.id;
@@ -473,8 +483,8 @@ Hooks.on("ready", () => {
             let auraToken;
             let auraRadius = auraEffect.data.flags?.ActiveAuras?.radius;
             let auraHeight = auraEffect.data.flags?.ActiveAuras?.height;
-            let auraType = auraEffect.data.flags?.ActiveAuras?.type.toLowerCase();
-            let auraAlignment = auraEffect.data.flags?.ActiveAuras?.alignment.toLowerCase();
+            let auraType = auraEffect.data.flags?.ActiveAuras?.type !== undefined ? auraEffect.data.flags?.ActiveAuras?.type.toLowerCase() : "";
+            let auraAlignment = auraEffect.data.flags?.ActiveAuras?.alignment !== undefined ? auraEffect.data.flags?.ActiveAuras?.alignment.toLowerCase() : "";
 
             //{data: testEffect.data, parentActorLink :testEffect.parent.data.token.actorLink, parentActorId : testEffect.parent._id, tokenId: testToken.id}
             if (auraEffect.parentActorLink) {
