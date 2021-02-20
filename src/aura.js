@@ -570,7 +570,7 @@ Hooks.on("ready", () => {
             const flavor = `${CONFIG.DND5E.abilities[oldEffectData.flags[MODULE_NAME].save]} DC${oldEffectData.flags[MODULE_NAME].savedc} ${oldEffectData.label || ""}`;
             let saveRoll = (await token.actor.rollAbilitySave(oldEffectData.flags[MODULE_NAME].save, { flavor }));
             if (saveRoll && (saveRoll.total >= oldEffectData.flags[MODULE_NAME].savedc)) {
-                ui.notifications.notify(game.il8n.format("ACTIVEAURAS.saveNotify", { tokenName: token.data.name, oldEffectDataLabel: oldEffectData.label }))
+                ui.notifications.notify(game.i18n.format("ACTIVEAURAS.saveNotify", { tokenName: token.data.name, oldEffectDataLabel: oldEffectData.label }))
                 return;
             }
         }
