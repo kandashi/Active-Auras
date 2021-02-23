@@ -1,4 +1,6 @@
 {
+    "ACTIVEAURAS.measurmentoptions_name":"Measurement system",
+    "ACTIVEAURAS.measurmentoptions_hint":"Use system defined movement measurement system rather than straight line (euclidean), default on",
     "ACTIVEAURAS.measurementHeight_name":"Height measurement system",
     "ACTIVEAURAS.measurementHeight_hint":"System for measuring heights in regards to auras. True is simple comparison of heights, false is eucleadian distance (experimental)",
     "ACTIVEAURAS.debug_name" : "Debug",

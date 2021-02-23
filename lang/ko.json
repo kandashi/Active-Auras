@@ -1,4 +1,6 @@
 {
+    "ACTIVEAURAS.measurmentoptions_name":"측정 시스템",
+    "ACTIVEAURAS.measurmentoptions_hint":"직선(유클리디언) 대신 시스템 정의 이동 측정 시스템을 사용한다.",
     "ACTIVEAURAS.measurementHeight_name":"높이 측정 시스템",
     "ACTIVEAURAS.measurementHeight_hint":"오러에 대한 높이 측정 시스템. True는 간단한 높이 비교이며 False는 유클리디언 거리이다. (실험적)",
     "ACTIVEAURAS.debug_name" : "디버그",

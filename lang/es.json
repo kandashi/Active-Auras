@@ -1,4 +1,6 @@
 {
+    "ACTIVEAURAS.measurmentoptions_name":"Sistema de medida",
+    "ACTIVEAURAS.measurmentoptions_hint":"Usar el sistema de medida de movimiento definido por el sistema, en lugar de una línea recta (euclídeo), por defecto activado",
     "ACTIVEAURAS.measurementHeight_name":"Sistema de medida de altura",
     "ACTIVEAURAS.measurementHeight_hint":"Sistema para medir alturas con respecto a auras. Verdadero es una comparación simple, falso es distancia euclídea (experimental)",
     "ACTIVEAURAS.debug_name" : "Debug",

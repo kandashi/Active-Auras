@@ -1,4 +1,12 @@
 Hooks.on('init', () => {
+    game.settings.register("ActiveAuras", "measurement", {
+        name: game.i18n.format("ACTIVEAURAS.measurmentoptions_name"),
+        hint: game.i18n.format("ACTIVEAURAS.measurmentoptions_hint"),
+        scope: "world",
+        config: true,
+        default: true,
+        type: Boolean,
+    });
     game.settings.register("ActiveAuras", "wall-block", {
         name: game.i18n.format("ACTIVEAURAS.walltoptions_name"),
         hint: game.i18n.format("ACTIVEAURAS.walltoptions_hint"),
@@ -436,6 +444,7 @@ Hooks.on("ready", () => {
     }
 
 
+  
     /**
      * Test individual token against aura array
      * @param {Map} map - empty map to populate 
@@ -518,47 +527,48 @@ Hooks.on("ready", () => {
         }
     }
 
-    /**
-     * 
-     * @param {Token} token1 - test token
-     * @param {Token} token2 - aura token
-     */
-    function RayDistance(token1, token2, auraHeight) {
-        const ray = new Ray(token1.center, token2.center)
-        const segments = [{ ray }]
-        let distance;
-        if (game.settings.get('ActiveAuras', 'measurement') === false) {
-            distance = (ray.distance / canvas.grid.grid.options.dimensions.size) * canvas.grid.grid.options.dimensions.distance
-        }
-        else if (game.settings.get('ActiveAuras', 'measurement') === true) {
-            distance = canvas.grid.measureDistances(segments, { gridSpaces: true })[0]
-        }
-        let collision = canvas.walls.checkCollision(ray)
-        if (collision && game.settings.get("ActiveAuras", "wall-block") === true) return false
-        if (auraHeight === true) {
-            if (game.settings.get("ActiveAuras", "vertical-euclidean") === true) {
-                let heightChange = Math.abs(token1.data.elevation - token2.data.elevation)
-                distance = distance > heightChange ? distance : heightChange
-            }
-            if (game.settings.get("ActiveAuras", "vertical-euclidean") === false) {
-                let a = distance;
-                let b = (token1.data.elevation - token2.data.elevation)
-                let c = (a * a) + (b * b)
-                distance = Math.sqrt(c)
-            }
-        }
-        return distance
-    }
 
     function getDistance(t1, t2, wallblocking = false, auraHeight) {
         //Log("get distance callsed");
         var x, x1, y, y1, d, r, segments = [], rdistance, distance;
-        for (x = 0; x < t1.data.width; x++) {
-            for (y = 0; y < t1.data.height; y++) {
-                const origin = new PIXI.Point(...canvas.grid.getCenter(t1.data.x + (canvas.dimensions.size * x), t1.data.y + (canvas.dimensions.size * y)));
-                for (x1 = 0; x1 < t2.data.width; x1++) {
-                    for (y1 = 0; y1 < t2.data.height; y1++) {
-                        const dest = new PIXI.Point(...canvas.grid.getCenter(t2.data.x + (canvas.dimensions.size * x1), t2.data.y + (canvas.dimensions.size * y1)));
+        switch (game.settings.get("ActiveAuras", "measurement",)) {
+            case (true): {
+                for (x = 0; x < t1.data.width; x++) {
+                    for (y = 0; y < t1.data.height; y++) {
+                        const origin = new PIXI.Point(...canvas.grid.getCenter(t1.data.x + (canvas.dimensions.size * x), t1.data.y + (canvas.dimensions.size * y)));
+                        for (x1 = 0; x1 < t2.data.width; x1++) {
+                            for (y1 = 0; y1 < t2.data.height; y1++) {
+                                const dest = new PIXI.Point(...canvas.grid.getCenter(t2.data.x + (canvas.dimensions.size * x1), t2.data.y + (canvas.dimensions.size * y1)));
+                                const r = new Ray(origin, dest);
+                                if (wallblocking && canvas.walls.checkCollision(r)) {
+                                    //Log(`ray ${r} blocked due to walls`);
+                                    continue;
+                                }
+                                segments.push({ ray: r });
+                            }
+                        }
+                    }
+                }
+                // console.log(segments);
+                if (segments.length === 0) {
+                    //Log(`${t2.data.name} full blocked by walls`);
+                    return -1;
+                }
+                rdistance = canvas.grid.measureDistances(segments, { gridSpaces: true });
+                distance = rdistance[0];
+                rdistance.forEach(d => {
+                    if (d < distance)
+                        distance = d;
+                });
+            }
+                break;
+            case (false): {
+                let gs = canvas.dimensions.size
+                let auraTokenSize = (t2.data.height / 2) * canvas.dimensions.distance
+                for (x = 0; x < t1.data.width; x++) {
+                    for (y = 0; y < t1.data.height; y++) {
+                        const origin = new PIXI.Point(...canvas.grid.getCenter(t1.data.x + (canvas.dimensions.size * x), t1.data.y + (canvas.dimensions.size * y)));
+                        const dest = new PIXI.Point(t2.center.x, t2.center.y);
                         const r = new Ray(origin, dest);
                         if (wallblocking && canvas.walls.checkCollision(r)) {
                             //Log(`ray ${r} blocked due to walls`);
@@ -567,19 +577,20 @@ Hooks.on("ready", () => {
                         segments.push({ ray: r });
                     }
                 }
+                if (segments.length === 0) {
+                    //Log(`${t2.data.name} full blocked by walls`);
+                    return -1;
+                }
+                rdistance = []
+                segments.forEach(i => rdistance.push(i.ray.distance / gs * canvas.dimensions.distance))
+                distance = rdistance[0];
+                rdistance.forEach(d => {
+                    if (d < distance)
+                        distance = d;
+                });
+                distance -= auraTokenSize
             }
         }
-        // console.log(segments);
-        if (segments.length === 0) {
-            //Log(`${t2.data.name} full blocked by walls`);
-            return -1;
-        }
-        rdistance = canvas.grid.measureDistances(segments, { gridSpaces: true });
-        distance = rdistance[0];
-        rdistance.forEach(d => {
-            if (d < distance)
-                distance = d;
-        });
         if (auraHeight === true) {
             if (game.settings.get("ActiveAuras", "vertical-euclidean") === true) {
                 let heightChange = Math.abs(t1.data.elevation - t2.data.elevation)
@@ -593,12 +604,13 @@ Hooks.on("ready", () => {
             }
         }
         return distance;
+
     }
     /**
-  * 
-  * @param {Token} token - token to apply effect too
-  * @param {ActiveEffect} effectData - effect data to generate effect
-  */
+    * 
+    * @param {Token} token - token to apply effect too
+    * @param {ActiveEffect} effectData - effect data to generate effect
+    */
     async function CreateActiveEffect(tokenID, oldEffectData) {
         let token = canvas.tokens.get(tokenID)
         if (token.actor.effects.entries.find(e => e.data.label === oldEffectData.label)) return;
