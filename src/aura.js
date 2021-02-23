@@ -126,7 +126,7 @@ Hooks.on("ready", () => {
             </div>
             <div class="form-group">
                 <label>${FormRadius}</label>
-                <input id="radius" name="flags.${MODULE_NAME}.radius" type="number" min="0" value="${flags[MODULE_NAME]?.radius}" placeholder="${FormRadiusPrompt}"></input>
+                <input id="radius" name="flags.${MODULE_NAME}.radius" type="number" min="0" step="any" value="${flags[MODULE_NAME]?.radius}" placeholder="${FormRadiusPrompt}"></input>
             </div> 
             <div class="form-group">
             <label>${FormSaveEnable}</label>
@@ -153,16 +153,21 @@ Hooks.on("ready", () => {
     */
     Hooks.on("createToken", (_scene, token) => {
         let actor = game.actors.get(token.actorId)
-        if (actor.effects?.entries) {
-            for (let effect of actor.effects?.entries) {
-                if (effect.getFlag('ActiveAuras', 'isAura')) {
-                    setTimeout(() => {
-                        if (debug) console.log("createToken, collate auras true false")
-                        CollateAuras(canvas, true, false, "createToken")
-                    }, 20)
-                    break;
+        try {
+            if (actor.effects?.entries) {
+                for (let effect of actor.effects?.entries) {
+                    if (effect.getFlag('ActiveAuras', 'isAura')) {
+                        setTimeout(() => {
+                            if (debug) console.log("createToken, collate auras true false")
+                            CollateAuras(canvas, true, false, "createToken")
+                        }, 20)
+                        break;
+                    }
                 }
             }
+        } catch (error) {
+            if (error.message === "Cannot read property 'effects' of null")
+                console.error(token, `This token has a no actor linked to it, please cleanup this token`)
         }
     });
 
@@ -303,6 +308,7 @@ Hooks.on("ready", () => {
     function IsAuraToken(token, canvas) {
         let MapKey = canvas.scene._id;
         MapObject = AuraMap.get(MapKey);
+        if (!MapObject.effects) return;
         for (let effect of MapObject.effects) {
             if (effect.tokenId === token._id) return true;
 
@@ -444,7 +450,7 @@ Hooks.on("ready", () => {
     }
 
 
-  
+
     /**
      * Test individual token against aura array
      * @param {Map} map - empty map to populate 
@@ -456,18 +462,41 @@ Hooks.on("ready", () => {
             if (GetAllFlags(canvasToken, 'multilevel-tokens')) return;
         }
         if (canvasToken.actor === null) return;
+
         let tokenType;
         switch (canvasToken.actor.data.type) {
-            case "npc":
-                tokenType = canvasToken.actor?.data.data.details.type.toLowerCase();
+            case "npc": {
+                try {
+                    tokenType = canvasToken.actor?.data.data.details.type.toLowerCase();
+                } catch (error) {
+                    console.error([`ActiveAuras the token has an unreadable type`, canvasToken])
+                }
+            }
                 break;
-            case "character":
-                tokenType = canvasToken.actor?.data.data.details.race.toLowerCase()
+            case "character": {
+                try {
+                    tokenType = canvasToken.actor?.data.data.details.race.toLowerCase()
+                } catch (error) {
+                    console.error([`ActiveAuras the token has an unreadable type`, canvasToken])
+                }
+            }
                 break;
+            case "vehicle": return;
         }
-        let humanoidRaces = ["human", "orc", "half orc", "elf", "half elf", "tiefling", "gnome", "aaracokra", "dragonborn", "dwarf", "halfing", "leonin", "satyr", "genasi", "goliath", "aasimar", "bugbear", "firbolg", "goblin", "lizardfolk", "tabxi", "triton", "yuan-ti", "tortle", "changling", "kalashtar", "shifter", "warforged", "gith", "centaur", "loxodon", "minotaur", "simic hybrid", "vedalken", "verdan", "locathah", "grung"]
-        if (humanoidRaces.includes(tokenType)) tokenType = "humanoid"
-        let tokenAlignment = canvasToken.actor?.data.data.details.alignment.toLowerCase();
+        tokenType = tokenType.split(" ");
+        let humanoidRaces = ["human", "orc", "elf", "tiefling", "gnome", "aaracokra", "dragonborn", "dwarf", "halfling", "leonin", "satyr", "genasi", "goliath", "aasimar", "bugbear", "firbolg", "goblin", "lizardfolk", "tabxi", "triton", "yuan-ti", "tortle", "changling", "kalashtar", "shifter", "warforged", "gith", "centaur", "loxodon", "minotaur", "simic hybrid", "vedalken", "verdan", "locathah", "grung"]
+        for (x of tokenType) {
+            if (humanoidRaces.includes(x)) {
+                tokenType = "humanoid"
+                continue;
+            }
+        }
+        let tokenAlignment;
+        try {
+             tokenAlignment = canvasToken.actor?.data.data.details.alignment.toLowerCase();
+             } catch (error) {
+                    console.error([`ActiveAuras the token has an unreadable alignment`, canvasToken])
+                }
         let MapKey = canvasToken.scene._id;
         MapObject = AuraMap.get(MapKey)
         let checkEffects = MapObject.effects;
@@ -528,6 +557,7 @@ Hooks.on("ready", () => {
     }
 
 
+
     function getDistance(t1, t2, wallblocking = false, auraHeight) {
         //Log("get distance callsed");
         var x, x1, y, y1, d, r, segments = [], rdistance, distance;
@@ -552,7 +582,7 @@ Hooks.on("ready", () => {
                 // console.log(segments);
                 if (segments.length === 0) {
                     //Log(`${t2.data.name} full blocked by walls`);
-                    return -1;
+                    return false;
                 }
                 rdistance = canvas.grid.measureDistances(segments, { gridSpaces: true });
                 distance = rdistance[0];
@@ -579,7 +609,7 @@ Hooks.on("ready", () => {
                 }
                 if (segments.length === 0) {
                     //Log(`${t2.data.name} full blocked by walls`);
-                    return -1;
+                    return false;
                 }
                 rdistance = []
                 segments.forEach(i => rdistance.push(i.ray.distance / gs * canvas.dimensions.distance))
