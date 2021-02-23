@@ -1,12 +1,4 @@
 Hooks.on('init', () => {
-    game.settings.register("ActiveAuras", "measurement", {
-        name: game.i18n.format("ACTIVEAURAS.measurmentoptions_name"),
-        hint: game.i18n.format("ACTIVEAURAS.measurmentoptions_hint"),
-        scope: "world",
-        config: true,
-        default: true,
-        type: Boolean,
-    });
     game.settings.register("ActiveAuras", "wall-block", {
         name: game.i18n.format("ACTIVEAURAS.walltoptions_name"),
         hint: game.i18n.format("ACTIVEAURAS.walltoptions_hint"),
@@ -407,7 +399,7 @@ Hooks.on("ready", () => {
                 updateTokens = [];
                 updateTokens.push(canvas.tokens.get(movedToken._id))
             }
-            if(IsAuraToken(movedToken, canvas)){
+            if (IsAuraToken(movedToken, canvas)) {
                 auraTokenId = movedToken._id
             }
         }
@@ -454,7 +446,7 @@ Hooks.on("ready", () => {
         if (game.modules.get("multilevel-tokens")) {
             if (GetAllFlags(canvasToken, 'multilevel-tokens')) return;
         }
-        if(canvasToken.actor === null) return;
+        if (canvasToken.actor === null) return;
         let tokenType;
         switch (canvasToken.actor.data.type) {
             case "npc":
@@ -470,7 +462,7 @@ Hooks.on("ready", () => {
         let MapKey = canvasToken.scene._id;
         MapObject = AuraMap.get(MapKey)
         let checkEffects = MapObject.effects;
-        if(tokenId){
+        if (tokenId) {
             checkEffects = checkEffects.filter(i => i.tokenId === tokenId)
         }
 
@@ -483,8 +475,8 @@ Hooks.on("ready", () => {
             let auraToken;
             let auraRadius = auraEffect.data.flags?.ActiveAuras?.radius;
             let auraHeight = auraEffect.data.flags?.ActiveAuras?.height;
-            let auraType = auraEffect.data.flags?.ActiveAuras?.type !== undefined ? auraEffect.data.flags?.ActiveAuras?.type.toLowerCase() : "";
-            let auraAlignment = auraEffect.data.flags?.ActiveAuras?.alignment !== undefined ? auraEffect.data.flags?.ActiveAuras?.alignment.toLowerCase() : "";
+            let auraType = auraEffect.data.flags?.ActiveAuras?.type.toLowerCase();
+            let auraAlignment = auraEffect.data.flags?.ActiveAuras?.alignment.toLowerCase();
 
             //{data: testEffect.data, parentActorLink :testEffect.parent.data.token.actorLink, parentActorId : testEffect.parent._id, tokenId: testToken.id}
             if (auraEffect.parentActorLink) {
@@ -492,7 +484,7 @@ Hooks.on("ready", () => {
                 if (auraTokenArray.length > 1) {
                     auraToken = auraTokenArray.reduce(FindClosestToken, auraTokenArray[0])
                     function FindClosestToken(tokenA, tokenB) {
-                        return RayDistance(tokenA, canvasToken) < RayDistance(tokenB, canvasToken) ? tokenA : tokenB
+                        return getDistance(tokenA, canvasToken, game.settings.get("ActiveAuras", "wall-block"), auraHeight) < getDistance(tokenB, canvasToken, game.settings.get("ActiveAuras", "wall-block"), auraHeight) ? tokenA : tokenB
                     }
                 }
                 else auraToken = auraTokenArray[0]
@@ -506,7 +498,7 @@ Hooks.on("ready", () => {
             if (!tokenAlignment.includes(auraAlignment) && !tokenAlignment.includes("any")) continue;
             if (!tokenType.includes(auraType) && !tokenType.includes("any")) continue;
 
-            let distance = RayDistance(canvasToken, auraToken, auraHeight)
+            let distance = getDistance(canvasToken, auraToken, game.settings.get("ActiveAuras", "wall-block"), auraHeight)
             if ((distance !== false) && (distance <= auraRadius)) {
                 if (MapObject) {
                     MapObject.add = true
@@ -558,6 +550,50 @@ Hooks.on("ready", () => {
         return distance
     }
 
+    function getDistance(t1, t2, wallblocking = false, auraHeight) {
+        //Log("get distance callsed");
+        var x, x1, y, y1, d, r, segments = [], rdistance, distance;
+        for (x = 0; x < t1.data.width; x++) {
+            for (y = 0; y < t1.data.height; y++) {
+                const origin = new PIXI.Point(...canvas.grid.getCenter(t1.data.x + (canvas.dimensions.size * x), t1.data.y + (canvas.dimensions.size * y)));
+                for (x1 = 0; x1 < t2.data.width; x1++) {
+                    for (y1 = 0; y1 < t2.data.height; y1++) {
+                        const dest = new PIXI.Point(...canvas.grid.getCenter(t2.data.x + (canvas.dimensions.size * x1), t2.data.y + (canvas.dimensions.size * y1)));
+                        const r = new Ray(origin, dest);
+                        if (wallblocking && canvas.walls.checkCollision(r)) {
+                            //Log(`ray ${r} blocked due to walls`);
+                            continue;
+                        }
+                        segments.push({ ray: r });
+                    }
+                }
+            }
+        }
+        // console.log(segments);
+        if (segments.length === 0) {
+            //Log(`${t2.data.name} full blocked by walls`);
+            return -1;
+        }
+        rdistance = canvas.grid.measureDistances(segments, { gridSpaces: true });
+        distance = rdistance[0];
+        rdistance.forEach(d => {
+            if (d < distance)
+                distance = d;
+        });
+        if (auraHeight === true) {
+            if (game.settings.get("ActiveAuras", "vertical-euclidean") === true) {
+                let heightChange = Math.abs(t1.data.elevation - t2.data.elevation)
+                distance = distance > heightChange ? distance : heightChange
+            }
+            if (game.settings.get("ActiveAuras", "vertical-euclidean") === false) {
+                let a = distance;
+                let b = (t1.data.elevation - t2.data.elevation)
+                let c = (a * a) + (b * b)
+                distance = Math.sqrt(c)
+            }
+        }
+        return distance;
+    }
     /**
   * 
   * @param {Token} token - token to apply effect too
