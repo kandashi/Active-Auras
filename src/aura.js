@@ -241,10 +241,10 @@ Hooks.on("ready", () => {
     Hooks.on("deleteActiveEffect", (_actor, effect) => {
         let applyStatus = effect.flags?.ActiveAuras?.applied;
         let auraStatus = effect.flags?.ActiveAuras?.isAura;
-        if (!applyStatus && applyStatus) {
+        if (!applyStatus && auraStatus) {
             setTimeout(() => {
                 if (debug) console.log("deleteAE, collate auras true false")
-                CollateAuras(canvas, true, false, "createActiveEffect")
+                CollateAuras(canvas, false, true, "deleteActiveEffect")
             }, 20)
         }
     });
