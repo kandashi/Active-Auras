@@ -3,18 +3,18 @@
 	"title": "Active-Auras",
 	"description": "Active-Auras",
 	"author": "Kandashi",
-	"version": "0.1.42",
+	"version": "0.1.43",
 	"minimumCoreVersion": "0.7.5",
 	"compatibleCoreVersion": "0.7.9",
 	"packs": [
 		{
 			"name": "Active Auras premade",
 			"label": "Active Auras premade",
-			"path" : "packs/AuraItems",
+			"path": "packs/AuraItems",
 			"entity": "Item",
 			"module": "ActiveAuras"
 		}
-		],
+	],
 	"scripts": [
 		"src/aura.js"
 	],
@@ -23,15 +23,20 @@
 			"lang": "en",
 			"name": "English",
 			"path": "lang/en.json"
-		  },
-		  {
+		},
+		{
 			"lang": "es",
 			"name": "Español",
 			"path": "lang/es.json"
-		  }
+		},
+		{
+			"lang": "ko",
+			"name": "Korean",
+			"path": "lang/ko.json"
+		}
 	],
-	 "url": "https://github.com/kandashi/Active-Auras",
-         "manifest": "https://raw.githubusercontent.com/kandashi/Active-Auras/main/module.json",
+	"url": "https://github.com/kandashi/Active-Auras",
+	"manifest": "https://raw.githubusercontent.com/kandashi/Active-Auras/main/module.json",
 	"download": "https://github.com/kandashi/Active-Auras/archive/main.zip",
 	"allowBugReporter": true,
 	"bugs": "https://github.com/kandashi/Active-Auras/issues"
