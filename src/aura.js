@@ -483,7 +483,7 @@ Hooks.on("ready", () => {
                 break;
             case "vehicle": return;
         }
-        tokenType = tokenType.split(" ");
+        tokenType = tokenType.replace("-", " ").split(" ");
         let humanoidRaces = ["human", "orc", "elf", "tiefling", "gnome", "aaracokra", "dragonborn", "dwarf", "halfling", "leonin", "satyr", "genasi", "goliath", "aasimar", "bugbear", "firbolg", "goblin", "lizardfolk", "tabxi", "triton", "yuan-ti", "tortle", "changling", "kalashtar", "shifter", "warforged", "gith", "centaur", "loxodon", "minotaur", "simic hybrid", "vedalken", "verdan", "locathah", "grung"]
         for (x of tokenType) {
             if (humanoidRaces.includes(x)) {
@@ -513,8 +513,8 @@ Hooks.on("ready", () => {
             let auraToken;
             let auraRadius = auraEffect.data.flags?.ActiveAuras?.radius;
             let auraHeight = auraEffect.data.flags?.ActiveAuras?.height;
-            let auraType = auraEffect.data.flags?.ActiveAuras?.type.toLowerCase();
-            let auraAlignment = auraEffect.data.flags?.ActiveAuras?.alignment.toLowerCase();
+            let auraType = auraEffect.data.flags?.ActiveAuras?.type  !== undefined ? auraEffect.data.flags?.ActiveAuras?.type.toLowerCase(): "";
+            let auraAlignment = auraEffect.data.flags?.ActiveAuras?.alignment !== undefined ? auraEffect.data.flags?.ActiveAuras?.alignment.toLowerCase() : "";
 
             //{data: testEffect.data, parentActorLink :testEffect.parent.data.token.actorLink, parentActorId : testEffect.parent._id, tokenId: testToken.id}
             if (auraEffect.parentActorLink) {
@@ -533,8 +533,8 @@ Hooks.on("ready", () => {
             if (auraToken.id === canvasToken.id) continue;
             if (auraTargets === "Allies" && (auraToken.data.disposition !== canvasToken.data.disposition)) continue;
             if (auraTargets === "Enemy" && (auraToken.data.disposition === canvasToken.data.disposition)) continue;
-            if (!tokenAlignment.includes(auraAlignment) && !tokenAlignment.includes("any")) continue;
-            if (!tokenType.includes(auraType) && !tokenType.includes("any")) continue;
+            if (auraAlignment !== "" && !tokenAlignment.includes(auraAlignment) && !tokenAlignment.includes("any")) continue;
+            if (auraType !== "" && !tokenType.includes(auraType) && !tokenType.includes("any")) continue;
 
             let distance = getDistance(canvasToken, auraToken, game.settings.get("ActiveAuras", "wall-block"), auraHeight)
             if ((distance !== false) && (distance <= auraRadius)) {
