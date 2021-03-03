@@ -340,7 +340,7 @@ Hooks.on("ready", () => {
         for (let testToken of canvas.tokens.placeables) {
 
             //Skips over null actor tokens
-            if (testToken.actor === null || testToken.actor === undefined) continue;#
+            if (testToken.actor === null || testToken.actor === undefined) continue;
             //Skips over MLT coppied tokens
             if (game.modules.get("multilevel-tokens")?.active) {
                 if (GetAllFlags(testToken, 'multilevel-tokens')) continue;
@@ -640,7 +640,7 @@ Hooks.on("ready", () => {
                     //Log(`${t2.data.name} full blocked by walls`);
                     return false;
                 }
-                rdistance = canvas.grid.measureDistances(segments, { gridSpaces: true });
+                rdistance = segments.map(segment => canvas.grid.measureDistances([segment], { gridSpaces: true })[0]);
                 distance = rdistance[0];
                 rdistance.forEach(d => {
                     if (d < distance)
