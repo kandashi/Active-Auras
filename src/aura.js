@@ -45,6 +45,7 @@ let existingActiveEffectsApply;
 
 Hooks.on("ready", () => {
     const MODULE_NAME = "ActiveAuras";
+    const gm = game.user === game.users.find((u) => u.isGM && u.active)
 
     /**
      * Bind a filter to the ActiveEffect.apply() prototype chain
@@ -152,6 +153,7 @@ Hooks.on("ready", () => {
     * Re-run aura detection on token creation
     */
     Hooks.on("createToken", (_scene, token) => {
+        if (!gm) return;
         let actor = game.actors.get(token.actorId)
         try {
             if (actor.effects?.entries) {
@@ -176,6 +178,7 @@ Hooks.on("ready", () => {
      * Filter for aura effects on deleted token and remove from canvas tokens
      */
     Hooks.on("preDeleteToken", async (_scene, token) => {
+        if (!gm) return;
         if (IsAuraToken(token, canvas)) {
             setTimeout(() => {
                 if (debug) console.log("preDelete, collate auras false true")
@@ -216,6 +219,7 @@ Hooks.on("ready", () => {
      * On token movement run MainAura
      */
     Hooks.on("updateToken", async (_scene, token, update, _flags, _id) => {
+        if (!gm) return;
         if (("y" in update || "x" in update || "elevation" in update)) {
             if (debug) console.log("movement, main aura")
             await MainAura(token, "movement update")
@@ -240,6 +244,7 @@ Hooks.on("ready", () => {
      * @todo
      */
     Hooks.on("updateActiveEffect", (_actor, effect, _update) => {
+        if (!gm) return;
         if (effect.flags?.ActiveAuras?.isAura) {
             setTimeout(() => {
                 if (debug) console.log("updateAE, collate auras true true")
@@ -252,6 +257,7 @@ Hooks.on("ready", () => {
      * On removal of active effect from linked actor, if aura remove from canvas.tokens
      */
     Hooks.on("deleteActiveEffect", (_actor, effect) => {
+        if (!gm) return;
         let applyStatus = effect.flags?.ActiveAuras?.applied;
         let auraStatus = effect.flags?.ActiveAuras?.isAura;
         if (!applyStatus && auraStatus) {
@@ -266,6 +272,7 @@ Hooks.on("ready", () => {
      * On creation of active effect on linked actor, run MainAura
      */
     Hooks.on("createActiveEffect", (_actor, effect) => {
+        if (!gm) return;
         if (!effect.flags?.ActiveAuras?.applied && effect.flags?.ActiveAuras?.isAura) {
             setTimeout(() => {
                 if (debug) console.log("deleteAE, collate auras true false")
@@ -275,6 +282,7 @@ Hooks.on("ready", () => {
     });
 
     Hooks.on("canvasReady", (canvas) => {
+        if (!gm) return;
         setTimeout(() => {
             if (debug) console.log("canvasReady, collate auras true false")
             CollateAuras(canvas, true, false, "ready")
@@ -286,12 +294,14 @@ Hooks.on("ready", () => {
             if (IsAuraToken(actor.getActiveTokens()[0].data, canvas)) {
                 if (debug) console.log("0hp, collate auras true true")
                 Hooks.once("updateActor", () => {
+                    if (!gm) return;
                     CollateAuras(canvas, true, true, "updateActor, dead")
                 })
             }
         }
         if (actor.data.data.attributes.hp.value === 0 && update?.data?.attributes?.hp?.value > 0) {
             Hooks.once("updateActor", () => {
+                if (!gm) return;
                 CollateAuras(canvas, true, false, "updateActor, revived")
             })
         }
@@ -305,6 +315,12 @@ Hooks.on("ready", () => {
         }
     }
 
+    /**
+     * 
+     * @param {token} token 
+     * @param {scene} canvas 
+     * checks if provided token has an aura stored in the scene  
+     */
     function IsAuraToken(token, canvas) {
         let MapKey = canvas.scene._id;
         MapObject = AuraMap.get(MapKey);
@@ -316,15 +332,16 @@ Hooks.on("ready", () => {
     }
 
     function CollateAuras(canvas, checkAuras, removeAuras, source) {
-        if (debug) console.log(source)
-        let gm = game.user === game.users.find((u) => u.isGM && u.active)
         if (!gm) return;
+        if (debug) console.log(source)
         let MapKey = canvas.scene._id;
         MapObject = AuraMap.get(MapKey);
         let effectArray = [];
         for (let testToken of canvas.tokens.placeables) {
 
+            //Skips over null actor tokens
             if (testToken.actor === null || testToken.actor === undefined) continue;
+            //Skips over MLT coppied tokens
             if (game.modules.get("multilevel-tokens")?.active) {
                 if (GetAllFlags(testToken, 'multilevel-tokens')) continue;
             }
@@ -340,7 +357,7 @@ Hooks.on("ready", () => {
                                 let dataPath = change.value.substring(2)
                                 let newValue = getProperty(testToken.actor.getRollData(), dataPath)
                                 const changeIndex = newEffect.data.changes.findIndex(i => i.value === change.value && i.key === change.key)
-                                newEffect.data.changes[changeIndex].value = `+ ${newValue}`
+                                newEffect.data.changes[changeIndex].value = `+${newValue}`
                             }
                         }
                         if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.data.flags.ActiveAuras.isMacro = true
@@ -351,8 +368,8 @@ Hooks.on("ready", () => {
                     newEffect.data.flags.ActiveAuras.isAura = false;
                     newEffect.data.flags.ActiveAuras.applied = true;
                     newEffect.data.flags.ActiveAuras.isMacro = macro;
-                    newEffect.data.flags.ActiveAuras.ignoreSelf = false
-                        ;
+                    newEffect.data.flags.ActiveAuras.ignoreSelf = false;
+                    newEffect.data.flags.ActiveAuras.aura = "";
                     effectArray.push(newEffect)
                 }
             }
@@ -401,7 +418,6 @@ Hooks.on("ready", () => {
      */
     async function MainAura(movedToken, source) {
         if (debug) console.log(source)
-        let gm = game.user === game.users.find((u) => u.isGM && u.active)
         if (!gm) return;
 
         let map = new Map();
@@ -409,13 +425,14 @@ Hooks.on("ready", () => {
         let auraTokenId;
 
         if (movedToken !== undefined) {
-            if (!IsAuraToken(movedToken, canvas)) {
-                updateTokens = [];
-                updateTokens.push(canvas.tokens.get(movedToken._id))
-            }
             if (IsAuraToken(movedToken, canvas)) {
                 auraTokenId = movedToken._id
             }
+            else {
+                updateTokens = [];
+                updateTokens.push(canvas.tokens.get(movedToken._id))
+            }
+
         }
         UpdateAllTokens(map, updateTokens, auraTokenId)
 
@@ -424,6 +441,42 @@ Hooks.on("ready", () => {
             map.set(MapKey, { add: mapEffect[1].add, token: mapEffect[1].token, effect: mapEffect[1].effect.data })
         }
         if (debug) console.log(map)
+
+
+
+        map.forEach(compareMap)
+
+        /**
+         * 
+         * @param {map value} value 
+         * @param {map key} key 
+         * @param {map object} map1 
+         * Loop over the map to remove any "add.false" entries where a "add.true" is present, prevents odd ordering from removing auras when in range of 2 or more of the same aura
+         * Where 2 of the same type of aura are present, choose the higher of the 2 values to update too
+         */
+        function compareMap(value, key, map1) {
+            const iterator1 = map1[Symbol.iterator]();
+            for (const m of iterator1) {
+                if (m[0] === key) continue;
+
+                if ((m[1].effect.label === value.effect.label) && (m[1].add === true && value.add === true)) {
+                    for (let e = 0; e < m[1].effect.changes.length; e++) {
+                        if (typeof (parseInt(m[1].effect.changes[e].value)) !== "number") continue;
+                        let oldEffectValue = parseInt(value.effect.changes[e].value);
+                        let newEffectValue = parseInt(m[1].effect.changes[e].value)
+                        if (oldEffectValue < newEffectValue) {
+                            map1.delete(key)
+                        }
+                    }
+                }
+
+                else if ((m[1].effect.label === value.effect.label) && (m[1].add === true || value.add === true)) {
+                    if (value.add === false) map.delete(key)
+                }
+            }
+
+        }
+
         for (let update of map) {
             if (update[1].add) {
                 await CreateActiveEffect(update[1].token.id, update[1].effect)
@@ -462,14 +515,13 @@ Hooks.on("ready", () => {
             if (GetAllFlags(canvasToken, 'multilevel-tokens')) return;
         }
         if (canvasToken.actor === null) return;
-
         let tokenType;
         switch (canvasToken.actor.data.type) {
             case "npc": {
                 try {
                     tokenType = canvasToken.actor?.data.data.details.type.toLowerCase();
                 } catch (error) {
-                    console.error([`ActiveAuras the token has an unreadable type`, canvasToken])
+                    console.error([`ActiveAuras: the token has an unreadable type`, canvasToken])
                 }
             }
                 break;
@@ -477,7 +529,7 @@ Hooks.on("ready", () => {
                 try {
                     tokenType = canvasToken.actor?.data.data.details.race.toLowerCase()
                 } catch (error) {
-                    console.error([`ActiveAuras the token has an unreadable type`, canvasToken])
+                    console.error([`ActiveAuras: the token has an unreadable type`, canvasToken])
                 }
             }
                 break;
@@ -493,27 +545,30 @@ Hooks.on("ready", () => {
         }
         let tokenAlignment;
         try {
-             tokenAlignment = canvasToken.actor?.data.data.details.alignment.toLowerCase();
-             } catch (error) {
-                    console.error([`ActiveAuras the token has an unreadable alignment`, canvasToken])
-                }
+            tokenAlignment = canvasToken.actor?.data.data.details.alignment.toLowerCase();
+        } catch (error) {
+            console.error([`ActiveAuras: the token has an unreadable alignment`, canvasToken])
+        }
         let MapKey = canvasToken.scene._id;
         MapObject = AuraMap.get(MapKey)
         let checkEffects = MapObject.effects;
+        //Check for other types of X aura if the aura token is moved
         if (tokenId) {
             checkEffects = checkEffects.filter(i => i.tokenId === tokenId)
-        }
+            let duplicateEffect = []
+            checkEffects.forEach(e => duplicateEffect = (MapObject.effects.filter(i => (i.data?.label === e.data?.label) && i.tokenId !== tokenId)));
+            checkEffects = checkEffects.concat(duplicateEffect)
 
+        }
 
         for (let auraEffect of checkEffects) {
 
             let auraTargets = auraEffect.data.flags?.ActiveAuras?.aura
-            let MapKey = auraEffect.data.label + "-" + canvasToken.id;
-            MapObject = map.get(MapKey);
+
             let auraToken;
             let auraRadius = auraEffect.data.flags?.ActiveAuras?.radius;
             let auraHeight = auraEffect.data.flags?.ActiveAuras?.height;
-            let auraType = auraEffect.data.flags?.ActiveAuras?.type  !== undefined ? auraEffect.data.flags?.ActiveAuras?.type.toLowerCase(): "";
+            let auraType = auraEffect.data.flags?.ActiveAuras?.type !== undefined ? auraEffect.data.flags?.ActiveAuras?.type.toLowerCase() : "";
             let auraAlignment = auraEffect.data.flags?.ActiveAuras?.alignment !== undefined ? auraEffect.data.flags?.ActiveAuras?.alignment.toLowerCase() : "";
 
             //{data: testEffect.data, parentActorLink :testEffect.parent.data.token.actorLink, parentActorId : testEffect.parent._id, tokenId: testToken.id}
@@ -530,12 +585,13 @@ Hooks.on("ready", () => {
             else if (auraEffect.tokenId) {
                 auraToken = canvas.tokens.get(auraEffect.tokenId)
             }
+            let MapKey = auraEffect.data.label + "-" + canvasToken.id + "-" + auraToken.id;
+            MapObject = map.get(MapKey);
             if (auraToken.id === canvasToken.id) continue;
             if (auraTargets === "Allies" && (auraToken.data.disposition !== canvasToken.data.disposition)) continue;
             if (auraTargets === "Enemy" && (auraToken.data.disposition === canvasToken.data.disposition)) continue;
             if (auraAlignment !== "" && !tokenAlignment.includes(auraAlignment) && !tokenAlignment.includes("any")) continue;
             if (auraType !== "" && !tokenType.includes(auraType) && !tokenType.includes("any")) continue;
-
             let distance = getDistance(canvasToken, auraToken, game.settings.get("ActiveAuras", "wall-block"), auraHeight)
             if ((distance !== false) && (distance <= auraRadius)) {
                 if (MapObject) {
@@ -584,7 +640,7 @@ Hooks.on("ready", () => {
                     //Log(`${t2.data.name} full blocked by walls`);
                     return false;
                 }
-                rdistance = canvas.grid.measureDistances(segments, { gridSpaces: true });
+                rdistance = segments.map(segment => canvas.grid.measureDistances([segment], { gridSpaces: true })[0]);
                 distance = rdistance[0];
                 rdistance.forEach(d => {
                     if (d < distance)
@@ -643,8 +699,13 @@ Hooks.on("ready", () => {
     */
     async function CreateActiveEffect(tokenID, oldEffectData) {
         let token = canvas.tokens.get(tokenID)
-        if (token.actor.effects.entries.find(e => e.data.label === oldEffectData.label)) return;
-        if (oldEffectData.flags[MODULE_NAME].save !== "") {
+
+        let duplicateEffect = token.actor.effects.entries.find(e => e.data.label === oldEffectData.label)
+        if (duplicateEffect) {
+            if (JSON.stringify(duplicateEffect.data.changes) === JSON.stringify(oldEffectData.changes)) return;
+            else await RemoveActiveEffects(tokenID, oldEffectData.label)
+        }
+        if (oldEffectData.flags[MODULE_NAME].save) {
             const flavor = `${CONFIG.DND5E.abilities[oldEffectData.flags[MODULE_NAME].save]} DC${oldEffectData.flags[MODULE_NAME].savedc} ${oldEffectData.label || ""}`;
             let saveRoll = (await token.actor.rollAbilitySave(oldEffectData.flags[MODULE_NAME].save, { flavor }));
             if (saveRoll && (saveRoll.total >= oldEffectData.flags[MODULE_NAME].savedc)) {
@@ -691,7 +752,7 @@ Hooks.on("ready", () => {
     async function RemoveActiveEffects(tokenID, effectLabel) {
         let token = canvas.tokens.get(tokenID)
         for (let tokenEffects of token.actor.effects) {
-            if (tokenEffects.data.label === effectLabel && tokenEffects.data.flags?.ActiveAuras.applied === true) {
+            if (tokenEffects.data.label === effectLabel && tokenEffects.data.flags?.ActiveAuras?.applied === true) {
                 await token.actor.deleteEmbeddedEntity("ActiveEffect", tokenEffects.id)
                 console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: effectLabel, tokenName: token.name }))
 
