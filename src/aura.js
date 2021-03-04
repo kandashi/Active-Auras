@@ -140,8 +140,15 @@ Hooks.on("ready", () => {
             
         </div>`;
 
+        const appliedAuraContent = `
+        <div class="tab" data-tab="ActiveAuras">
+            <h3> You cannot alter an applied aura </h3>
+        </div>
+        `
+
         html.find(".tabs .item").last().after(tab);
         if (!flags[MODULE_NAME]?.applied) html.find(".tab").last().after(contents);
+        else html.find(".tab").last().after(appliedAuraContent);
     });
 
     let AuraMap = new Map()
@@ -369,7 +376,6 @@ Hooks.on("ready", () => {
                     newEffect.data.flags.ActiveAuras.applied = true;
                     newEffect.data.flags.ActiveAuras.isMacro = macro;
                     newEffect.data.flags.ActiveAuras.ignoreSelf = false;
-                    newEffect.data.flags.ActiveAuras.aura = "";
                     effectArray.push(newEffect)
                 }
             }
@@ -470,7 +476,7 @@ Hooks.on("ready", () => {
                     }
                 }
 
-                else if ((m[1].effect.label === value.effect.label) && (m[1].add === true || value.add === true)) {
+                else if ((m[1].effect.label === value.effect.label) && (m[1].add === true || value.add === true) && (m[1].token.id === value.token.id)) {
                     if (value.add === false) map.delete(key)
                 }
             }
@@ -739,7 +745,7 @@ Hooks.on("ready", () => {
                 }
             }
         }
-
+        ['ignoreSelf', 'hidden', 'height', 'alignment', 'type', 'aura', 'radius', 'save', 'isAura', 'savedc', 'height'].forEach(e => delete effectData.flags.ActiveAuras[e])
         await token.actor.createEmbeddedEntity("ActiveEffect", effectData);
         console.log(game.i18n.format("ACTIVEAURAS.ApplyLog", { effectDataLabel: effectData.label, tokenName: token.name }))
     }
