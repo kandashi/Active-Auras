@@ -144,12 +144,11 @@ Hooks.on("ready", () => {
             <div class="form-group">
             <label>${FormSaveEnable}</label>
             <input id="save" name="flags.${MODULE_NAME}.save" type="text" value="${save}" placeholder="${FormSavePrompt}"></input>
-        </div>
+            </div>
             <div class="form-group">
                 <label>${FormSaveDC}</label>
                 <input id="savedc" name="flags.${MODULE_NAME}.savedc" type="number" min="0" value="${flags[MODULE_NAME]?.savedc}"></input>
             </div>
-        </div>
             <div class="form-group">
                 <label>${HostileTurn}</label>
                 <input name="flags.${MODULE_NAME}.hostile" type="checkbox" ${flags[MODULE_NAME]?.hostile ? 'checked' : ''}></input>
@@ -157,8 +156,8 @@ Hooks.on("ready", () => {
             <div class="form-group">
                 <label>${ActivateOnce}</label>
                 <input name="flags.${MODULE_NAME}.onlyOnce" type="checkbox" ${flags[MODULE_NAME]?.onlyOnce ? 'checked' : ''}></input>
-            </div>`
-            ;
+            </div>
+        </div>`;
 
         if (game.modules.get("times-up").active) {
             contents += `
