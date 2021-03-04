@@ -31,6 +31,9 @@
     "ACTIVEAURAS.FORM_TypePrompt": "humanoid/beast etc",
     "ACTIVEAURAS.FORM_RadiusPrompt": "Measured by your grid scale",
     "ACTIVEAURAS.FORM_SavePrompt": "str/dex/con/wis/int/cha",    
+    "ACTIVEAURAS.FORM_TimePrompt": "Special Expiry for the Applied Effect",
+    "ACTIVEAURAS.FORM_HostileTurn": "Only apply during the current combatants turn",
+    "ACTIVEAURAS.FORM_ActivateOnce": "Only trigger the aura once per turn",
 
     "ACTIVEAURAS.ApplyLog":"ActiveAuras | Applied '{effectDataLabel}' to {tokenName}",
     "ACTIVEAURAS.RemoveLog":"ActiveAuras | Removed '{effectDataLabel}' from {tokenName}",

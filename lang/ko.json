@@ -30,7 +30,10 @@
     "ACTIVEAURAS.FORM_SaveDC": "내성 굴림 난이도",
     "ACTIVEAURAS.FORM_TypePrompt": "인간형/야수 기타",
     "ACTIVEAURAS.FORM_RadiusPrompt": "격자 척도로 측정",
-    "ACTIVEAURAS.FORM_SavePrompt": "str/dex/con/wis/int/cha",    
+    "ACTIVEAURAS.FORM_SavePrompt": "str/dex/con/wis/int/cha",
+    "ACTIVEAURAS.FORM_TimePrompt": "[EN] Special Expiry for the Applied Effect",
+    "ACTIVEAURAS.FORM_HostileTurn": "[EN] Only apply during the current combatants turn",
+    "ACTIVEAURAS.FORM_ActivateOnce": "[EN] Only trigger the aura once per turn",    
 
     "ACTIVEAURAS.ApplyLog":"ActiveAuras | '{effectDataLabel}' 효과가 {tokenName} 캐릭터에게 적용되었습니다",
     "ACTIVEAURAS.RemoveLog":"ActiveAuras | '{effectDataLabel}' 효과가 {tokenName} 캐릭터에게 제거되었습니다.",
