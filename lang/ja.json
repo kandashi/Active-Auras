@@ -31,6 +31,9 @@
     "ACTIVEAURAS.FORM_TypePrompt": "humanoid/beast など",
     "ACTIVEAURAS.FORM_RadiusPrompt": "グリッドスケールで測定する",
     "ACTIVEAURAS.FORM_SavePrompt": "str/dex/con/wis/int/cha",
+    "ACTIVEAURAS.FORM_TimePrompt": "[EN] Special Expiry for the Applied Effect",
+    "ACTIVEAURAS.FORM_HostileTurn": "[EN] Only apply during the current combatants turn",
+    "ACTIVEAURAS.FORM_ActivateOnce": "[EN] Only trigger the aura once per turn", 
     
     "ACTIVEAURAS.ApplyLog":"Active Auras | {effectDataLabel}が{tokenName}に適用されました。",
     "ACTIVEAURAS.RemoveLog":"Active Auras | {effectDataLabel}が{tokenName}から取り除かれました。",

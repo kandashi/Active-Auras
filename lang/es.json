@@ -31,6 +31,9 @@
     "ACTIVEAURAS.FORM_TypePrompt": "humanoide/bestia, etc",
     "ACTIVEAURAS.FORM_RadiusPrompt": "Medido con tu escala de cuadrícula",
     "ACTIVEAURAS.FORM_SavePrompt": "fue/des/con/sab/int/car",
+    "ACTIVEAURAS.FORM_TimePrompt": "[EN] Special Expiry for the Applied Effect",
+    "ACTIVEAURAS.FORM_HostileTurn": "[EN]  Only apply during the current combatants turn",
+    "ACTIVEAURAS.FORM_ActivateOnce": "[EN] Only trigger the aura once per turn",
 
     "ACTIVEAURAS.ApplyLog":"ActiveAuras | '{effectDataLabel}' aplicado a {tokenName}",
     "ACTIVEAURAS.RemoveLog":"ActiveAuras | '{effectDataLabel}' quitado de {tokenName}",

@@ -78,6 +78,18 @@ Hooks.on("ready", () => {
         const FormTypePrompt = game.i18n.format("ACTIVEAURAS.FORM_TypePrompt")
         const FormRadiusPrompt = game.i18n.format("ACTIVEAURAS.FORM_RadiusPrompt")
         const FormSavePrompt = game.i18n.format("ACTIVEAURAS.FORM_SavePrompt")
+        const FormTimePrompt = game.i18n.format("ACTIVEAURAS.FORM_TimePrompt")
+        const HostileTurn = game.i18n.format("ACTIVEAURAS.FORM_HostileTurn")
+        const ActivateOnce = game.i18n.format("ACTIVEAURAS.FORM_ActivateOnce")
+        if (game.modules.get("dae").active && game.modules.get("times-up").active) {
+            var isAttacked = game.i18n.format("dae.isAttacked")
+            var isDamaged = game.i18n.format("dae.isDamaged")
+            var action = game.i18n.format("dae.1Action")
+            var attack = game.i18n.format("dae.1Attack")
+            var hit = game.i18n.format("dae.1Hit")
+            var turnStart = game.i18n.format("dae.turnStart")
+            var turnEnd = game.i18n.format("dae.turnEnd")
+        }
 
 
         const tab = `<a class="item" data-tab="ActiveAuras"><i class="fas fa-broadcast-tower"></i> ${AuraTab}</a>`;
@@ -85,7 +97,7 @@ Hooks.on("ready", () => {
         let alignment = flags[MODULE_NAME]?.alignment ? flags[MODULE_NAME]?.alignment : "";
         let save = flags[MODULE_NAME]?.save ? flags[MODULE_NAME]?.save : "";
 
-        const contents = `
+        let contents = `
         <div class="tab" data-tab="ActiveAuras">
             <div class="form-group">
                 <label>${FormIsAura}?</label>
@@ -136,9 +148,36 @@ Hooks.on("ready", () => {
             <div class="form-group">
                 <label>${FormSaveDC}</label>
                 <input id="savedc" name="flags.${MODULE_NAME}.savedc" type="number" min="0" value="${flags[MODULE_NAME]?.savedc}"></input>
+            </div>
+        </div>
+            <div class="form-group">
+                <label>${HostileTurn}</label>
+                <input name="flags.${MODULE_NAME}.hostile" type="checkbox" ${flags[MODULE_NAME]?.hostile ? 'checked' : ''}></input>
+            </div>
+            <div class="form-group">
+                <label>${ActivateOnce}</label>
+                <input name="flags.${MODULE_NAME}.onlyOnce" type="checkbox" ${flags[MODULE_NAME]?.onlyOnce ? 'checked' : ''}></input>
+            </div>`
+            ;
+
+        if (game.modules.get("times-up").active) {
+            contents += `
+            <div class="form-group">
+                <label>${FormTimePrompt}</label>
+                <select name="flags.${MODULE_NAME}.time" data-dtype="String" value=${flags[MODULE_NAME]?.time}>
+                    <option value="None" ${flags[MODULE_NAME]?.time === 'None' ? 'selected' : ''}></option>
+                    <option value="isAttacked"${flags[MODULE_NAME]?.time === 'isAttacked' ? 'selected' : ''}>${isAttacked}</option>
+                    <option value="isDamaged"${flags[MODULE_NAME]?.time === 'isDamaged' ? 'selected' : ''}>${isDamaged}</option>
+                    <option value="1Action"${flags[MODULE_NAME]?.time === '1Action' ? 'selected' : ''}>${action}</option>
+                    <option value="1Attack"${flags[MODULE_NAME]?.time === '1Attack' ? 'selected' : ''}>${attack}</option>
+                    <option value="1Hit"${flags[MODULE_NAME]?.time === '1Hit' ? 'selected' : ''}>${hit}</option>
+                    <option value="turnStart"${flags[MODULE_NAME]?.time === 'turnStart' ? 'selected' : ''}>${turnStart}</option>
+                    <option value="turnEnd"${flags[MODULE_NAME]?.time === 'turnEnd' ? 'selected' : ''}>${turnEnd}</option>
+                </select>
             </div> 
-            
-        </div>`;
+            `
+        }
+        else contents += `</div>`
 
         const appliedAuraContent = `
         <div class="tab" data-tab="ActiveAuras">
@@ -180,10 +219,17 @@ Hooks.on("ready", () => {
         }
     });
 
-    /**
-     * @todo
-     * Filter for aura effects on deleted token and remove from canvas tokens
-     */
+    Hooks.on("updateCombat", async (combat, changed, options, userId) => {
+        if (!("turn" in changed)) return;
+        if (!gm) return;
+        let combatant = canvas.tokens.get(combat.combatant.tokenId);
+        let previousTurn = combat.turns[changed.turn - 1 > -1 ? changed.turn - 1 : combat.turns.length - 1]
+        let previousCombatant = canvas.tokens.get(previousTurn.tokenId)
+        previousCombatant.update({"flags.ActiveAuras" : false })
+        if (debug) console.log("updateCombat, main aura")
+        await MainAura(combatant.data, "combat update")
+    });
+
     Hooks.on("preDeleteToken", async (_scene, token) => {
         if (!gm) return;
         if (IsAuraToken(token, canvas)) {
@@ -576,6 +622,7 @@ Hooks.on("ready", () => {
             let auraHeight = auraEffect.data.flags?.ActiveAuras?.height;
             let auraType = auraEffect.data.flags?.ActiveAuras?.type !== undefined ? auraEffect.data.flags?.ActiveAuras?.type.toLowerCase() : "";
             let auraAlignment = auraEffect.data.flags?.ActiveAuras?.alignment !== undefined ? auraEffect.data.flags?.ActiveAuras?.alignment.toLowerCase() : "";
+            let hostileTurn = auraEffect.data.flags?.ActiveAuras?.hostile
 
             //{data: testEffect.data, parentActorLink :testEffect.parent.data.token.actorLink, parentActorId : testEffect.parent._id, tokenId: testToken.id}
             if (auraEffect.parentActorLink) {
@@ -598,6 +645,7 @@ Hooks.on("ready", () => {
             if (auraTargets === "Enemy" && (auraToken.data.disposition === canvasToken.data.disposition)) continue;
             if (auraAlignment !== "" && !tokenAlignment.includes(auraAlignment) && !tokenAlignment.includes("any")) continue;
             if (auraType !== "" && !tokenType.includes(auraType) && !tokenType.includes("any")) continue;
+            if (hostileTurn && canvasToken.data._id !== game.combats.active.current.tokenId) return;
             let distance = getDistance(canvasToken, auraToken, game.settings.get("ActiveAuras", "wall-block"), auraHeight)
             if ((distance !== false) && (distance <= auraRadius)) {
                 if (MapObject) {
@@ -746,6 +794,13 @@ Hooks.on("ready", () => {
             }
         }
         ['ignoreSelf', 'hidden', 'height', 'alignment', 'type', 'aura', 'radius', 'save', 'isAura', 'savedc', 'height'].forEach(e => delete effectData.flags.ActiveAuras[e])
+        if (effectData.flags.ActiveAuras.time) {
+            effectData.flags.dae.specialDuration.push(effectData.flags.ActiveAuras.time)
+        }
+        if (effectData.flags.ActiveAuras.onlyOnce) {
+            if (await token.getFlag("ActiveAuras", `${oldEffectData.origin}`)) return;
+            else await token.setFlag("ActiveAuras", `${oldEffectData.origin}`, true)
+        }
         await token.actor.createEmbeddedEntity("ActiveEffect", effectData);
         console.log(game.i18n.format("ACTIVEAURAS.ApplyLog", { effectDataLabel: effectData.label, tokenName: token.name }))
     }
