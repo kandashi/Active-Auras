@@ -142,14 +142,13 @@ Hooks.on("ready", () => {
                 <input id="radius" name="flags.${MODULE_NAME}.radius" type="number" min="0" step="any" value="${flags[MODULE_NAME]?.radius}" placeholder="${FormRadiusPrompt}"></input>
             </div> 
             <div class="form-group">
-            <label>${FormSaveEnable}</label>
-            <input id="save" name="flags.${MODULE_NAME}.save" type="text" value="${save}" placeholder="${FormSavePrompt}"></input>
-        </div>
+                <label>${FormSaveEnable}</label>
+                <input id="save" name="flags.${MODULE_NAME}.save" type="text" value="${save}" placeholder="${FormSavePrompt}"></input>
+            </div>
             <div class="form-group">
                 <label>${FormSaveDC}</label>
                 <input id="savedc" name="flags.${MODULE_NAME}.savedc" type="number" min="0" value="${flags[MODULE_NAME]?.savedc}"></input>
             </div>
-        </div>
             <div class="form-group">
                 <label>${HostileTurn}</label>
                 <input name="flags.${MODULE_NAME}.hostile" type="checkbox" ${flags[MODULE_NAME]?.hostile ? 'checked' : ''}></input>
@@ -175,15 +174,14 @@ Hooks.on("ready", () => {
                     <option value="turnEnd"${flags[MODULE_NAME]?.time === 'turnEnd' ? 'selected' : ''}>${turnEnd}</option>
                 </select>
             </div> 
-            `
+        </div>`
         }
         else contents += `</div>`
 
         const appliedAuraContent = `
         <div class="tab" data-tab="ActiveAuras">
             <h3> You cannot alter an applied aura </h3>
-        </div>
-        `
+        </div>`;
 
         html.find(".tabs .item").last().after(tab);
         if (!flags[MODULE_NAME]?.applied) html.find(".tab").last().after(contents);
@@ -225,7 +223,7 @@ Hooks.on("ready", () => {
         let combatant = canvas.tokens.get(combat.combatant.tokenId);
         let previousTurn = combat.turns[changed.turn - 1 > -1 ? changed.turn - 1 : combat.turns.length - 1]
         let previousCombatant = canvas.tokens.get(previousTurn.tokenId)
-        previousCombatant.update({"flags.ActiveAuras" : false })
+        previousCombatant.update({ "flags.ActiveAuras": false })
         if (debug) console.log("updateCombat, main aura")
         await MainAura(combatant.data, "combat update")
     });
@@ -755,6 +753,7 @@ Hooks.on("ready", () => {
         let token = canvas.tokens.get(tokenID)
 
         let duplicateEffect = token.actor.effects.entries.find(e => e.data.label === oldEffectData.label)
+        if(getProperty(duplicateEffect, "data.flags.ActiveAuras.isAura")) return;
         if (duplicateEffect) {
             if (JSON.stringify(duplicateEffect.data.changes) === JSON.stringify(oldEffectData.changes)) return;
             else await RemoveActiveEffects(tokenID, oldEffectData.label)
