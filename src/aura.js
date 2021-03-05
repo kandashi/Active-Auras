@@ -81,7 +81,7 @@ Hooks.on("ready", () => {
         const FormTimePrompt = game.i18n.format("ACTIVEAURAS.FORM_TimePrompt")
         const HostileTurn = game.i18n.format("ACTIVEAURAS.FORM_HostileTurn")
         const ActivateOnce = game.i18n.format("ACTIVEAURAS.FORM_ActivateOnce")
-        if (game.modules.get("dae").active && game.modules.get("times-up").active) {
+        if (game.modules.get("dae")?.active && game.modules.get("times-up")?.active) {
             var isAttacked = game.i18n.format("dae.isAttacked")
             var isDamaged = game.i18n.format("dae.isDamaged")
             var action = game.i18n.format("dae.1Action")
@@ -159,7 +159,7 @@ Hooks.on("ready", () => {
             </div>`
             ;
 
-        if (game.modules.get("times-up").active) {
+        if (game.modules.get("times-up")?.active) {
             contents += `
             <div class="form-group">
                 <label>${FormTimePrompt}</label>
