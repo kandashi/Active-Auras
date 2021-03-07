@@ -38,7 +38,16 @@
             "lang": "ja",
             "name": "日本語",
             "path": "lang/ja.json"
+        },
+		{
+            "lang": "fr",
+            "name": "French",
+            "path": "lang/fr.json"
         }
+	],
+	"systems": [
+		"dnd5e",
+		"sw5e"
 	],
 	"url": "https://github.com/kandashi/Active-Auras",
 	"manifest": "https://raw.githubusercontent.com/kandashi/Active-Auras/main/module.json",
