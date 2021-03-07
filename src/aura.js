@@ -610,14 +610,13 @@ Hooks.on("ready", () => {
         let MapKey = canvasToken.scene._id;
         MapObject = AuraMap.get(MapKey)
         let checkEffects = MapObject.effects;
-        //Check for other types of X aura if the aura token is moved
-        if (tokenId) {
+        //Check for other types of X aura if the aura token is moved, removed due to issues with mutliple auras not updating correctly
+        /*if (tokenId) {
             checkEffects = checkEffects.filter(i => i.tokenId === tokenId)
             let duplicateEffect = []
             checkEffects.forEach(e => duplicateEffect = (MapObject.effects.filter(i => (i.data?.label === e.data?.label) && i.tokenId !== tokenId)));
             checkEffects = checkEffects.concat(duplicateEffect)
-
-        }
+        }*/
 
         for (let auraEffect of checkEffects) {
 
