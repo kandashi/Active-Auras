@@ -200,6 +200,9 @@ Hooks.on("ready", () => {
         if (!gm) return;
         let actor = game.actors.get(token.actorId)
         try {
+            if (game.modules.get("multilevel-tokens")?.active) {
+                if (GetAllFlags(testToken, 'multilevel-tokens')) return;
+            }
             if (actor.effects?.entries) {
                 for (let effect of actor.effects?.entries) {
                     if (effect.getFlag('ActiveAuras', 'isAura')) {
@@ -610,13 +613,13 @@ Hooks.on("ready", () => {
         let MapKey = canvasToken.scene._id;
         MapObject = AuraMap.get(MapKey)
         let checkEffects = MapObject.effects;
-        //Check for other types of X aura if the aura token is moved, removed due to issues with mutliple auras not updating correctly
-        /*if (tokenId) {
+        //Check for other types of X aura if the aura token is moved
+        if (tokenId && canvasToken.id !== tokenId) {
             checkEffects = checkEffects.filter(i => i.tokenId === tokenId)
             let duplicateEffect = []
             checkEffects.forEach(e => duplicateEffect = (MapObject.effects.filter(i => (i.data?.label === e.data?.label) && i.tokenId !== tokenId)));
             checkEffects = checkEffects.concat(duplicateEffect)
-        }*/
+        }
 
         for (let auraEffect of checkEffects) {
 
