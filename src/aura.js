@@ -803,7 +803,7 @@ Hooks.on("ready", () => {
             }
         }
         ['ignoreSelf', 'hidden', 'height', 'alignment', 'type', 'aura', 'radius', 'save', 'isAura', 'savedc', 'height'].forEach(e => delete effectData.flags.ActiveAuras[e])
-        if (effectData.flags.ActiveAuras.time) {
+        if (effectData.flags.ActiveAuras.time !== "None") {
             effectData.flags.dae.specialDuration.push(effectData.flags.ActiveAuras.time)
         }
         if (effectData.flags.ActiveAuras.onlyOnce) {
