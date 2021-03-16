@@ -31,10 +31,10 @@
     "ACTIVEAURAS.FORM_TypePrompt": "humanoid/beast など",
     "ACTIVEAURAS.FORM_RadiusPrompt": "グリッドスケールで測定する",
     "ACTIVEAURAS.FORM_SavePrompt": "str/dex/con/wis/int/cha",
-    "ACTIVEAURAS.FORM_TimePrompt": "[EN] Special Expiry for the Applied Effect",
-    "ACTIVEAURAS.FORM_HostileTurn": "[EN] Only apply during the current combatants turn",
-    "ACTIVEAURAS.FORM_ActivateOnce": "[EN] Only trigger the aura once per turn", 
-    
+    "ACTIVEAURAS.FORM_TimePrompt": "適用効果の特別な有効期限",
+    "ACTIVEAURAS.FORM_HostileTurn": "現戦闘参加者のターン中のみ適用",
+    "ACTIVEAURAS.FORM_ActivateOnce": "ターン中に一度だけオーラを発動", 
+
     "ACTIVEAURAS.ApplyLog":"Active Auras | {effectDataLabel}が{tokenName}に適用されました。",
     "ACTIVEAURAS.RemoveLog":"Active Auras | {effectDataLabel}が{tokenName}から取り除かれました。",
     "ACTIVEAURAS.IgnoreSelfLog":"ActiveAuras | '{effectDataLabel}'を無視し、{changeKey}を{actorName}に変更しました。",
