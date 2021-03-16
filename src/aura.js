@@ -201,6 +201,7 @@ Hooks.on("ready", () => {
         let actor = game.actors.get(token.actorId)
         try {
             if (game.modules.get("multilevel-tokens")?.active) {
+                let testToken = canvas.tokens.get(token._id)
                 if (GetAllFlags(testToken, 'multilevel-tokens')) return;
             }
             if (actor.effects?.entries) {
