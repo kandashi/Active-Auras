@@ -1,3 +1,4 @@
+
 Hooks.on('init', () => {
     game.settings.register("ActiveAuras", "measurement", {
         name: game.i18n.format("ACTIVEAURAS.measurmentoptions_name"),
@@ -214,6 +215,7 @@ Hooks.on("createToken", (_scene, token) => {
     let actor = game.actors.get(token.actorId)
     try {
         if (game.modules.get("multilevel-tokens")?.active) {
+            let testToken = canvas.tokens.get(token._id)
             if (ActiveAuras.GetAllFlags(testToken, 'multilevel-tokens')) return;
         }
         if (actor.effects?.entries) {
@@ -374,6 +376,11 @@ Hooks.on("preUpdateActor", (actor, update) => {
     }
 })
 
+Hooks.on("updateMeasuredTemplate", (scene, data, update)=> {
+    if(!getProperty(data, "flags.ActiveAuras")) return;
+    ActiveAuras.MainAura(undefined, "template movement")
+})
+
 class ActiveAuras {
     static GetAllFlags(entity, scope) {
         {
@@ -418,7 +425,7 @@ class ActiveAuras {
                 if (testEffect.getFlag('ActiveAuras', 'isAura')) {
                     if (testEffect.data.disabled) continue;
                     if (testEffect.getFlag('ActiveAuras', 'hidden') && testToken.data.hidden) continue;
-                    let newEffect = { data: duplicate(testEffect.data), parentActorLink: testEffect.parent.data.token.actorLink, parentActorId: testEffect.parent._id, tokenId: testToken.id }
+                    let newEffect = { data: duplicate(testEffect.data), parentActorLink: testEffect.parent.data.token.actorLink, parentActorId: testEffect.parent._id, entityType: "token", entityId: testToken.id }
                     for (let change of newEffect.data.changes) {
                         if (typeof change.value === "string" && change.key !== "macro.execute" && change.key !== "macro.itemMacro") {
                             if (change.value.includes("@")) {
@@ -441,12 +448,16 @@ class ActiveAuras {
                 }
             }
         }
+        ActiveAuras.RetrieveDrawingAuras(effectArray)
+        ActiveAuras.RetrieveTemplateAuras(effectArray)
         if (MapObject) {
             MapObject.effects = effectArray
         }
         else {
             AuraMap.set(MapKey, { effects: effectArray })
         }
+
+
         if (debug) console.log(AuraMap)
         if (checkAuras) {
             setTimeout(() => {
@@ -463,7 +474,7 @@ class ActiveAuras {
     static async RemoveAppliedAuras() {
         let EffectsArray = [];
         let MapKey = canvas.scene._id
-        MapObject = AuraMap.get(MapKey)
+        let MapObject = AuraMap.get(MapKey)
         MapObject.effects.forEach(i => EffectsArray.push(i.data.origin))
 
         for (let removeToken of canvas.tokens.placeables) {
@@ -495,11 +506,13 @@ class ActiveAuras {
             if (ActiveAuras.IsAuraToken(movedToken, canvas)) {
                 auraTokenId = movedToken._id
             }
+            else if( getProperty(movedToken, "flags.token-attacher")){
+                if(debug) console.log("ActiveAuras: token attacher movement")
+            }
             else {
                 updateTokens = [];
                 updateTokens.push(canvas.tokens.get(movedToken._id))
             }
-
         }
         ActiveAuras.UpdateAllTokens(map, updateTokens, auraTokenId)
 
@@ -553,17 +566,14 @@ class ActiveAuras {
             }
         }
     }
-
-    static async RetrieveTemplateAuras() {
+    //@todo wipes auramap fix
+    static async RetrieveTemplateAuras(effectArray) {
         let auraTemplates = canvas.templates.placeables.filter(i => i.data.flags?.ActiveAuras?.IsAura !== undefined)
-        let MapKey = canvas.scene._id;
-        let MapObject = AuraMap.get(MapKey);
-        let effectArray = []
 
         for (let template of auraTemplates) {
             for (let testEffect of template.data.flags?.ActiveAuras?.IsAura) {
                 if (testEffect.disabled) continue;
-                let newEffect = { data: duplicate(testEffect), parentActorId: false, parentActorLink: false, tokenId: "template", templateId: template.id, }
+                let newEffect = duplicate(testEffect)
                 for (let change of newEffect.data.changes) {
                     if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.flags.ActiveAuras.isMacro = true
                 }
@@ -577,25 +587,16 @@ class ActiveAuras {
                 effectArray.push(newEffect)
             }
         }
-
-        if (MapObject) {
-            MapObject.effects = effectArray
-        }
-        else {
-            AuraMap.set(MapKey, { effects: effectArray })
-        }
+        return effectArray
     }
-
-    static async RetrieveDrawingAuras() {
+    //@todo wipes auramap fix
+    static async RetrieveDrawingAuras(effectArray) {
         let auraDrawings = canvas.drawings.placeables.filter(i => i.data.flags?.ActiveAuras?.IsAura !== undefined)
-        let MapKey = canvas.scene._id;
-        let MapObject = AuraMap.get(MapKey);
-        let effectArray = []
 
         for (let drawing of auraDrawings) {
             for (let testEffect of drawing.data.flags?.ActiveAuras?.IsAura) {
                 if (testEffect.disabled) continue;
-                let newEffect = { data: duplicate(testEffect), parentActorId: false, parentActorLink: false, tokenId: "template", templateId: false, drawingId: drawing.id, }
+                let newEffect = { data: duplicate(testEffect), parentActorId: false, parentActorLink: false, entityType: "drawing", entityId: drawing.id, }
                 for (let change of newEffect.data.changes) {
                     if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.flags.ActiveAuras.isMacro = true
                 }
@@ -609,13 +610,7 @@ class ActiveAuras {
                 effectArray.push(newEffect)
             }
         }
-
-        if (MapObject) {
-            MapObject.effects = effectArray
-        }
-        else {
-            AuraMap.set(MapKey, { effects: effectArray })
-        }
+        return effectArray
     }
 
 
@@ -631,7 +626,15 @@ class ActiveAuras {
         }
     }
 
-    _getDrawingCentre(drawing) {
+    static rotate(centre, point, degrees) {
+        const r = degrees * Math.PI / 180;
+        return {
+            x: centre.x + (point.x - centre.x) * Math.cos(r) - (point.y - centre.y) * Math.sin(r),
+            y: centre.y + (point.x - centre.x) * Math.sin(r) + (point.y - centre.y) * Math.cos(r),
+        };
+    }
+
+    static getDrawingCentre(drawing) {
         return {
             x: drawing.x + drawing.width / 2,
             y: drawing.y + drawing.height / 2
@@ -639,10 +642,10 @@ class ActiveAuras {
     }
 
     static isPointInRegion(point, region) {
-        if (region.rotation) {
-            point = this._rotate(this._getDrawingCentre(region), point, -region.rotation);
-        }
 
+        if (region.rotation) {
+            point = this.rotate(ActiveAuras.getDrawingCentre(region), point, -region.rotation);
+        }
         const inBox = point.x >= region.x && point.x <= region.x + region.width &&
             point.y >= region.y && point.y <= region.y + region.height;
         if (!inBox) {
@@ -680,6 +683,7 @@ class ActiveAuras {
         }
         return false;
     }
+
     /**
      * Test individual token against aura array
      * @param {Map} map - empty map to populate 
@@ -754,58 +758,49 @@ class ActiveAuras {
             let auraType = auraEffect.data.flags?.ActiveAuras?.type !== undefined ? auraEffect.data.flags?.ActiveAuras?.type.toLowerCase() : "";
             let auraAlignment = auraEffect.data.flags?.ActiveAuras?.alignment !== undefined ? auraEffect.data.flags?.ActiveAuras?.alignment.toLowerCase() : "";
             let hostileTurn = auraEffect.data.flags?.ActiveAuras?.hostile
+            let auraEntityType = auraEffect.entityType
 
-            //{data: testEffect.data, parentActorLink :testEffect.parent.data.token.actorLink, parentActorId : testEffect.parent._id, tokenId: testToken.id, templateId: template._id, }
-            if (tokenId) {
-                if (auraEffect.parentActorLink) {
-                    let auraTokenArray = game.actors.get(auraEffect.parentActorId).getActiveTokens()
-                    if (auraTokenArray.length > 1) {
-                        auraEntity = auraTokenArray.reduce(FindClosestToken, auraTokenArray[0])
-                        function FindClosestToken(tokenA, tokenB) {
-                            return ActiveAuras.getDistance(tokenA, canvasToken, game.settings.get("ActiveAuras", "wall-block"), auraHeight) < ActiveAuras.getDistance(tokenB, canvasToken, game.settings.get("ActiveAuras", "wall-block"), auraHeight) ? tokenA : tokenB
+            switch (auraEntityType) {
+                //{data: testEffect.data, parentActorLink :testEffect.parent.data.token.actorLink, parentActorId : testEffect.parent._id, tokenId: testToken.id, templateId: template._id, }
+                case "token": {
+                    if (auraEffect.parentActorLink) {
+                        let auraTokenArray = game.actors.get(auraEffect.parentActorId).getActiveTokens()
+                        if (auraTokenArray.length > 1) {
+                            auraEntity = auraTokenArray.reduce(FindClosestToken, auraTokenArray[0])
+                            function FindClosestToken(tokenA, tokenB) {
+                                return ActiveAuras.getDistance(tokenA, canvasToken, game.settings.get("ActiveAuras", "wall-block"), auraHeight) < ActiveAuras.getDistance(tokenB, canvasToken, game.settings.get("ActiveAuras", "wall-block"), auraHeight) ? tokenA : tokenB
+                            }
                         }
+                        else auraEntity = auraTokenArray[0]
                     }
-                    else auraEntity = auraTokenArray[0]
+                    else auraEntity = canvas.tokens.get(auraEffect.entityId)
+
+                    if (auraEntity.id === canvasToken.id) continue;
+                    if (auraTargets === "Allies" && (auraEntity.data.disposition !== canvasToken.data.disposition)) continue;
+                    if (auraTargets === "Enemy" && (auraEntity.data.disposition === canvasToken.data.disposition)) continue;
+                    if (auraAlignment !== "" && !tokenAlignment.includes(auraAlignment) && !tokenAlignment.includes("any")) continue;
+                    if (auraType !== "" && !tokenType.includes(auraType) && !tokenType.includes("any")) continue;
+                    if (hostileTurn && canvasToken.data._id !== game.combats.active.current.tokenId) return;
+                    distance = ActiveAuras.getDistance(canvasToken, auraEntity, game.settings.get("ActiveAuras", "wall-block"), auraHeight)
                 }
-            }
-            else if (auraEffect.tokenId !== "template") {
-                auraEntity = canvas.tokens.get(auraEffect.tokenId)
-
-                if (auraEntity.id === canvasToken.id) continue;
-                if (auraTargets === "Allies" && (auraEntity.data.disposition !== canvasToken.data.disposition)) continue;
-                if (auraTargets === "Enemy" && (auraEntity.data.disposition === canvasToken.data.disposition)) continue;
-                if (auraAlignment !== "" && !tokenAlignment.includes(auraAlignment) && !tokenAlignment.includes("any")) continue;
-                if (auraType !== "" && !tokenType.includes(auraType) && !tokenType.includes("any")) continue;
-                if (hostileTurn && canvasToken.data._id !== game.combats.active.current.tokenId) return;
-                distance = ActiveAuras.getDistance(canvasToken, auraEntity, game.settings.get("ActiveAuras", "wall-block"), auraHeight)
-            }
-            else if (auraEffect.templateId) {
-                auraEntity = canvas.templates.get(auraEffect.templateId)
-
-                function between(x, min, max) {
-                    return ((x - min) * (x - max) <= 0);
-                }
-
-                switch (auraEntity.data.t) {
-                    case "rect": {
-                        let { x, y, direction } = auraEntity.data
-                        let { height, width } = auraEntity.shape
-                        let x1 = (direction < 90 || direction < 270) ? x + width : x - width;
-                        let y1 = (direction < 180) ? y + height : y - height
-                        if (between(canvasToken.center.x, x, x1) && between(canvasToken.center.y, y, y1)) {
-                            distance = 0
-                        } else distance = false
-                    }
-                        break;
+                    break;
+                case "template": {
+                    auraEntity = canvas.templates.get(auraEffect.entityId)
+                    if(ActiveAuras.getTemplateTargets(canvasToken, auraEntity.data)) distance = 0
+                    else distance = false
 
                 }
-            } else if (auraEffect.drawingId) {
-                auraEntity = canvas.drawings.get(auraEffect.drawingId)
-                if (ActiveAuras.isPointInRegion(canvasToken.center, auraEntity)) distance = 0
-                else distance = false
+                    break;
+                case "drawing": {
+                    auraEntity = canvas.drawings.get(auraEffect.entityId)
+                    if (ActiveAuras.isPointInRegion(canvasToken.center, auraEntity)) distance = 0
+                    else distance = false
+                }
+                    break;
             }
             let MapKey = auraEffect.data.label + "-" + canvasToken.id + "-" + auraEntity.id;
             MapObject = map.get(MapKey);
+
 
             if ((distance !== false) && (distance <= auraRadius)) {
                 if (MapObject) {
@@ -826,6 +821,58 @@ class ActiveAuras {
         }
     }
 
+    static getTemplateTargets(t, data) {
+        t = canvas.tokens.get(t.id)
+        
+        let templateDetails = canvas.templates.get(data._id);
+        let tdx = data.x;
+        let tdy = data.y;
+        // Extract and prepare data
+        let { direction, distance, angle, width } = data;
+        distance *= canvas.scene.data.grid / canvas.scene.data.gridDistance;
+        width *= canvas.scene.data.grid / canvas.scene.data.gridDistance;
+        direction = toRadians(direction);
+        var shape;
+        // Get the Template shape
+        switch (data.t) {
+            case "circle":
+                shape = templateDetails._getCircleShape(distance);
+                break;
+            case "cone":
+                shape = templateDetails._getConeShape(direction, angle, distance);
+                break;
+            case "rect":
+                shape = templateDetails._getRectShape(direction, distance);
+                break;
+            case "ray":
+                shape = templateDetails._getRayShape(direction, distance, width);
+        }
+        // skip special tokens with a race of trigger
+        const w = t.width >= 1 ? 0.5 : t.data.width / 2;
+        const h = t.height >= 1 ? 0.5 : t.data.height / 2;
+        const gridSize = canvas.scene.data.grid;
+        let contained = false;
+        for (let xstep = w; xstep <= t.data.width && !contained; xstep++) {
+            for (let ystep = h; ystep <= t.data.height && !contained; ystep++) {
+                const tx = t.data.x + xstep * gridSize;
+                const ty = t.data.y + ystep * gridSize;
+                if (shape.contains(tx - tdx, ty - tdy)) {
+                        if (data.t === "rect") {
+                            // for rectangles the origin is top left, so measure from the centre instaed.
+                            let template_x = templateDetails.x + shape.width / 2;
+                            let template_y = templateDetails.y + shape.height / 2;
+                            const r = new Ray({ x: tx, y: ty }, { x: template_x, y: template_y });
+                            contained = !canvas.walls.checkCollision(r);
+                        }
+                        else {
+                            const r = new Ray({ x: tx, y: ty }, templateDetails.data);
+                            contained = !canvas.walls.checkCollision(r);
+                        }
+                }
+            }
+        }
+        if (contained) return true
+    }
 
 
     static getDistance(t1, t2, wallblocking = false, auraHeight) {
