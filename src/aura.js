@@ -252,7 +252,7 @@ Hooks.on("updateCombat", async (combat, changed, options, userId) => {
     let previousCombatant = canvas.tokens.get(previousTurn.tokenId)
     previousCombatant.update({ "flags.ActiveAuras": false })
     if (debug) console.log("updateCombat, main aura")
-    await ActiveAuras.MainAura(combatant.data, "combat update")
+    await ActiveAuras.MainAura(combatant.data, "combat update", combatant.scene.id)
 });
 
 Hooks.on("preDeleteToken", async (_scene, token) => {
@@ -296,11 +296,13 @@ Hooks.on("preUpdateToken", (_scene, token, update, _flags, _id) => {
 /**
  * On token movement run MainAura
  */
-Hooks.on("updateToken", async (_scene, token, update, _flags, _id) => {
+Hooks.on("updateToken", async (scene, token, update, _flags, _id) => {
     if (!AAgm) return;
     if (("y" in update || "x" in update || "elevation" in update)) {
+        let MapObject = AuraMap.get(scene.id);
+        if (MapObject.effects.length < 1) return;
         if (debug) console.log("movement, main aura")
-        await ActiveAuras.MainAura(token, "movement update")
+        await ActiveAuras.MainAura(token, "movement update", scene.id)
     }
 
     if ("hidden" in update && ActiveAuras.IsAuraToken(token, canvas)) {
@@ -319,7 +321,6 @@ Hooks.on("updateToken", async (_scene, token, update, _flags, _id) => {
 
 
 /**
- * @todo
  */
 Hooks.on("updateActiveEffect", (_actor, effect, _update) => {
     if (!AAgm) return;
@@ -387,7 +388,13 @@ Hooks.on("preUpdateActor", (actor, update) => {
 
 Hooks.on("updateMeasuredTemplate", (scene, data, update) => {
     if (!getProperty(data, "flags.ActiveAuras")) return;
-    ActiveAuras.MainAura(undefined, "template movement")
+    ActiveAuras.MainAura(undefined, "template movement", scene.id)
+})
+
+Hooks.on("deleteMeasuredTemplate", (scene, data) => {
+    if (!getProperty(data, "flags.ActiveAuras")) return;
+    ActiveAuras.CollateAuras(scene, false, true, "template deletion")
+
 })
 
 class ActiveAuras {
@@ -453,7 +460,7 @@ class ActiveAuras {
                     newEffect.data.flags.ActiveAuras.isMacro = macro;
                     newEffect.data.flags.ActiveAuras.ignoreSelf = false;
                     if (testEffect.getFlag('ActiveAuras', 'hidden') && testToken.data.hidden) newEffect.data.flags.ActiveAuras.Paused = true;
-                    else  newEffect.data.flags.ActiveAuras.Paused = false;
+                    else newEffect.data.flags.ActiveAuras.Paused = false;
                     effectArray.push(newEffect)
                 }
             }
@@ -471,7 +478,7 @@ class ActiveAuras {
         if (debug) console.log(AuraMap)
         if (checkAuras) {
             setTimeout(() => {
-                ActiveAuras.MainAura(undefined, "Collate auras")
+                ActiveAuras.MainAura(undefined, "Collate auras", canvas.id)
             }, 20)
         }
         if (removeAuras) {
@@ -479,6 +486,53 @@ class ActiveAuras {
                 ActiveAuras.RemoveAppliedAuras(canvas)
             }, 20)
         }
+    }
+
+    static async RetrieveTemplateAuras(effectArray) {
+        let auraTemplates = canvas.templates.placeables.filter(i => i.data.flags?.ActiveAuras?.IsAura !== undefined)
+
+        for (let template of auraTemplates) {
+            for (let testEffect of template.data.flags?.ActiveAuras?.IsAura) {
+                if (testEffect.disabled) continue;
+                let newEffect = duplicate(testEffect)
+                for (let change of newEffect.data.changes) {
+                    if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.flags.ActiveAuras.isMacro = true
+                }
+                newEffect.disabled = false
+                let macro = newEffect.data.flags.ActiveAuras.isMacro !== undefined ? newEffect.data.flags.ActiveAuras.isMacro : false;
+
+                newEffect.data.flags.ActiveAuras.isAura = false;
+                newEffect.data.flags.ActiveAuras.applied = true;
+                newEffect.data.flags.ActiveAuras.isMacro = macro;
+                newEffect.data.flags.ActiveAuras.ignoreSelf = false;
+                effectArray.push(newEffect)
+            }
+        }
+        return effectArray
+    }
+
+    static async RetrieveDrawingAuras(effectArray) {
+        if(!effectArray) effectArray = AuraMap.get(canvas.scene._id)?.effects;
+        let auraDrawings = canvas.drawings.placeables.filter(i => i.data.flags?.ActiveAuras?.IsAura !== undefined)
+
+        for (let drawing of auraDrawings) {
+            for (let testEffect of drawing.data.flags?.ActiveAuras?.IsAura) {
+                if (testEffect.disabled) continue;
+                let newEffect = { data: duplicate(testEffect), parentActorId: false, parentActorLink: false, entityType: "drawing", entityId: drawing.id, }
+                for (let change of newEffect.data.changes) {
+                    if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.data.flags.ActiveAuras.isMacro = true
+                }
+                newEffect.disabled = false
+                let macro = newEffect.data.flags.ActiveAuras.isMacro !== undefined ? newEffect.data.flags.ActiveAuras.isMacro : false;
+
+                newEffect.data.flags.ActiveAuras.isAura = false;
+                newEffect.data.flags.ActiveAuras.applied = true;
+                newEffect.data.flags.ActiveAuras.isMacro = macro;
+                newEffect.data.flags.ActiveAuras.ignoreSelf = false;
+                effectArray.push(newEffect)
+            }
+        }
+        return effectArray
     }
 
     static async RemoveAppliedAuras() {
@@ -499,14 +553,204 @@ class ActiveAuras {
         }
     }
 
+    static rotate(centre, point, degrees) {
+        const r = degrees * Math.PI / 180;
+        return {
+            x: centre.x + (point.x - centre.x) * Math.cos(r) - (point.y - centre.y) * Math.sin(r),
+            y: centre.y + (point.x - centre.x) * Math.sin(r) + (point.y - centre.y) * Math.cos(r),
+        };
+    }
+
+    static getDrawingCentre(drawing) {
+        return {
+            x: drawing.x + drawing.width / 2,
+            y: drawing.y + drawing.height / 2
+        };
+    }
+
+    static isPointInRegion(point, region) {
+
+        if (region.rotation) {
+            point = this.rotate(ActiveAuras.getDrawingCentre(region), point, -region.rotation);
+        }
+        const inBox = point.x >= region.x && point.x <= region.x + region.width &&
+            point.y >= region.y && point.y <= region.y + region.height;
+        if (!inBox) {
+            return false;
+        }
+        if (region.type === CONST.DRAWING_TYPES.RECTANGLE) {
+            return true;
+        }
+        if (region.type === CONST.DRAWING_TYPES.ELLIPSE) {
+            if (!region.width || !region.height) {
+                return false;
+            }
+            const dx = region.x + region.width / 2 - point.x;
+            const dy = region.y + region.height / 2 - point.y;
+            return 4 * (dx * dx) / (region.width * region.width) + 4 * (dy * dy) / (region.height * region.height) <= 1;
+        }
+        if (region.type === CONST.DRAWING_TYPES.POLYGON) {
+            const cx = point.x - region.x;
+            const cy = point.y - region.y;
+            let w = 0;
+            for (let i0 = 0; i0 < region.points.length; ++i0) {
+                let i1 = i0 + 1 === region.points.length ? 0 : i0 + 1;
+                if (region.points[i0][1] <= cy && region.points[i1][1] > cy &&
+                    (region.points[i1][0] - region.points[i0][0]) * (cy - region.points[i0][1]) -
+                    (region.points[i1][1] - region.points[i0][1]) * (cx - region.points[i0][0]) > 0) {
+                    ++w;
+                }
+                if (region.points[i0][1] > cy && region.points[i1][1] <= cy &&
+                    (region.points[i1][0] - region.points[i0][0]) * (cy - region.points[i0][1]) -
+                    (region.points[i1][1] - region.points[i0][1]) * (cx - region.points[i0][0]) < 0) {
+                    --w;
+                }
+            }
+            return w !== 0;
+        }
+        return false;
+    }
+
+    static getTemplateTargets(t, data) {
+        t = canvas.tokens.get(t.id)
+
+        let templateDetails = canvas.templates.get(data._id);
+        let tdx = data.x;
+        let tdy = data.y;
+        // Extract and prepare data
+        let { direction, distance, angle, width } = data;
+        distance *= canvas.scene.data.grid / canvas.scene.data.gridDistance;
+        width *= canvas.scene.data.grid / canvas.scene.data.gridDistance;
+        direction = toRadians(direction);
+        var shape;
+        // Get the Template shape
+        switch (data.t) {
+            case "circle":
+                shape = templateDetails._getCircleShape(distance);
+                break;
+            case "cone":
+                shape = templateDetails._getConeShape(direction, angle, distance);
+                break;
+            case "rect":
+                shape = templateDetails._getRectShape(direction, distance);
+                break;
+            case "ray":
+                shape = templateDetails._getRayShape(direction, distance, width);
+        }
+        // skip special tokens with a race of trigger
+        const w = t.width >= 1 ? 0.5 : t.data.width / 2;
+        const h = t.height >= 1 ? 0.5 : t.data.height / 2;
+        const gridSize = canvas.scene.data.grid;
+        let contained = false;
+        for (let xstep = w; xstep <= t.data.width && !contained; xstep++) {
+            for (let ystep = h; ystep <= t.data.height && !contained; ystep++) {
+                const tx = t.data.x + xstep * gridSize;
+                const ty = t.data.y + ystep * gridSize;
+                if (shape.contains(tx - tdx, ty - tdy)) {
+                    if (data.t === "rect") {
+                        // for rectangles the origin is top left, so measure from the centre instaed.
+                        let template_x = templateDetails.x + shape.width / 2;
+                        let template_y = templateDetails.y + shape.height / 2;
+                        const r = new Ray({ x: tx, y: ty }, { x: template_x, y: template_y });
+                        contained = !canvas.walls.checkCollision(r);
+                    }
+                    else {
+                        const r = new Ray({ x: tx, y: ty }, templateDetails.data);
+                        contained = !canvas.walls.checkCollision(r);
+                    }
+                }
+            }
+        }
+        if (contained) return true
+    }
+
+    static getDistance(t1, t2, wallblocking = false, auraHeight) {
+        //Log("get distance callsed");
+        var x, x1, y, y1, d, r, segments = [], rdistance, distance;
+        switch (game.settings.get("ActiveAuras", "measurement",)) {
+            case (true): {
+                for (x = 0; x < t1.data.width; x++) {
+                    for (y = 0; y < t1.data.height; y++) {
+                        const origin = new PIXI.Point(...canvas.grid.getCenter(t1.data.x + (canvas.dimensions.size * x), t1.data.y + (canvas.dimensions.size * y)));
+                        for (x1 = 0; x1 < t2.data.width; x1++) {
+                            for (y1 = 0; y1 < t2.data.height; y1++) {
+                                const dest = new PIXI.Point(...canvas.grid.getCenter(t2.data.x + (canvas.dimensions.size * x1), t2.data.y + (canvas.dimensions.size * y1)));
+                                const r = new Ray(origin, dest);
+                                if (wallblocking && canvas.walls.checkCollision(r)) {
+                                    //Log(`ray ${r} blocked due to walls`);
+                                    continue;
+                                }
+                                segments.push({ ray: r });
+                            }
+                        }
+                    }
+                }
+                // console.log(segments);
+                if (segments.length === 0) {
+                    //Log(`${t2.data.name} full blocked by walls`);
+                    return false;
+                }
+                rdistance = segments.map(segment => canvas.grid.measureDistances([segment], { gridSpaces: true })[0]);
+                distance = rdistance[0];
+                rdistance.forEach(d => {
+                    if (d < distance)
+                        distance = d;
+                });
+            }
+                break;
+            case (false): {
+                let gs = canvas.dimensions.size
+                let auraTokenSize = (t2.data.height / 2) * canvas.dimensions.distance
+                for (x = 0; x < t1.data.width; x++) {
+                    for (y = 0; y < t1.data.height; y++) {
+                        const origin = new PIXI.Point(...canvas.grid.getCenter(t1.data.x + (canvas.dimensions.size * x), t1.data.y + (canvas.dimensions.size * y)));
+                        const dest = new PIXI.Point(t2.center.x, t2.center.y);
+                        const r = new Ray(origin, dest);
+                        if (wallblocking && canvas.walls.checkCollision(r)) {
+                            //Log(`ray ${r} blocked due to walls`);
+                            continue;
+                        }
+                        segments.push({ ray: r });
+                    }
+                }
+                if (segments.length === 0) {
+                    //Log(`${t2.data.name} full blocked by walls`);
+                    return false;
+                }
+                rdistance = []
+                segments.forEach(i => rdistance.push(i.ray.distance / gs * canvas.dimensions.distance))
+                distance = rdistance[0];
+                rdistance.forEach(d => {
+                    if (d < distance)
+                        distance = d;
+                });
+                distance -= auraTokenSize
+            }
+        }
+        if (auraHeight === true) {
+            if (game.settings.get("ActiveAuras", "vertical-euclidean") === true) {
+                let heightChange = Math.abs(t1.data.elevation - t2.data.elevation)
+                distance = distance > heightChange ? distance : heightChange
+            }
+            if (game.settings.get("ActiveAuras", "vertical-euclidean") === false) {
+                let a = distance;
+                let b = (t1.data.elevation - t2.data.elevation)
+                let c = (a * a) + (b * b)
+                distance = Math.sqrt(c)
+            }
+        }
+        return distance;
+
+    }
     /**
      * 
      * @param {Token} movedToken - optional value for further extension, currently unused
      * Locate all auras on the canvas, create map of tokens to update, update tokens 
      */
-    static async MainAura(movedToken, source) {
+    static async MainAura(movedToken, source, sceneID) {
         if (debug) console.log(source)
         if (!AAgm) return;
+        if (sceneID !== canvas.id) return ui.notifications.warn("An update was called on a non viewed scene, auras will be updated when you return to that scene")
 
         let map = new Map();
         let updateTokens = canvas.tokens.placeables
@@ -576,53 +820,6 @@ class ActiveAuras {
             }
         }
     }
-    //@todo wipes auramap fix
-    static async RetrieveTemplateAuras(effectArray) {
-        let auraTemplates = canvas.templates.placeables.filter(i => i.data.flags?.ActiveAuras?.IsAura !== undefined)
-
-        for (let template of auraTemplates) {
-            for (let testEffect of template.data.flags?.ActiveAuras?.IsAura) {
-                if (testEffect.disabled) continue;
-                let newEffect = duplicate(testEffect)
-                for (let change of newEffect.data.changes) {
-                    if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.flags.ActiveAuras.isMacro = true
-                }
-                newEffect.disabled = false
-                let macro = newEffect.data.flags.ActiveAuras.isMacro !== undefined ? newEffect.data.flags.ActiveAuras.isMacro : false;
-
-                newEffect.data.flags.ActiveAuras.isAura = false;
-                newEffect.data.flags.ActiveAuras.applied = true;
-                newEffect.data.flags.ActiveAuras.isMacro = macro;
-                newEffect.data.flags.ActiveAuras.ignoreSelf = false;
-                effectArray.push(newEffect)
-            }
-        }
-        return effectArray
-    }
-    //@todo wipes auramap fix
-    static async RetrieveDrawingAuras(effectArray) {
-        let auraDrawings = canvas.drawings.placeables.filter(i => i.data.flags?.ActiveAuras?.IsAura !== undefined)
-
-        for (let drawing of auraDrawings) {
-            for (let testEffect of drawing.data.flags?.ActiveAuras?.IsAura) {
-                if (testEffect.disabled) continue;
-                let newEffect = { data: duplicate(testEffect), parentActorId: false, parentActorLink: false, entityType: "drawing", entityId: drawing.id, }
-                for (let change of newEffect.data.changes) {
-                    if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.data.flags.ActiveAuras.isMacro = true
-                }
-                newEffect.disabled = false
-                let macro = newEffect.data.flags.ActiveAuras.isMacro !== undefined ? newEffect.data.flags.ActiveAuras.isMacro : false;
-
-                newEffect.data.flags.ActiveAuras.isAura = false;
-                newEffect.data.flags.ActiveAuras.applied = true;
-                newEffect.data.flags.ActiveAuras.isMacro = macro;
-                newEffect.data.flags.ActiveAuras.ignoreSelf = false;
-                effectArray.push(newEffect)
-            }
-        }
-        return effectArray
-    }
-
 
     /**
      * Loop over canvas tokens for individual tests
@@ -634,64 +831,6 @@ class ActiveAuras {
         for (let canvasToken of tokens) {
             ActiveAuras.UpdateToken(map, canvasToken, tokenId)
         }
-    }
-
-    static rotate(centre, point, degrees) {
-        const r = degrees * Math.PI / 180;
-        return {
-            x: centre.x + (point.x - centre.x) * Math.cos(r) - (point.y - centre.y) * Math.sin(r),
-            y: centre.y + (point.x - centre.x) * Math.sin(r) + (point.y - centre.y) * Math.cos(r),
-        };
-    }
-
-    static getDrawingCentre(drawing) {
-        return {
-            x: drawing.x + drawing.width / 2,
-            y: drawing.y + drawing.height / 2
-        };
-    }
-
-    static isPointInRegion(point, region) {
-
-        if (region.rotation) {
-            point = this.rotate(ActiveAuras.getDrawingCentre(region), point, -region.rotation);
-        }
-        const inBox = point.x >= region.x && point.x <= region.x + region.width &&
-            point.y >= region.y && point.y <= region.y + region.height;
-        if (!inBox) {
-            return false;
-        }
-        if (region.type === CONST.DRAWING_TYPES.RECTANGLE) {
-            return true;
-        }
-        if (region.type === CONST.DRAWING_TYPES.ELLIPSE) {
-            if (!region.width || !region.height) {
-                return false;
-            }
-            const dx = region.x + region.width / 2 - point.x;
-            const dy = region.y + region.height / 2 - point.y;
-            return 4 * (dx * dx) / (region.width * region.width) + 4 * (dy * dy) / (region.height * region.height) <= 1;
-        }
-        if (region.type === CONST.DRAWING_TYPES.POLYGON) {
-            const cx = point.x - region.x;
-            const cy = point.y - region.y;
-            let w = 0;
-            for (let i0 = 0; i0 < region.points.length; ++i0) {
-                let i1 = i0 + 1 === region.points.length ? 0 : i0 + 1;
-                if (region.points[i0][1] <= cy && region.points[i1][1] > cy &&
-                    (region.points[i1][0] - region.points[i0][0]) * (cy - region.points[i0][1]) -
-                    (region.points[i1][1] - region.points[i0][1]) * (cx - region.points[i0][0]) > 0) {
-                    ++w;
-                }
-                if (region.points[i0][1] > cy && region.points[i1][1] <= cy &&
-                    (region.points[i1][0] - region.points[i0][0]) * (cy - region.points[i0][1]) -
-                    (region.points[i1][1] - region.points[i0][1]) * (cx - region.points[i0][0]) < 0) {
-                    --w;
-                }
-            }
-            return w !== 0;
-        }
-        return false;
     }
 
     /**
@@ -830,138 +969,6 @@ class ActiveAuras {
         }
     }
 
-    static getTemplateTargets(t, data) {
-        t = canvas.tokens.get(t.id)
-
-        let templateDetails = canvas.templates.get(data._id);
-        let tdx = data.x;
-        let tdy = data.y;
-        // Extract and prepare data
-        let { direction, distance, angle, width } = data;
-        distance *= canvas.scene.data.grid / canvas.scene.data.gridDistance;
-        width *= canvas.scene.data.grid / canvas.scene.data.gridDistance;
-        direction = toRadians(direction);
-        var shape;
-        // Get the Template shape
-        switch (data.t) {
-            case "circle":
-                shape = templateDetails._getCircleShape(distance);
-                break;
-            case "cone":
-                shape = templateDetails._getConeShape(direction, angle, distance);
-                break;
-            case "rect":
-                shape = templateDetails._getRectShape(direction, distance);
-                break;
-            case "ray":
-                shape = templateDetails._getRayShape(direction, distance, width);
-        }
-        // skip special tokens with a race of trigger
-        const w = t.width >= 1 ? 0.5 : t.data.width / 2;
-        const h = t.height >= 1 ? 0.5 : t.data.height / 2;
-        const gridSize = canvas.scene.data.grid;
-        let contained = false;
-        for (let xstep = w; xstep <= t.data.width && !contained; xstep++) {
-            for (let ystep = h; ystep <= t.data.height && !contained; ystep++) {
-                const tx = t.data.x + xstep * gridSize;
-                const ty = t.data.y + ystep * gridSize;
-                if (shape.contains(tx - tdx, ty - tdy)) {
-                    if (data.t === "rect") {
-                        // for rectangles the origin is top left, so measure from the centre instaed.
-                        let template_x = templateDetails.x + shape.width / 2;
-                        let template_y = templateDetails.y + shape.height / 2;
-                        const r = new Ray({ x: tx, y: ty }, { x: template_x, y: template_y });
-                        contained = !canvas.walls.checkCollision(r);
-                    }
-                    else {
-                        const r = new Ray({ x: tx, y: ty }, templateDetails.data);
-                        contained = !canvas.walls.checkCollision(r);
-                    }
-                }
-            }
-        }
-        if (contained) return true
-    }
-
-
-    static getDistance(t1, t2, wallblocking = false, auraHeight) {
-        //Log("get distance callsed");
-        var x, x1, y, y1, d, r, segments = [], rdistance, distance;
-        switch (game.settings.get("ActiveAuras", "measurement",)) {
-            case (true): {
-                for (x = 0; x < t1.data.width; x++) {
-                    for (y = 0; y < t1.data.height; y++) {
-                        const origin = new PIXI.Point(...canvas.grid.getCenter(t1.data.x + (canvas.dimensions.size * x), t1.data.y + (canvas.dimensions.size * y)));
-                        for (x1 = 0; x1 < t2.data.width; x1++) {
-                            for (y1 = 0; y1 < t2.data.height; y1++) {
-                                const dest = new PIXI.Point(...canvas.grid.getCenter(t2.data.x + (canvas.dimensions.size * x1), t2.data.y + (canvas.dimensions.size * y1)));
-                                const r = new Ray(origin, dest);
-                                if (wallblocking && canvas.walls.checkCollision(r)) {
-                                    //Log(`ray ${r} blocked due to walls`);
-                                    continue;
-                                }
-                                segments.push({ ray: r });
-                            }
-                        }
-                    }
-                }
-                // console.log(segments);
-                if (segments.length === 0) {
-                    //Log(`${t2.data.name} full blocked by walls`);
-                    return false;
-                }
-                rdistance = segments.map(segment => canvas.grid.measureDistances([segment], { gridSpaces: true })[0]);
-                distance = rdistance[0];
-                rdistance.forEach(d => {
-                    if (d < distance)
-                        distance = d;
-                });
-            }
-                break;
-            case (false): {
-                let gs = canvas.dimensions.size
-                let auraTokenSize = (t2.data.height / 2) * canvas.dimensions.distance
-                for (x = 0; x < t1.data.width; x++) {
-                    for (y = 0; y < t1.data.height; y++) {
-                        const origin = new PIXI.Point(...canvas.grid.getCenter(t1.data.x + (canvas.dimensions.size * x), t1.data.y + (canvas.dimensions.size * y)));
-                        const dest = new PIXI.Point(t2.center.x, t2.center.y);
-                        const r = new Ray(origin, dest);
-                        if (wallblocking && canvas.walls.checkCollision(r)) {
-                            //Log(`ray ${r} blocked due to walls`);
-                            continue;
-                        }
-                        segments.push({ ray: r });
-                    }
-                }
-                if (segments.length === 0) {
-                    //Log(`${t2.data.name} full blocked by walls`);
-                    return false;
-                }
-                rdistance = []
-                segments.forEach(i => rdistance.push(i.ray.distance / gs * canvas.dimensions.distance))
-                distance = rdistance[0];
-                rdistance.forEach(d => {
-                    if (d < distance)
-                        distance = d;
-                });
-                distance -= auraTokenSize
-            }
-        }
-        if (auraHeight === true) {
-            if (game.settings.get("ActiveAuras", "vertical-euclidean") === true) {
-                let heightChange = Math.abs(t1.data.elevation - t2.data.elevation)
-                distance = distance > heightChange ? distance : heightChange
-            }
-            if (game.settings.get("ActiveAuras", "vertical-euclidean") === false) {
-                let a = distance;
-                let b = (t1.data.elevation - t2.data.elevation)
-                let c = (a * a) + (b * b)
-                distance = Math.sqrt(c)
-            }
-        }
-        return distance;
-
-    }
     /**
     * 
     * @param {Token} token - token to apply effect too
@@ -973,7 +980,7 @@ class ActiveAuras {
         let duplicateEffect = token.actor.effects.entries.find(e => e.data.label === oldEffectData.label)
         if (getProperty(duplicateEffect, "data.flags.ActiveAuras.isAura")) return;
         if (duplicateEffect) {
-            if(duplicateEffect.data.origin === oldEffectData.origin) return;
+            if (duplicateEffect.data.origin === oldEffectData.origin) return;
             if (JSON.stringify(duplicateEffect.data.changes) === JSON.stringify(oldEffectData.changes)) return;
             else await ActiveAuras.RemoveActiveEffects(tokenID, oldEffectData.label)
         }
@@ -1013,7 +1020,7 @@ class ActiveAuras {
             }
         }
         ['ignoreSelf', 'hidden', 'height', 'alignment', 'type', 'aura', 'radius', 'save', 'isAura', 'savedc', 'height'].forEach(e => delete effectData.flags.ActiveAuras[e])
-        if (effectData.flags.ActiveAuras.time !== "None") {
+        if (effectData.flags.ActiveAuras.time !== "None" && effectData.flags.ActiveAuras.time !== undefined && game.modules.get("dae")?.active) {
             effectData.flags.dae?.specialDuration?.push(effectData.flags.ActiveAuras.time)
         }
         if (effectData.flags.ActiveAuras.onlyOnce) {
@@ -1039,12 +1046,5 @@ class ActiveAuras {
             }
         }
     }
-
-    /**
-     * 
-     * @param {Actor} actor 
-     * @param {ActiveEffect} change 
-     */
-
 }
 
