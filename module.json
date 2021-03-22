@@ -3,16 +3,31 @@
     "title": "Active-Auras",
     "description": "Active-Auras",
     "author": "Kandashi",
-    "version": "0.1.59",
+    "version": "0.2.00",
     "minimumCoreVersion": "0.7.5",
     "compatibleCoreVersion": "0.7.9",
     "packs": [{
-        "name": "Active Auras premade",
-        "label": "Active Auras premade",
+        "name": "Active Auras Auras",
+        "label": "Active Auras Auras",
         "path": "packs/AuraItems",
         "entity": "Item",
         "module": "ActiveAuras"
-    }],
+    },
+    {
+        "name": "Active Auras Zone Actors",
+        "label": "Active Auras Zone Actors",
+        "path": "packs/ZoneActors",
+        "entity": "Actor",
+        "module": "ActiveAuras"
+    },
+    {
+        "name": "Active Auras Macros",
+        "label": "Active Auras Macros",
+        "path": "packs/macros",
+        "entity": "Macro",
+        "module": "ActiveAuras"
+    }
+],
     "scripts": [
         "src/aura.js"
     ],
