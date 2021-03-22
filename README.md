@@ -34,6 +34,17 @@ The "Apply while inactive" option allows for effects to propagate to other token
 - Works with DAE as far as I know
 - Multi Level Token should work fine, clones actors are ignored for purposes of calculating auras
 
+## Templates and drawings
+- Any template effect can now call a AA macro (included in the compendium) in the Midi QoL OnUse field to apply any active effects to the template rather than the targeted tokens. 
+    - This template will then act as its own source of an aura, any tokens that move inside the template will have the arua applied to them (not radius from the placement)
+    - For setting up auras like this, simply put any non-0 value inside the aura radius and call the "AA ApplyEffectsToTemplate" macro in Midi QoL OnUse
+- Auras can now be added to drawings through macros and will apply via the same logic as templates
+    - Any token within a drawing will have the aura applied to them
+    - Freehand drawings are not supported
+    - `drawing.setFlag("ActiveAuras", "IsAura", [effect.data])` where effect is the active effect to apply
+    - There is a bundled macro to select an active effect from a premade actor avaliable in the compendium, which has several "zone effect" style auras setup
+
 
 ## Notes
 - Only works with a GM account currently connected
+- Only works while a GM views the scene where an update takes place (a notification is given when this occurs)

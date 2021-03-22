@@ -206,6 +206,15 @@ Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
 let AuraMap = new Map()
 let debug = false
 
+/*
+Hooks.on("renderDrawingConfig", (sheet, html) => {
+    let extraHtml = `
+    <button type="button" title="Add Aura"</button>
+    `
+let test = html.find(".tab .item .position")after( extraHtml)
+})
+*/
+
 
 /**
 * Re-run aura detection on token creation
@@ -376,8 +385,8 @@ Hooks.on("preUpdateActor", (actor, update) => {
     }
 })
 
-Hooks.on("updateMeasuredTemplate", (scene, data, update)=> {
-    if(!getProperty(data, "flags.ActiveAuras")) return;
+Hooks.on("updateMeasuredTemplate", (scene, data, update) => {
+    if (!getProperty(data, "flags.ActiveAuras")) return;
     ActiveAuras.MainAura(undefined, "template movement")
 })
 
@@ -401,7 +410,7 @@ class ActiveAuras {
         let MapObject = AuraMap.get(MapKey);
         if (!MapObject.effects) return;
         for (let effect of MapObject.effects) {
-            if (effect.tokenId === token._id) return true;
+            if (effect.entityId === token._id) return true;
 
         }
     }
@@ -424,7 +433,6 @@ class ActiveAuras {
             for (let testEffect of testToken?.actor?.effects.entries) {
                 if (testEffect.getFlag('ActiveAuras', 'isAura')) {
                     if (testEffect.data.disabled) continue;
-                    if (testEffect.getFlag('ActiveAuras', 'hidden') && testToken.data.hidden) continue;
                     let newEffect = { data: duplicate(testEffect.data), parentActorLink: testEffect.parent.data.token.actorLink, parentActorId: testEffect.parent._id, entityType: "token", entityId: testToken.id }
                     for (let change of newEffect.data.changes) {
                         if (typeof change.value === "string" && change.key !== "macro.execute" && change.key !== "macro.itemMacro") {
@@ -444,6 +452,8 @@ class ActiveAuras {
                     newEffect.data.flags.ActiveAuras.applied = true;
                     newEffect.data.flags.ActiveAuras.isMacro = macro;
                     newEffect.data.flags.ActiveAuras.ignoreSelf = false;
+                    if (testEffect.getFlag('ActiveAuras', 'hidden') && testToken.data.hidden) newEffect.data.flags.ActiveAuras.Paused = true;
+                    else  newEffect.data.flags.ActiveAuras.Paused = false;
                     effectArray.push(newEffect)
                 }
             }
@@ -506,8 +516,8 @@ class ActiveAuras {
             if (ActiveAuras.IsAuraToken(movedToken, canvas)) {
                 auraTokenId = movedToken._id
             }
-            else if( getProperty(movedToken, "flags.token-attacher")){
-                if(debug) console.log("ActiveAuras: token attacher movement")
+            else if (getProperty(movedToken, "flags.token-attacher")) {
+                if (debug) console.log("ActiveAuras: token attacher movement")
             }
             else {
                 updateTokens = [];
@@ -598,7 +608,7 @@ class ActiveAuras {
                 if (testEffect.disabled) continue;
                 let newEffect = { data: duplicate(testEffect), parentActorId: false, parentActorLink: false, entityType: "drawing", entityId: drawing.id, }
                 for (let change of newEffect.data.changes) {
-                    if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.flags.ActiveAuras.isMacro = true
+                    if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.data.flags.ActiveAuras.isMacro = true
                 }
                 newEffect.disabled = false
                 let macro = newEffect.data.flags.ActiveAuras.isMacro !== undefined ? newEffect.data.flags.ActiveAuras.isMacro : false;
@@ -742,14 +752,13 @@ class ActiveAuras {
         let checkEffects = MapObject.effects;
         //Check for other types of X aura if the aura token is moved
         if (tokenId && canvasToken.id !== tokenId) {
-            checkEffects = checkEffects.filter(i => i.tokenId === tokenId)
+            checkEffects = checkEffects.filter(i => i.entityId === tokenId)
             let duplicateEffect = []
-            checkEffects.forEach(e => duplicateEffect = (MapObject.effects.filter(i => (i.data?.label === e.data?.label) && i.tokenId !== tokenId)));
+            checkEffects.forEach(e => duplicateEffect = (MapObject.effects.filter(i => (i.data?.label === e.data?.label) && i.entityId !== tokenId)));
             checkEffects = checkEffects.concat(duplicateEffect)
         }
 
         for (let auraEffect of checkEffects) {
-
             let auraTargets = auraEffect.data.flags?.ActiveAuras?.aura
 
             let auraEntity, distance;
@@ -786,14 +795,14 @@ class ActiveAuras {
                     break;
                 case "template": {
                     auraEntity = canvas.templates.get(auraEffect.entityId)
-                    if(ActiveAuras.getTemplateTargets(canvasToken, auraEntity.data)) distance = 0
+                    if (ActiveAuras.getTemplateTargets(canvasToken, auraEntity.data)) distance = 0
                     else distance = false
 
                 }
                     break;
                 case "drawing": {
                     auraEntity = canvas.drawings.get(auraEffect.entityId)
-                    if (ActiveAuras.isPointInRegion(canvasToken.center, auraEntity)) distance = 0
+                    if (ActiveAuras.isPointInRegion(canvasToken.center, auraEntity.data)) distance = 0
                     else distance = false
                 }
                     break;
@@ -802,7 +811,7 @@ class ActiveAuras {
             MapObject = map.get(MapKey);
 
 
-            if ((distance !== false) && (distance <= auraRadius)) {
+            if ((distance !== false) && (distance <= auraRadius) && !auraEffect.data.flags?.ActiveAuras?.Paused) {
                 if (MapObject) {
                     MapObject.add = true
                 }
@@ -823,7 +832,7 @@ class ActiveAuras {
 
     static getTemplateTargets(t, data) {
         t = canvas.tokens.get(t.id)
-        
+
         let templateDetails = canvas.templates.get(data._id);
         let tdx = data.x;
         let tdy = data.y;
@@ -857,17 +866,17 @@ class ActiveAuras {
                 const tx = t.data.x + xstep * gridSize;
                 const ty = t.data.y + ystep * gridSize;
                 if (shape.contains(tx - tdx, ty - tdy)) {
-                        if (data.t === "rect") {
-                            // for rectangles the origin is top left, so measure from the centre instaed.
-                            let template_x = templateDetails.x + shape.width / 2;
-                            let template_y = templateDetails.y + shape.height / 2;
-                            const r = new Ray({ x: tx, y: ty }, { x: template_x, y: template_y });
-                            contained = !canvas.walls.checkCollision(r);
-                        }
-                        else {
-                            const r = new Ray({ x: tx, y: ty }, templateDetails.data);
-                            contained = !canvas.walls.checkCollision(r);
-                        }
+                    if (data.t === "rect") {
+                        // for rectangles the origin is top left, so measure from the centre instaed.
+                        let template_x = templateDetails.x + shape.width / 2;
+                        let template_y = templateDetails.y + shape.height / 2;
+                        const r = new Ray({ x: tx, y: ty }, { x: template_x, y: template_y });
+                        contained = !canvas.walls.checkCollision(r);
+                    }
+                    else {
+                        const r = new Ray({ x: tx, y: ty }, templateDetails.data);
+                        contained = !canvas.walls.checkCollision(r);
+                    }
                 }
             }
         }
@@ -964,6 +973,7 @@ class ActiveAuras {
         let duplicateEffect = token.actor.effects.entries.find(e => e.data.label === oldEffectData.label)
         if (getProperty(duplicateEffect, "data.flags.ActiveAuras.isAura")) return;
         if (duplicateEffect) {
+            if(duplicateEffect.data.origin === oldEffectData.origin) return;
             if (JSON.stringify(duplicateEffect.data.changes) === JSON.stringify(oldEffectData.changes)) return;
             else await ActiveAuras.RemoveActiveEffects(tokenID, oldEffectData.label)
         }
@@ -971,7 +981,8 @@ class ActiveAuras {
             const flavor = `${CONFIG.DND5E.abilities[oldEffectData.flags[MODULE_NAME].save]} DC${oldEffectData.flags[MODULE_NAME].savedc} ${oldEffectData.label || ""}`;
             let saveRoll = (await token.actor.rollAbilitySave(oldEffectData.flags[MODULE_NAME].save, { flavor }));
             if (saveRoll && (saveRoll.total >= oldEffectData.flags[MODULE_NAME].savedc)) {
-                ui.notifications.notify(game.i18n.format("ACTIVEAURAS.saveNotify", { tokenName: token.data.name, oldEffectDataLabel: oldEffectData.label }))
+                let notification = game.i18n.format("ACTIVEAURAS.saveNotify", { tokenName: token.data.name, oldEffectDataLabel: oldEffectData.label })
+                ui.notifications.notify(notification)
                 return;
             }
         }
@@ -1003,7 +1014,7 @@ class ActiveAuras {
         }
         ['ignoreSelf', 'hidden', 'height', 'alignment', 'type', 'aura', 'radius', 'save', 'isAura', 'savedc', 'height'].forEach(e => delete effectData.flags.ActiveAuras[e])
         if (effectData.flags.ActiveAuras.time !== "None") {
-            effectData.flags.dae.specialDuration.push(effectData.flags.ActiveAuras.time)
+            effectData.flags.dae?.specialDuration?.push(effectData.flags.ActiveAuras.time)
         }
         if (effectData.flags.ActiveAuras.onlyOnce) {
             if (await token.getFlag("ActiveAuras", `${oldEffectData.origin}`)) return;
