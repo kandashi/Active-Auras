@@ -512,7 +512,7 @@ class ActiveAuras {
     }
 
     static async RetrieveDrawingAuras(effectArray) {
-        if(!effectArray) effectArray = AuraMap.get(canvas.scene._id)?.effects;
+        if (!effectArray) effectArray = AuraMap.get(canvas.scene._id)?.effects;
         let auraDrawings = canvas.drawings.placeables.filter(i => i.data.flags?.ActiveAuras?.IsAura !== undefined)
 
         for (let drawing of auraDrawings) {
@@ -833,17 +833,8 @@ class ActiveAuras {
         }
     }
 
-    /**
-     * Test individual token against aura array
-     * @param {Map} map - empty map to populate 
-     * @param {Array} auraEffectArray - array of auras to test against 
-     * @param {Token} canvasToken - single token to test
-     */
-    static UpdateToken(map, canvasToken, tokenId) {
-        if (game.modules.get("multilevel-tokens")) {
-            if (ActiveAuras.GetAllFlags(canvasToken, 'multilevel-tokens')) return;
-        }
-        if (canvasToken.actor === null) return;
+    static CheckType(canvasToken, type) {
+
         let tokenType;
         switch (canvasToken.actor.data.type) {
             case "npc": {
@@ -875,11 +866,44 @@ class ActiveAuras {
         else humanoidRaces = ["human", "orc", "elf", "tiefling", "gnome", "aaracokra", "dragonborn", "dwarf", "halfling", "leonin", "satyr", "genasi", "goliath", "aasimar", "bugbear", "firbolg", "goblin", "lizardfolk", "tabxi", "triton", "yuan-ti", "tortle", "changling", "kalashtar", "shifter", "warforged", "gith", "centaur", "loxodon", "minotaur", "simic hybrid", "vedalken", "verdan", "locathah", "grung"];
 
         for (let x of tokenType) {
+            if (x === type) return true
+        }
+
+        for (let x of tokenType) {
             if (humanoidRaces.includes(x)) {
                 tokenType = "humanoid"
                 continue;
             }
         }
+        if (tokenType === type || tokenType === "any") return true;
+        return false
+    }
+
+
+    static DispositonCheck(auraTargets, auraDis, tokenDis) {
+        switch (auraTargets) {
+            case "Allies": {
+                if (auraDis !== tokenDis) return false
+                else return true
+            }
+            case "Enemy": {
+                if (auraDis === tokenDis) return false
+                else return true
+            }
+        }
+    }
+    /**
+     * Test individual token against aura array
+     * @param {Map} map - empty map to populate 
+     * @param {Array} auraEffectArray - array of auras to test against 
+     * @param {Token} canvasToken - single token to test
+     */
+    static UpdateToken(map, canvasToken, tokenId) {
+        if (game.modules.get("multilevel-tokens")) {
+            if (ActiveAuras.GetAllFlags(canvasToken, 'multilevel-tokens')) return;
+        }
+        if (canvasToken.actor === null) return;
+
         let tokenAlignment;
         try {
             tokenAlignment = canvasToken.actor?.data.data.details.alignment.toLowerCase();
@@ -900,23 +924,27 @@ class ActiveAuras {
         for (let auraEffect of checkEffects) {
             let auraTargets = auraEffect.data.flags?.ActiveAuras?.aura
 
+            let { radius, height, type, alignment, hostile } = auraEffect.data.flags?.ActiveAuras;
+            let { parentActorLink, parentActorId } = auraEffect
+            type = type !== undefined ? type.toLowerCase() : "";
+            alignment = alignment !== undefined ? alignment.toLowerCase() : "";
             let auraEntity, distance;
-            let auraRadius = auraEffect.data.flags?.ActiveAuras?.radius;
-            let auraHeight = auraEffect.data.flags?.ActiveAuras?.height;
+            /*
             let auraType = auraEffect.data.flags?.ActiveAuras?.type !== undefined ? auraEffect.data.flags?.ActiveAuras?.type.toLowerCase() : "";
             let auraAlignment = auraEffect.data.flags?.ActiveAuras?.alignment !== undefined ? auraEffect.data.flags?.ActiveAuras?.alignment.toLowerCase() : "";
             let hostileTurn = auraEffect.data.flags?.ActiveAuras?.hostile
+            */
             let auraEntityType = auraEffect.entityType
 
             switch (auraEntityType) {
                 //{data: testEffect.data, parentActorLink :testEffect.parent.data.token.actorLink, parentActorId : testEffect.parent._id, tokenId: testToken.id, templateId: template._id, }
                 case "token": {
-                    if (auraEffect.parentActorLink) {
-                        let auraTokenArray = game.actors.get(auraEffect.parentActorId).getActiveTokens()
+                    if (parentActorLink) {
+                        let auraTokenArray = game.actors.get(parentActorId).getActiveTokens()
                         if (auraTokenArray.length > 1) {
                             auraEntity = auraTokenArray.reduce(FindClosestToken, auraTokenArray[0])
                             function FindClosestToken(tokenA, tokenB) {
-                                return ActiveAuras.getDistance(tokenA, canvasToken, game.settings.get("ActiveAuras", "wall-block"), auraHeight) < ActiveAuras.getDistance(tokenB, canvasToken, game.settings.get("ActiveAuras", "wall-block"), auraHeight) ? tokenA : tokenB
+                                return ActiveAuras.getDistance(tokenA, canvasToken, game.settings.get("ActiveAuras", "wall-block"), height) < ActiveAuras.getDistance(tokenB, canvasToken, game.settings.get("ActiveAuras", "wall-block"), height) ? tokenA : tokenB
                             }
                         }
                         else auraEntity = auraTokenArray[0]
@@ -924,16 +952,26 @@ class ActiveAuras {
                     else auraEntity = canvas.tokens.get(auraEffect.entityId)
 
                     if (auraEntity.id === canvasToken.id) continue;
-                    if (auraTargets === "Allies" && (auraEntity.data.disposition !== canvasToken.data.disposition)) continue;
-                    if (auraTargets === "Enemy" && (auraEntity.data.disposition === canvasToken.data.disposition)) continue;
-                    if (auraAlignment !== "" && !tokenAlignment.includes(auraAlignment) && !tokenAlignment.includes("any")) continue;
-                    if (auraType !== "" && !tokenType.includes(auraType) && !tokenType.includes("any")) continue;
-                    if (hostileTurn && canvasToken.data._id !== game.combats.active.current.tokenId) return;
-                    distance = ActiveAuras.getDistance(canvasToken, auraEntity, game.settings.get("ActiveAuras", "wall-block"), auraHeight)
+                    if (alignment) {
+                        if (alignment !== "" && !tokenAlignment.includes(alignment) && !tokenAlignment.includes("any")) continue;
+                    }
+                    if (!ActiveAuras.DispositonCheck(auraTargets, auraEntity.data.disposition, canvasToken.data.disposition)) continue;
+                    if (type) {
+                        if (!ActiveAuras.CheckType(canvasToken, type)) continue
+                    }
+                    if (hostile && canvasToken.data._id !== game.combats.active.current.tokenId) continue;
+                    distance = ActiveAuras.getDistance(canvasToken, auraEntity, game.settings.get("ActiveAuras", "wall-block"), height)
                 }
                     break;
                 case "template": {
                     auraEntity = canvas.templates.get(auraEffect.entityId)
+                    if (alignment) {
+                        if (alignment !== "" && !tokenAlignment.includes(alignment) && !tokenAlignment.includes("any")) continue;
+                    }
+                    if (type) {
+                        if (!ActiveAuras.CheckType(canvasToken, type)) continue
+                    }
+                    if (hostile && canvasToken.data._id !== game.combats.active.current.tokenId) return;
                     if (ActiveAuras.getTemplateTargets(canvasToken, auraEntity.data)) distance = 0
                     else distance = false
 
@@ -941,6 +979,13 @@ class ActiveAuras {
                     break;
                 case "drawing": {
                     auraEntity = canvas.drawings.get(auraEffect.entityId)
+                    if (alignment) {
+                        if (alignment !== "" && !tokenAlignment.includes(alignment) && !tokenAlignment.includes("any")) continue;
+                    }
+                    if (type) {
+                        if (!ActiveAuras.CheckType(canvasToken, type)) continue
+                    }
+                    if (hostile && canvasToken.data._id !== game.combats.active.current.tokenId) return;
                     if (ActiveAuras.isPointInRegion(canvasToken.center, auraEntity.data)) distance = 0
                     else distance = false
                 }
@@ -950,7 +995,7 @@ class ActiveAuras {
             MapObject = map.get(MapKey);
 
 
-            if ((distance !== false) && (distance <= auraRadius) && !auraEffect.data.flags?.ActiveAuras?.Paused) {
+            if ((distance !== false) && (distance <= radius) && !auraEffect.data.flags?.ActiveAuras?.Paused) {
                 if (MapObject) {
                     MapObject.add = true
                 }
@@ -994,6 +1039,10 @@ class ActiveAuras {
             }
         }
         let effectData = duplicate(oldEffectData)
+        if (effectData.flags.ActiveAuras.onlyOnce) {
+            if (await token.getFlag("ActiveAuras", `${oldEffectData.origin}`)) return;
+            else await token.setFlag("ActiveAuras", `${oldEffectData.origin}`, true)
+        }
         if (effectData.flags.ActiveAuras?.isMacro) {
             for (let change of effectData.changes) {
                 let newValue = change.value;
@@ -1023,10 +1072,7 @@ class ActiveAuras {
         if (effectData.flags.ActiveAuras.time !== "None" && effectData.flags.ActiveAuras.time !== undefined && game.modules.get("dae")?.active) {
             effectData.flags.dae?.specialDuration?.push(effectData.flags.ActiveAuras.time)
         }
-        if (effectData.flags.ActiveAuras.onlyOnce) {
-            if (await token.getFlag("ActiveAuras", `${oldEffectData.origin}`)) return;
-            else await token.setFlag("ActiveAuras", `${oldEffectData.origin}`, true)
-        }
+        
         await token.actor.createEmbeddedEntity("ActiveEffect", effectData);
         console.log(game.i18n.format("ACTIVEAURAS.ApplyLog", { effectDataLabel: effectData.label, tokenName: token.name }))
     }
