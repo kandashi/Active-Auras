@@ -37,7 +37,7 @@ The "Apply while inactive" option allows for effects to propagate to other token
 ## Templates and drawings
 - Any template effect can now call a AA macro (included in the compendium) in the Midi QoL OnUse field to apply any active effects to the template rather than the targeted tokens. 
     - This template will then act as its own source of an aura, any tokens that move inside the template will have the arua applied to them (not radius from the placement)
-    - For setting up auras like this, simply put any non-0 value inside the aura radius and call the "AA ApplyEffectsToTemplate" macro in Midi QoL OnUse
+    - For setting up auras like this, simply call the "AA ApplyEffectsToTemplate" macro in Midi QoL OnUse, any effects in the item will be applied to the aura
 - Auras can now be added to drawings through macros and will apply via the same logic as templates
     - Any token within a drawing will have the aura applied to them
     - Freehand drawings are not supported
