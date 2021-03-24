@@ -232,7 +232,7 @@ Hooks.on("createToken", (_scene, token) => {
                 if (effect.getFlag('ActiveAuras', 'isAura')) {
                     setTimeout(() => {
                         if (debug) console.log("createToken, collate auras true false")
-                        ActiveAuras.CollateAuras(canvas, true, false, "createToken")
+                        ActiveAuras.CollateAuras(canvas.scene._id, true, false, "createToken")
                     }, 20)
                     break;
                 }
@@ -260,7 +260,7 @@ Hooks.on("preDeleteToken", async (_scene, token) => {
     if (ActiveAuras.IsAuraToken(token, canvas)) {
         setTimeout(() => {
             if (debug) console.log("preDelete, collate auras false true")
-            ActiveAuras.CollateAuras(canvas, false, true, "preDeleteToken")
+            ActiveAuras.CollateAuras(canvas.scene._id, false, true, "preDeleteToken")
         }, 20)
     }
 });
@@ -274,7 +274,7 @@ Hooks.on("preUpdateToken", (_scene, token, update, _flags, _id) => {
             if (effect.flags?.ActiveAuras?.isAura) {
                 setTimeout(() => {
                     if (debug) console.log("preupdate, collate auras true true")
-                    ActiveAuras.CollateAuras(canvas, true, true, "preUpdateToken, removal")
+                    ActiveAuras.CollateAuras(canvas.scene._id, true, true, "preUpdateToken, removal")
                 }, 50)
                 return;
             }
@@ -285,7 +285,7 @@ Hooks.on("preUpdateToken", (_scene, token, update, _flags, _id) => {
             if (effect.flags?.ActiveAuras?.isAura) {
                 setTimeout(() => {
                     if (debug) console.log("preupdate, collate auras true false")
-                    ActiveAuras.CollateAuras(canvas, true, false, "preUpdateToken, addition")
+                    ActiveAuras.CollateAuras(canvas.scene._id, true, false, "preUpdateToken, addition")
                 }, 50)
                 return;
             }
@@ -300,7 +300,7 @@ Hooks.on("updateToken", async (scene, token, update, _flags, _id) => {
     if (!AAgm) return;
     if (("y" in update || "x" in update || "elevation" in update)) {
         let MapObject = AuraMap.get(scene.id);
-        if (MapObject.effects.length < 1) return;
+        if (!MapObject || MapObject?.effects.length < 1) return;
         if (debug) console.log("movement, main aura")
         await ActiveAuras.MainAura(token, "movement update", scene.id)
     }
@@ -308,13 +308,13 @@ Hooks.on("updateToken", async (scene, token, update, _flags, _id) => {
     if ("hidden" in update && ActiveAuras.IsAuraToken(token, canvas)) {
         setTimeout(() => {
             if (debug) console.log("hidden, collate auras true true")
-            ActiveAuras.CollateAuras(canvas, true, true, "updateToken")
+            ActiveAuras.CollateAuras(canvas.scene._id, true, true, "updateToken")
         }, 20)
     }
     if (ActiveAuras.IsAuraToken(token, canvas) && update?.actorData?.data?.attributes?.hp?.value <= 0) {
         setTimeout(() => {
             if (debug) console.log("0hp, collate auras true true")
-            ActiveAuras.CollateAuras(canvas, true, true, "updateToken, dead")
+            ActiveAuras.CollateAuras(canvas.scene._id, true, true, "updateToken, dead")
         }, 50)
     }
 });
@@ -327,7 +327,7 @@ Hooks.on("updateActiveEffect", (_actor, effect, _update) => {
     if (effect.flags?.ActiveAuras?.isAura) {
         setTimeout(() => {
             if (debug) console.log("updateAE, collate auras true true")
-            ActiveAuras.CollateAuras(canvas, true, true, "updateActiveEffect")
+            ActiveAuras.CollateAuras(canvas.scene._id, true, true, "updateActiveEffect")
         }, 20)
     }
 })
@@ -342,7 +342,7 @@ Hooks.on("deleteActiveEffect", (_actor, effect) => {
     if (!applyStatus && auraStatus) {
         setTimeout(() => {
             if (debug) console.log("deleteAE, collate auras true false")
-            ActiveAuras.CollateAuras(canvas, false, true, "deleteActiveEffect")
+            ActiveAuras.CollateAuras(canvas.scene._id, false, true, "deleteActiveEffect")
         }, 20)
     }
 });
@@ -355,7 +355,7 @@ Hooks.on("createActiveEffect", (_actor, effect) => {
     if (!effect.flags?.ActiveAuras?.applied && effect.flags?.ActiveAuras?.isAura) {
         setTimeout(() => {
             if (debug) console.log("deleteAE, collate auras true false")
-            ActiveAuras.CollateAuras(canvas, true, false, "createActiveEffect")
+            ActiveAuras.CollateAuras(canvas.scene._id, true, false, "createActiveEffect")
         }, 20)
     };
 });
@@ -364,7 +364,7 @@ Hooks.on("canvasReady", (canvas) => {
     if (!AAgm) return;
     setTimeout(() => {
         if (debug) console.log("canvasReady, collate auras true false")
-        ActiveAuras.CollateAuras(canvas, true, false, "ready")
+        ActiveAuras.CollateAuras(canvas.scene._id, true, false, "ready")
     }, 20)
 })
 
@@ -374,14 +374,14 @@ Hooks.on("preUpdateActor", (actor, update) => {
             if (debug) console.log("0hp, collate auras true true")
             Hooks.once("updateActor", () => {
                 if (!AAgm) return;
-                ActiveAuras.CollateAuras(canvas, true, true, "updateActor, dead")
+                ActiveAuras.CollateAuras(canvas.scene._id, true, true, "updateActor, dead")
             })
         }
     }
     if (actor.data.data.attributes.hp.value === 0 && update?.data?.attributes?.hp?.value > 0) {
         Hooks.once("updateActor", () => {
             if (!AAgm) return;
-            ActiveAuras.CollateAuras(canvas, true, false, "updateActor, revived")
+            ActiveAuras.CollateAuras(canvas.scene._id, true, false, "updateActor, revived")
         })
     }
 })
@@ -393,7 +393,7 @@ Hooks.on("updateMeasuredTemplate", (scene, data, update) => {
 
 Hooks.on("deleteMeasuredTemplate", (scene, data) => {
     if (!getProperty(data, "flags.ActiveAuras")) return;
-    ActiveAuras.CollateAuras(scene, false, true, "template deletion")
+    ActiveAuras.CollateAuras(scene._id, false, true, "template deletion")
 
 })
 
@@ -422,10 +422,11 @@ class ActiveAuras {
         }
     }
 
-    static CollateAuras(canvas, checkAuras, removeAuras, source) {
+    static CollateAuras(sceneID, checkAuras, removeAuras, source) {
         if (!AAgm) return;
+        if (sceneID !== canvas.id) return ui.notifications.warn("Collate Auras called on a non viewed scene, auras will be updated when you return to that scene")
         if (debug) console.log(source)
-        let MapKey = canvas.scene._id;
+        let MapKey = sceneID;
         let MapObject = AuraMap.get(MapKey);
         let effectArray = [];
         for (let testToken of canvas.tokens.placeables) {
@@ -496,7 +497,7 @@ class ActiveAuras {
                 if (testEffect.disabled) continue;
                 let newEffect = duplicate(testEffect)
                 for (let change of newEffect.data.changes) {
-                    if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.flags.ActiveAuras.isMacro = true
+                    if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.data.flags.ActiveAuras.isMacro = true
                 }
                 newEffect.disabled = false
                 let macro = newEffect.data.flags.ActiveAuras.isMacro !== undefined ? newEffect.data.flags.ActiveAuras.isMacro : false;
@@ -890,6 +891,7 @@ class ActiveAuras {
                 if (auraDis === tokenDis) return false
                 else return true
             }
+            case "All" : return true;
         }
     }
     /**
@@ -1072,7 +1074,7 @@ class ActiveAuras {
         if (effectData.flags.ActiveAuras.time !== "None" && effectData.flags.ActiveAuras.time !== undefined && game.modules.get("dae")?.active) {
             effectData.flags.dae?.specialDuration?.push(effectData.flags.ActiveAuras.time)
         }
-        
+
         await token.actor.createEmbeddedEntity("ActiveEffect", effectData);
         console.log(game.i18n.format("ACTIVEAURAS.ApplyLog", { effectDataLabel: effectData.label, tokenName: token.name }))
     }
