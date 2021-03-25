@@ -8,6 +8,8 @@
     "ACTIVEAURAS.tabname": "오러",
     "ACTIVEAURAS.removeDead": "사망시 오러 제거",
     "ACTIVEAURAS.removeDeadHint": "Hp가 0이 된 토큰이 제공하는 오러를 제거한다.",
+    "ACTIVEAURAS.combatOnly" : "[EN]Auras in combat",
+    "ACTIVEAURAS.combatHint" : "[EN] Only check auras while a combat is active, this is for performance reasons and should be on unless you really need it off",
     
     "ACTIVEAURAS.walltoptions_name": "벽 오러 차단",
     "ACTIVEAURAS.walltoptions_hint":"벽에 가로막히면 오러 효과가 차단된다.",

@@ -8,6 +8,8 @@
     "ACTIVEAURAS.tabname": "Auras",
     "ACTIVEAURAS.removeDead": "Retirer les auras pour les personnages Morts",
     "ACTIVEAURAS.removeDeadHint": "Quand les tokens atteignent 0 hp, supprime toutes les auras qu'ils pouvaient donner. Actif par défaut.",
+    "ACTIVEAURAS.combatOnly" : "[EN]Auras in combat",
+    "ACTIVEAURAS.combatHint" : "[EN] Only check auras while a combat is active, this is for performance reasons and should be on unless you really need it off",
     
     "ACTIVEAURAS.walltoptions_name": "Les murs bloquent les Auras",
     "ACTIVEAURAS.walltoptions_hint":"Les murs bloquent le passage des effets des auras",

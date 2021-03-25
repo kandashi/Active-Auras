@@ -32,6 +32,18 @@ Hooks.on('init', () => {
         default: true,
         type: Boolean,
     });
+    game.settings.register("ActiveAuras", "combatOnly", {
+        name: game.i18n.format("ACTIVEAURAS.combatOnly"),
+        hint: game.i18n.format("ACTIVEAURAS.combatHint"),
+        scope: "world",
+        config: true,
+        default: true,
+        type: Boolean,
+        onChange: () => {
+            if (game.settings.get("ActiveAuras", "combatOnly") === false) ActiveAuras.CollateAuras(canvas.id, true, true, "settings change")
+            else ActiveAuras.RemoveAllAppliedAuras()
+        }
+    })
     game.settings.register("ActiveAuras", "debug", {
         name: game.i18n.format("ACTIVEAURAS.debug_name"),
         hint: game.i18n.format("ACTIVEAURAS.debug_hint"),
@@ -48,7 +60,7 @@ let AAgm;
 
 Hooks.on("ready", () => {
     AAgm = game.user === game.users.find((u) => u.isGM && u.active)
-    ActiveAuras.CollateAuras(canvas, true, false)
+    ActiveAuras.CollateAuras(canvas.id, true, false)
 
 
     /**
@@ -245,6 +257,10 @@ Hooks.on("createToken", (_scene, token) => {
 });
 
 Hooks.on("updateCombat", async (combat, changed, options, userId) => {
+    if(changed.round === 1){
+        ActiveAuras.MainAura(undefined, "combat start", canvas.id)
+        return;
+    }
     if (!("turn" in changed)) return;
     if (!AAgm) return;
     let combatant = canvas.tokens.get(combat.combatant.tokenId);
@@ -397,6 +413,12 @@ Hooks.on("deleteMeasuredTemplate", (scene, data) => {
 
 })
 
+Hooks.on("deleteCombat", (combat) => {
+    if (game.settings.get("ActiveAuras", "combatOnly")) {
+        ActiveAuras.RemoveAllAppliedAuras()
+    }
+})
+
 class ActiveAuras {
     static GetAllFlags(entity, scope) {
         {
@@ -422,6 +444,14 @@ class ActiveAuras {
         }
     }
 
+    /**
+     * 
+     * @param {string} sceneID 
+     * @param {boolean} checkAuras 
+     * @param {boolean} removeAuras 
+     * @param {string} source 
+     * @returns 
+     */
     static CollateAuras(sceneID, checkAuras, removeAuras, source) {
         if (!AAgm) return;
         if (sceneID !== canvas.id) return ui.notifications.warn("Collate Auras called on a non viewed scene, auras will be updated when you return to that scene")
@@ -543,9 +573,21 @@ class ActiveAuras {
         MapObject.effects.forEach(i => EffectsArray.push(i.data.origin))
 
         for (let removeToken of canvas.tokens.placeables) {
-            if (removeToken?.actor?.effects) {
+            if (removeToken?.actor?.effects.size > 0) {
                 for (let testEffect of removeToken.actor.effects) {
                     if (!EffectsArray.includes(testEffect.data.origin) && testEffect.data?.flags?.ActiveAuras?.applied) {
+                        await removeToken.actor.deleteEmbeddedEntity("ActiveEffect", testEffect.id)
+                        console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: testEffect.data.label, tokenName: removeToken.name }))
+                    }
+                }
+            }
+        }
+    }
+    static async RemoveAllAppliedAuras() {
+        for (let removeToken of canvas.tokens.placeables) {
+            if (removeToken?.actor?.effects.size > 0) {
+                for (let testEffect of removeToken.actor.effects) {
+                    if (testEffect.data?.flags?.ActiveAuras?.applied) {
                         await removeToken.actor.deleteEmbeddedEntity("ActiveEffect", testEffect.id)
                         console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: testEffect.data.label, tokenName: removeToken.name }))
                     }
@@ -751,6 +793,7 @@ class ActiveAuras {
     static async MainAura(movedToken, source, sceneID) {
         if (debug) console.log(source)
         if (!AAgm) return;
+        if (game.settings.get("ActiveAuras", "combatOnly") && !game.combats.active) return;
         if (sceneID !== canvas.id) return ui.notifications.warn("An update was called on a non viewed scene, auras will be updated when you return to that scene")
 
         let map = new Map();
@@ -891,7 +934,7 @@ class ActiveAuras {
                 if (auraDis === tokenDis) return false
                 else return true
             }
-            case "All" : return true;
+            case "All": return true;
         }
     }
     /**
