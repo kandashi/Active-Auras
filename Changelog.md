@@ -23,3 +23,9 @@ Lots of updates for templates and drawings
     - Freehand drawings are not supported
     - `drawing.setFlag("ActiveAuras", "IsAura", [effect.data])` where effect is the active effect to apply
     - There is a bundled macro to select an active effect from a premade actor avaliable in the compendium, which has several "zone effect" style auras setup
+
+
+## 0.2.04
+[BREAKING]
+Added combat check, by default tokens will only gain auras if combat is active. This is to limit the performance impact of Active Auras, and hopefully reduce stuttering and lag issues. There is a setting to remove this lock, however use at your own risk.
+For anyone updating AA, please use the command ActiveAuras.RemoveAllAppliedAuras() either in a macro or the console to reset your canvas after updating, this will be required on any canvas with auras currently active
