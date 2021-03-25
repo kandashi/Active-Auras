@@ -8,6 +8,9 @@
     "ACTIVEAURAS.tabname": "Auras",
     "ACTIVEAURAS.removeDead": "Remove Auras on death",
     "ACTIVEAURAS.removeDeadHint": "On tokens reaching 0 hp, remove any auras they would provide, default on",
+    "ACTIVEAURAS.combatOnly" : "Auras in combat",
+    "ACTIVEAURAS.combatHint" : "Only check auras while a combat is active, this is for performance reasons and should be on unless you really need it off",
+
     
     "ACTIVEAURAS.walltoptions_name": "Walls Block Auras",
     "ACTIVEAURAS.walltoptions_hint":"Interveneing walls will block aura effects",
