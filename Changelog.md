@@ -29,3 +29,9 @@ Lots of updates for templates and drawings
 [BREAKING]
 Added combat check, by default tokens will only gain auras if combat is active. This is to limit the performance impact of Active Auras, and hopefully reduce stuttering and lag issues. There is a setting to remove this lock, however use at your own risk.
 For anyone updating AA, please use the command ActiveAuras.RemoveAllAppliedAuras() either in a macro or the console to reset your canvas after updating, this will be required on any canvas with auras currently active
+
+## 0.2.05
+Internal change of debug setting to avoid namespace collisions
+Added create/delete combatant hooks to allow adding and removing aura actors from an ongoing combat
+[BREAKING]Added disposition check for template spells, the macro has been updated and will require replacing
+[BUGS] Currently Macro-Repeat function from TimesUp/DAE is broken with auras
