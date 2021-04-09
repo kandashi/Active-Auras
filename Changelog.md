@@ -35,3 +35,8 @@ Internal change of debug setting to avoid namespace collisions
 Added create/delete combatant hooks to allow adding and removing aura actors from an ongoing combat
 [BREAKING]Added disposition check for template spells, the macro has been updated and will require replacing
 [BUGS] Currently Macro-Repeat function from TimesUp/DAE is broken with auras
+
+## 0.2.07
+Clean up combatant checks 
+Clear up parsing of @ values within effect data
+Added multiple Aura effect spells into the compendium pack
