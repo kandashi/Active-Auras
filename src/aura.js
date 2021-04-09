@@ -263,7 +263,8 @@ Hooks.on("updateCombat", async (combat, changed, options, userId) => {
     }
     if (!("turn" in changed)) return;
     if (!AAgm) return;
-    let combatant = canvas.tokens.get(combat.combatant.tokenId);
+    let combatant = canvas.tokens.get(combat.combatant?.tokenId) || null;
+    if (!combatant) return;
     let previousTurn = combat.turns[changed.turn - 1 > -1 ? changed.turn - 1 : combat.turns.length - 1]
     let previousCombatant = canvas.tokens.get(previousTurn.tokenId)
     previousCombatant.update({ "flags.ActiveAuras": false })
@@ -421,13 +422,14 @@ Hooks.on("deleteCombat", (combat) => {
 })
 
 Hooks.on("deleteCombatant", (combat, combatant) => {
-    if(ActiveAuras.IsAuraToken(combatant.token), combat.scene.id){
-    ActiveAuras.ExtractAuraById(combatant.tokenId, combat.scene.id)
+    if (ActiveAuras.IsAuraToken(combatant.token, combat.scene.id)) {
+        ActiveAuras.ExtractAuraById(combatant.tokenId, combat.scene.id)
     }
 });
 
 Hooks.on("createCombatant", (combat, combatant) => {
-    if(!combat.active) return;
+    if (!combat.active) return;
+    combatant = canvas.tokens.get(combatant.tokenId)
     if (combatant.actor.effects?.entries) {
         for (let effect of combatant.actor.effects?.entries) {
             if (effect.getFlag('ActiveAuras', 'isAura')) {
@@ -466,6 +468,21 @@ class ActiveAuras {
         }
     }
 
+    static async ParseEffectValue(effectChanges, actor) {
+        for (let change of effectChanges[0].changes) {
+            let rollData = actor.getRollData()
+            if (change.value.includes("@")) {
+                let calcValue = new Roll(change.value, rollData).terms[0]
+                let newValue = `${calcValue}`
+                if (change.mode === 2) {
+                    newValue = `+${calcValue}`
+                }
+                change.value = newValue
+            }
+        }
+        return effectChanges
+    }
+
     /**
      * 
      * @param {string} sceneID 
@@ -495,14 +512,22 @@ class ActiveAuras {
                     if (testEffect.data.disabled) continue;
                     let newEffect = { data: duplicate(testEffect.data), parentActorLink: testEffect.parent.data.token.actorLink, parentActorId: testEffect.parent._id, entityType: "token", entityId: testToken.id }
                     for (let change of newEffect.data.changes) {
-                        if (typeof change.value === "string" && change.key !== "macro.execute" && change.key !== "macro.itemMacro") {
-                            if (change.value.includes("@")) {
-                                let dataPath = change.value.substring(2)
-                                let newValue = getProperty(testToken.actor.getRollData(), dataPath)
-                                const changeIndex = newEffect.data.changes.findIndex(i => i.value === change.value && i.key === change.key)
-                                newEffect.data.changes[changeIndex].value = `+${newValue}`
+                        let rollData = testToken.actor.getRollData()
+                        if (change.value.includes("@")) {
+                            let calcValue = new Roll(change.value, rollData).terms[0]
+                            let newValue = `${calcValue}`
+                            if (change.mode === 2) {
+                                newValue = `+${calcValue}`
                             }
+                            change.value = newValue
+                            /*
+                            let dataPath = change.value.substring(2)
+                            let newValue = getProperty(testToken.actor.getRollData(), dataPath)
+                            const changeIndex = newEffect.data.changes.findIndex(i => i.value === change.value && i.key === change.key)
+                            newEffect.data.changes[changeIndex].value = `+${newValue}`
+                            */
                         }
+
                         if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.data.flags.ActiveAuras.isMacro = true
                     }
                     newEffect.data.disabled = false
@@ -548,7 +573,19 @@ class ActiveAuras {
             for (let testEffect of template.data.flags?.ActiveAuras?.IsAura) {
                 if (testEffect.disabled) continue;
                 let newEffect = duplicate(testEffect)
+                const parts = testEffect.data.origin.split(".")
+                const [entityName, entityId, embeddedName, embeddedId] = parts;
+                let actor = game.actors.get(entityId)
+                let rollData = actor.getRollData()
+                rollData["item.level"] = getProperty(testEffect, "castLevel")
+                Object.assign(rollData, { item: { level: testEffect.castLevel } })
                 for (let change of newEffect.data.changes) {
+                    if (change.value.includes("@")) {
+                        let calcValue = new Roll(change.value, rollData)
+
+                        let newValue = calcValue.terms[0]
+                        change.value = newValue
+                    }
                     if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.data.flags.ActiveAuras.isMacro = true
                 }
                 newEffect.disabled = false
@@ -573,6 +610,12 @@ class ActiveAuras {
                 if (testEffect.disabled) continue;
                 let newEffect = { data: duplicate(testEffect), parentActorId: false, parentActorLink: false, entityType: "drawing", entityId: drawing.id, }
                 for (let change of newEffect.data.changes) {
+                    if (change.value.includes("@")) {
+                        let calcValue = new Roll(change.value, rollData)
+
+                        let newValue = calcValue.terms[0]
+                        change.value = newValue
+                    }
                     if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.data.flags.ActiveAuras.isMacro = true
                 }
                 newEffect.disabled = false
@@ -826,7 +869,8 @@ class ActiveAuras {
     static async MainAura(movedToken, source, sceneID) {
         if (AAdebug) console.log(source)
         if (!AAgm) return;
-        if (game.settings.get("ActiveAuras", "combatOnly") && !game.combats.active) return;
+        let sceneCombat = game.combats.filter(c => c.scene.id === sceneID)
+        if (game.settings.get("ActiveAuras", "combatOnly") && !sceneCombat[0].started) return;
         if (sceneID !== canvas.id) return ui.notifications.warn("An update was called on a non viewed scene, auras will be updated when you return to that scene")
 
         let map = new Map();
@@ -1050,7 +1094,7 @@ class ActiveAuras {
                         if (!ActiveAuras.CheckType(canvasToken, type)) continue
                     }
                     if (hostile && canvasToken.data._id !== game.combats.active.current.tokenId) return;
-                    if(auraEffect.casterDisposition){
+                    if (auraEffect.casterDisposition) {
                         if (!ActiveAuras.DispositonCheck(auraTargets, auraEffect.casterDisposition, canvasToken.data.disposition)) continue;
                     }
                     if (ActiveAuras.getTemplateTargets(canvasToken, auraEntity.data)) distance = 0
@@ -1130,22 +1174,25 @@ class ActiveAuras {
                 if (change.key === "macro.execute" || change.key === "macro.itemMacro") {
                     if (typeof newValue === "string") {
                         newValue = [newValue]
+
+                        newValue = newValue.map(val => {
+                            if (typeof val === "string" && val.includes("@@token")) {
+                                let re = /([\s]*@@token)/gms
+                                return val.replaceAll(re, ` @token`)
+                            }
+                            else if (typeof val === "string" && val.includes("@token")) {
+                                let re = /([\s]*@token)/gms
+                                return val.replaceAll(re, ` ${token.data._id}`)
+                            }
+                            return val;
+                        });
+                        if (typeof change.value === "string") {
+                            change.value = newValue[0];
+                        }
+                        else {
+                            change.value = newValue;
+                        }
                     }
-                    newValue = newValue.map(val => {
-                        if (typeof val === "string" && val.includes("@@token")) {
-                            let re = /([\s]*@@token)/gms
-                            return val.replaceAll(re, ` @token`)
-                        }
-                        else if (typeof val === "string" && val.includes("@token")) {
-                            let re = /([\s]*@token)/gms
-                            return val.replaceAll(re, ` ${token.data._id}`)
-                        }
-                        return val;
-                    });
-                    if (typeof change.value === "string")
-                        change.value = newValue[0];
-                    else
-                        change.value = newValue;
                 }
             }
         }
