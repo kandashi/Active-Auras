@@ -461,7 +461,7 @@ class ActiveAuras {
     static IsAuraToken(token, sceneID) {
         let MapKey = sceneID;
         let MapObject = AuraMap.get(MapKey);
-        if (!MapObject.effects) return;
+        if (!MapObject?.effects) return;
         for (let effect of MapObject.effects) {
             if (effect.entityId === token._id) return true;
 
@@ -512,6 +512,7 @@ class ActiveAuras {
                     if (testEffect.data.disabled) continue;
                     let newEffect = { data: duplicate(testEffect.data), parentActorLink: testEffect.parent.data.token.actorLink, parentActorId: testEffect.parent._id, entityType: "token", entityId: testToken.id }
                     for (let change of newEffect.data.changes) {
+                        if(typeof change.value !== "string") continue
                         let rollData = testToken.actor.getRollData()
                         if (change.value.includes("@")) {
                             let calcValue = new Roll(change.value, rollData).terms[0]
@@ -870,7 +871,7 @@ class ActiveAuras {
         if (AAdebug) console.log(source)
         if (!AAgm) return;
         let sceneCombat = game.combats.filter(c => c.scene.id === sceneID)
-        if (game.settings.get("ActiveAuras", "combatOnly") && !sceneCombat[0].started) return;
+        if (game.settings.get("ActiveAuras", "combatOnly") && !sceneCombat[0]?.started) return;
         if (sceneID !== canvas.id) return ui.notifications.warn("An update was called on a non viewed scene, auras will be updated when you return to that scene")
 
         let map = new Map();

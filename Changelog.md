@@ -40,3 +40,7 @@ Added create/delete combatant hooks to allow adding and removing aura actors fro
 Clean up combatant checks 
 Clear up parsing of @ values within effect data
 Added multiple Aura effect spells into the compendium pack
+
+## 0.2.08
+Fix for no-combat errors
+Cleanup for string effect values
