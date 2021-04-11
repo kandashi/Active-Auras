@@ -44,3 +44,4 @@ Added multiple Aura effect spells into the compendium pack
 ## 0.2.08
 Fix for no-combat errors
 Cleanup for string effect values
+Fix for Grease spell
