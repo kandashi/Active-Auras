@@ -610,6 +610,10 @@ class ActiveAuras {
             for (let testEffect of drawing.data.flags?.ActiveAuras?.IsAura) {
                 if (testEffect.disabled) continue;
                 let newEffect = { data: duplicate(testEffect), parentActorId: false, parentActorLink: false, entityType: "drawing", entityId: drawing.id, }
+                const parts = testEffect.origin.split(".")
+                const [entityName, entityId, embeddedName, embeddedId] = parts;
+                let actor = game.actors.get(entityId)
+                let rollData = actor.getRollData()
                 for (let change of newEffect.data.changes) {
                     if (change.value.includes("@")) {
                         let calcValue = new Roll(change.value, rollData)

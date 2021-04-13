@@ -45,3 +45,7 @@ Added multiple Aura effect spells into the compendium pack
 Fix for no-combat errors
 Cleanup for string effect values
 Fix for Grease spell
+
+## 0.2.09
+Fix for drawing effects not applying correctly
+Fix for Spirit Guardians spell, will need replacing and the macro importing
