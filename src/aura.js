@@ -581,6 +581,7 @@ class ActiveAuras {
                 rollData["item.level"] = getProperty(testEffect, "castLevel")
                 Object.assign(rollData, { item: { level: testEffect.castLevel } })
                 for (let change of newEffect.data.changes) {
+                    if(typeof change.value !== "string") continue;
                     if (change.value.includes("@")) {
                         let calcValue = new Roll(change.value, rollData)
 
@@ -615,6 +616,7 @@ class ActiveAuras {
                 let actor = game.actors.get(entityId)
                 let rollData = actor.getRollData()
                 for (let change of newEffect.data.changes) {
+                    if(typeof change.value !== "string") continue
                     if (change.value.includes("@")) {
                         let calcValue = new Roll(change.value, rollData)
 
