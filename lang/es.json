@@ -8,8 +8,8 @@
     "ACTIVEAURAS.tabname": "Auras",
     "ACTIVEAURAS.removeDead": "Quitar Auras al morir",
     "ACTIVEAURAS.removeDeadHint": "Cuando un token queda a 0 PG, desactivar auras que emita, por defecto sí",
-    "ACTIVEAURAS.combatOnly" : "[EN]Auras in combat",
-    "ACTIVEAURAS.combatHint" : "[EN] Only check auras while a combat is active, this is for performance reasons and should be on unless you really need it off",
+    "ACTIVEAURAS.combatOnly" : "Auras en combate",
+    "ACTIVEAURAS.combatHint" : "Comprobar auras sólo si hay un combate activo, esto es por cuestiones de rendimiento y debería estar encendido a no ser que necesites desactivarlo",
 
     "ACTIVEAURAS.walltoptions_name": "Paredes bloquean auras",
     "ACTIVEAURAS.walltoptions_hint":"Las paredes bloquearán el efecto de las auras",
