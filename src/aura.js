@@ -1088,7 +1088,7 @@ class ActiveAuras {
                     if (type) {
                         if (!ActiveAuras.CheckType(canvasToken, type)) continue
                     }
-                    if (hostile && canvasToken.data._id !== game.combats.active.current.tokenId) continue;
+                    if (hostile && canvasToken.data._id !== game.combats.active?.current.tokenId) continue;
                     distance = ActiveAuras.getDistance(canvasToken, auraEntity, game.settings.get("ActiveAuras", "wall-block"), height)
                 }
                     break;
@@ -1100,7 +1100,7 @@ class ActiveAuras {
                     if (type) {
                         if (!ActiveAuras.CheckType(canvasToken, type)) continue
                     }
-                    if (hostile && canvasToken.data._id !== game.combats.active.current.tokenId) return;
+                    if (hostile && canvasToken.data._id !== game.combats.active?.current.tokenId) return;
                     if (auraEffect.casterDisposition) {
                         if (!ActiveAuras.DispositonCheck(auraTargets, auraEffect.casterDisposition, canvasToken.data.disposition)) continue;
                     }
@@ -1117,7 +1117,7 @@ class ActiveAuras {
                     if (type) {
                         if (!ActiveAuras.CheckType(canvasToken, type)) continue
                     }
-                    if (hostile && canvasToken.data._id !== game.combats.active.current.tokenId) return;
+                    if (hostile && canvasToken.data._id !== game.combats.active?.current.tokenId) return;
                     if (ActiveAuras.isPointInRegion(canvasToken.center, auraEntity.data)) distance = 0
                     else distance = false
                 }
