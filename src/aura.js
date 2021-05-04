@@ -803,12 +803,13 @@ class ActiveAuras {
      */
     static getDistance(t1, t2, wallblocking = false, auraHeight, radius) {
         //Log("get distance callsed");
-        let xMax = t2.data.x + (radius / canvas.dimensions.distance * canvas.grid.size) + 100
-        let xMin = t2.data.x - (radius / canvas.dimensions.distance * canvas.grid.size) - 100
-        let yMax = t2.data.y + (radius / canvas.dimensions.distance * canvas.grid.size) + 100
-        let yMin = t2.data.y - (radius / canvas.dimensions.distance * canvas.grid.size) - 100
+        let { size, distance} = canvas.dimensions
+        const xMax = t2.data.x + (radius / distance * size) + t2.w  + 100
+        const xMin = t2.data.x - (radius / distance * size) - 100
+        const yMax = t2.data.y + (radius / distance * size) + t2.h + 100
+        const yMin = t2.data.y - (radius / distance * size) - 100
         if (t1.data.x < xMin || t1.data.x > xMax || t1.data.y > yMax || t1.data.y < yMin) return false;
-        var x, x1, y, y1, d, r, segments = [], rdistance, distance;
+        var x, x1, y, y1, d, r, segments = [], rdistance;
         switch (game.settings.get("ActiveAuras", "measurement",)) {
             case (true): {
                 for (x = 0; x < t1.data.width; x++) {
