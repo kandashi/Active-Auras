@@ -506,13 +506,15 @@ class ActiveAuras {
             if (game.modules.get("multilevel-tokens")?.active) {
                 if (ActiveAuras.GetAllFlags(testToken, 'multilevel-tokens')) continue;
             }
-            if ((testToken.data.actorData?.attributes?.hp?.value <= 0 || testToken.actor?.data.data.attributes.hp.value <= 0) && game.settings.get("ActiveAuras", "dead-aura")) continue;
-            for (let testEffect of testToken?.actor?.effects.entries) {
+            if ((testToken.data.actorData?.attributes?.hp?.value <= 0 || testToken.actor?.data.data.attributes.hp.value <= 0) && game.settings.get("ActiveAuras", "dead-aura")) {
+                if (AAdebug) console.log(`Skipping ${testToken.name}, 0hp`)
+                continue
+            } for (let testEffect of testToken?.actor?.effects.entries) {
                 if (testEffect.getFlag('ActiveAuras', 'isAura')) {
                     if (testEffect.data.disabled) continue;
                     let newEffect = { data: duplicate(testEffect.data), parentActorLink: testEffect.parent.data.token.actorLink, parentActorId: testEffect.parent._id, entityType: "token", entityId: testToken.id }
                     for (let change of newEffect.data.changes) {
-                        if(typeof change.value !== "string") continue
+                        if (typeof change.value !== "string") continue
                         let rollData = testToken.actor.getRollData()
                         if (change.value.includes("@")) {
                             let calcValue = new Roll(change.value, rollData).terms[0]
@@ -581,7 +583,7 @@ class ActiveAuras {
                 rollData["item.level"] = getProperty(testEffect, "castLevel")
                 Object.assign(rollData, { item: { level: testEffect.castLevel } })
                 for (let change of newEffect.data.changes) {
-                    if(typeof change.value !== "string") continue;
+                    if (typeof change.value !== "string") continue;
                     if (change.value.includes("@")) {
                         let calcValue = new Roll(change.value, rollData)
 
@@ -616,7 +618,7 @@ class ActiveAuras {
                 let actor = game.actors.get(entityId)
                 let rollData = actor.getRollData()
                 for (let change of newEffect.data.changes) {
-                    if(typeof change.value !== "string") continue
+                    if (typeof change.value !== "string") continue
                     if (change.value.includes("@")) {
                         let calcValue = new Roll(change.value, rollData)
 
@@ -790,8 +792,22 @@ class ActiveAuras {
         if (contained) return true
     }
 
-    static getDistance(t1, t2, wallblocking = false, auraHeight) {
+    /**
+     * 
+     * @param {object}} t1 canvas token
+     * @param {object} t2 aura entity
+     * @param {boolean} wallblocking 
+     * @param {number} auraHeight 
+     * @param {number} radius
+     * @returns 
+     */
+    static getDistance(t1, t2, wallblocking = false, auraHeight, radius) {
         //Log("get distance callsed");
+        let xMax = t2.data.x + (radius / canvas.dimensions.distance * canvas.grid.size) + 100
+        let xMin = t2.data.x - (radius / canvas.dimensions.distance * canvas.grid.size) - 100
+        let yMax = t2.data.y + (radius / canvas.dimensions.distance * canvas.grid.size) + 100
+        let yMin = t2.data.y - (radius / canvas.dimensions.distance * canvas.grid.size) - 100
+        if (t1.data.x < xMin || t1.data.x > xMax || t1.data.y > yMax || t1.data.y < yMin) return false;
         var x, x1, y, y1, d, r, segments = [], rdistance, distance;
         switch (game.settings.get("ActiveAuras", "measurement",)) {
             case (true): {
@@ -876,7 +892,7 @@ class ActiveAuras {
     static async MainAura(movedToken, source, sceneID) {
         if (AAdebug) console.log(source)
         if (!AAgm) return;
-        let sceneCombat = game.combats.filter(c => c.scene.id === sceneID)
+        let sceneCombat = game.combats.filter(c => c.scene?.id === sceneID)
         if (game.settings.get("ActiveAuras", "combatOnly") && !sceneCombat[0]?.started) return;
         if (sceneID !== canvas.id) return ui.notifications.warn("An update was called on a non viewed scene, auras will be updated when you return to that scene")
 
@@ -1073,7 +1089,7 @@ class ActiveAuras {
                         if (auraTokenArray.length > 1) {
                             auraEntity = auraTokenArray.reduce(FindClosestToken, auraTokenArray[0])
                             function FindClosestToken(tokenA, tokenB) {
-                                return ActiveAuras.getDistance(tokenA, canvasToken, game.settings.get("ActiveAuras", "wall-block"), height) < ActiveAuras.getDistance(tokenB, canvasToken, game.settings.get("ActiveAuras", "wall-block"), height) ? tokenA : tokenB
+                                return ActiveAuras.getDistance(tokenA, canvasToken, game.settings.get("ActiveAuras", "wall-block"), height, radius) < ActiveAuras.getDistance(tokenB, canvasToken, game.settings.get("ActiveAuras", "wall-block"), height) ? tokenA : tokenB
                             }
                         }
                         else auraEntity = auraTokenArray[0]
@@ -1089,7 +1105,7 @@ class ActiveAuras {
                         if (!ActiveAuras.CheckType(canvasToken, type)) continue
                     }
                     if (hostile && canvasToken.data._id !== game.combats.active?.current.tokenId) continue;
-                    distance = ActiveAuras.getDistance(canvasToken, auraEntity, game.settings.get("ActiveAuras", "wall-block"), height)
+                    distance = ActiveAuras.getDistance(canvasToken, auraEntity, game.settings.get("ActiveAuras", "wall-block"), height, radius)
                 }
                     break;
                 case "template": {
@@ -1100,7 +1116,7 @@ class ActiveAuras {
                     if (type) {
                         if (!ActiveAuras.CheckType(canvasToken, type)) continue
                     }
-                    if (hostile && canvasToken.data._id !== game.combats.active?.current.tokenId) return;
+                    if (hostile && canvasToken.data._id !== game.combats.active.current.tokenId) return;
                     if (auraEffect.casterDisposition) {
                         if (!ActiveAuras.DispositonCheck(auraTargets, auraEffect.casterDisposition, canvasToken.data.disposition)) continue;
                     }
@@ -1117,7 +1133,7 @@ class ActiveAuras {
                     if (type) {
                         if (!ActiveAuras.CheckType(canvasToken, type)) continue
                     }
-                    if (hostile && canvasToken.data._id !== game.combats.active?.current.tokenId) return;
+                    if (hostile && canvasToken.data._id !== game.combats.active.current.tokenId) return;
                     if (ActiveAuras.isPointInRegion(canvasToken.center, auraEntity.data)) distance = 0
                     else distance = false
                 }
