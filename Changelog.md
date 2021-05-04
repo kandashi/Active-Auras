@@ -49,3 +49,9 @@ Fix for Grease spell
 ## 0.2.09
 Fix for drawing effects not applying correctly
 Fix for Spirit Guardians spell, will need replacing and the macro importing
+
+## 0.2.11
+Fix for non-viewed scene errors on combat advancement
+Cleaned up the range computation to make things faster
+Updated spells : Spirit Guardians, Black Tentacles, Cloudkill, Incendiary Cloud, Insect Plague, Moonbeam, Sleet Storm, 
+Any of these spells will still work with the old versions, but the new ones will remove the effect if the token is forcefully removed from the aura not on their turn
