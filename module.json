@@ -4,8 +4,8 @@
     "description": "Active-Auras",
     "author": "Kandashi",
     "version": "0.2.11",
-    "minimumCoreVersion": "0.7.5",
-    "compatibleCoreVersion": "0.7.9",
+    "minimumCoreVersion": "0.8.5",
+    "compatibleCoreVersion": "0.8.5",
     "packs": [{
         "name": "Active Auras Auras",
         "label": "Active Auras Auras",
@@ -29,7 +29,14 @@
     }
 ],
     "scripts": [
-        "src/aura.js"
+        "src/aura.js",
+        "src/AAhelpers.js",
+        "src/AAhooks.js",
+        "src/collateAuras.js",
+        "src/measureDistances.js",
+        "src/settings.js",
+        "src/templateDetection.js",
+        "src/AAhtml.js"
     ],
     "languages": [{
             "lang": "en",
