@@ -12,7 +12,7 @@ Hooks.on("ready", () => {
     CONFIG.ActiveEffect.entityClass.prototype.apply = ActiveAurasApply;
 
     function ActiveAurasApply(actor, change) {
-        if (actor._id == change.effect.data.origin?.split('.')[1] && change.effect.data.flags?.ActiveAuras?.ignoreSelf) {
+        if (actor.id == change.effect.data.origin?.split('.')[1] && change.effect.data.flags?.ActiveAuras?.ignoreSelf) {
             console.log(game.i18n.format("ACTIVEAURAS.IgnoreSelfLog", { effectDataLabel: change.effect.data.label, changeKey: change.key, actorName: actor.name }));
             return null;
         }
@@ -152,9 +152,9 @@ Hooks.on("updateMeasuredTemplate", (scene, data, update) => {
     ActiveAuras.MainAura(undefined, "template movement", scene.id)
 })
 
-Hooks.on("deleteMeasuredTemplate", (scene, data) => {
+Hooks.on("deleteMeasuredTemplate", (doc) => {
     //if (!getProperty(data, "flags.ActiveAuras")) return;
-    AAhelpers.ExtractAuraById(data._id, scene._id)
+    AAhelpers.ExtractAuraById(doc.id, doc.parent.id)
     //ActiveAuras.CollateAuras(scene._id, false, true, "template deletion")
 
 })

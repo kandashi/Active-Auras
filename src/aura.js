@@ -11,6 +11,7 @@ class ActiveAuras {
      * Locate all auras on the canvas, create map of tokens to update, update tokens 
      */
     static async MainAura(movedToken, source, sceneID) {
+        if(typeof movedToken?.documentName !== "String") movedToken = movedToken?.document ?? undefined
         if (AAdebug) console.log(source)
         if (!AAgm) return;
         let sceneCombat = game.combats.filter(c => c.scene?.id === sceneID)
@@ -30,7 +31,7 @@ class ActiveAuras {
             }
             else {
                 updateTokens = [];
-                updateTokens.push(canvas.tokens.get(movedToken._id))
+                updateTokens.push(canvas.tokens.get(movedToken.id))
             }
         }
         map = await ActiveAuras.UpdateAllTokens(map, updateTokens, auraTokenId)
@@ -115,7 +116,7 @@ class ActiveAuras {
         } catch (error) {
             console.error([`ActiveAuras: the token has an unreadable alignment`, canvasToken])
         }
-        let MapKey = canvasToken.scene._id;
+        let MapKey = canvasToken.scene.id;
         let MapObject = AuraMap.get(MapKey)
         let checkEffects = MapObject.effects;
         //Check for other types of X aura if the aura token is moved
@@ -277,7 +278,7 @@ class ActiveAuras {
             effectData.flags.dae?.specialDuration?.push(effectData.flags.ActiveAuras.time)
         }
 
-        await token.actor.createEmbeddedEntity("ActiveEffect", effectData);
+        await token.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
         console.log(game.i18n.format("ACTIVEAURAS.ApplyLog", { effectDataLabel: effectData.label, tokenName: token.name }))
     }
 
@@ -290,7 +291,7 @@ class ActiveAuras {
         let token = canvas.tokens.get(tokenID)
         for (let tokenEffects of token.actor.effects) {
             if (tokenEffects.data.label === effectLabel && tokenEffects.data.flags?.ActiveAuras?.applied === true) {
-                await token.actor.deleteEmbeddedEntity("ActiveEffect", tokenEffects.id)
+                await token.actor.deleteEmbeddedDocuments("ActiveEffect", [tokenEffects.id])
                 console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: effectLabel, tokenName: token.name }))
 
             }

@@ -25,6 +25,7 @@ async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
                     if (typeof change.value !== "string") continue
                     let s = change.value
                     for (let match of s.match(re) || []) s = s.replace(match, getProperty(rollData, match.slice(1)))
+                    change.value = s
                     if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.data.flags.ActiveAuras.isMacro = true
                 }
                 newEffect.data.disabled = false
@@ -78,6 +79,7 @@ function RetrieveTemplateAuras(effectArray) {
                 if (typeof change.value !== "string") continue
                 let s = change.value
                 for (let match of s.match(re) || []) s = s.replace(match, getProperty(rollData, match.slice(1)))
+                change.value = s
                 if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.data.flags.ActiveAuras.isMacro = true
             }
             newEffect.disabled = false
@@ -110,7 +112,7 @@ function RetrieveDrawingAuras(effectArray) {
                 let re = /@[\w\.]+/g
                 let s = change.value
                 for (let match of s.match(re) || []) s = s.replace(match, getProperty(rollData, match.slice(1)))
-                
+                change.value = s
                 if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.data.flags.ActiveAuras.isMacro = true
             }
             newEffect.disabled = false

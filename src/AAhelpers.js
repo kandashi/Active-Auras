@@ -19,12 +19,12 @@ class AAhelpers {
      * @param {*} sceneID 
      * @returns 
      */
-     static IsAuraToken(token, sceneID) {
+    static IsAuraToken(token, sceneID) {
         let MapKey = sceneID;
         let MapObject = AuraMap.get(MapKey);
         if (!MapObject?.effects) return false;
         for (let effect of MapObject.effects) {
-            if (effect.entityId === token._id) return true;
+            if (effect.entityId === token.id) return true;
         }
         return false
     }
@@ -95,12 +95,12 @@ class AAhelpers {
         let MapObject = AuraMap.get(MapKey);
         let effectArray = MapObject.effects.filter(e => e.entityId !== entityId);
         AuraMap.set(MapKey, { effects: effectArray })
-            AAhelpers.RemoveAppliedAuras(canvas)
+        AAhelpers.RemoveAppliedAuras(canvas)
     }
 
     static async RemoveAppliedAuras() {
         let EffectsArray = [];
-        let MapKey = canvas.scene._id
+        let MapKey = canvas.scene.id
         let MapObject = AuraMap.get(MapKey)
         MapObject.effects.forEach(i => EffectsArray.push(i.data.origin))
 
@@ -108,7 +108,7 @@ class AAhelpers {
             if (removeToken?.actor?.effects.size > 0) {
                 for (let testEffect of removeToken.actor.effects) {
                     if (!EffectsArray.includes(testEffect.data.origin) && testEffect.data?.flags?.ActiveAuras?.applied) {
-                        await removeToken.actor.deleteEmbeddedEntity("ActiveEffect", testEffect.id)
+                        await removeToken.actor.deleteEmbeddedDocuments("ActiveEffect", [testEffect.id])
                         console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: testEffect.data.label, tokenName: removeToken.name }))
                     }
                 }
@@ -118,13 +118,11 @@ class AAhelpers {
     static async RemoveAllAppliedAuras() {
         for (let removeToken of canvas.tokens.placeables) {
             if (removeToken?.actor?.effects.size > 0) {
-                for (let testEffect of removeToken.actor.effects) {
-                    if (testEffect.data?.flags?.ActiveAuras?.applied) {
-                        await removeToken.actor.deleteEmbeddedEntity("ActiveEffect", testEffect.id)
-                        console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: testEffect.data.label, tokenName: removeToken.name }))
-                    }
-                }
+                let effects = removeToken.actor.effects.reduce((a, v) => { if (v.data?.flags?.ActiveAuras?.applied) return a.concat(v.id)}, [] )
+                await removeToken.actor.deleteEmbeddedDocuments("ActiveEffect", effects)
+                console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { tokenName: removeToken.name }))
             }
         }
+
     }
 }
