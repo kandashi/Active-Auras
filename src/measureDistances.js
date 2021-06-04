@@ -46,30 +46,29 @@ class AAmeasure {
 
             for (let s of sourceCorners) {
                 let r = new Ray(t, s)
+                debugger
                 if (wallblocking) {
                     if (canvas.walls.checkCollision(r)) continue
                 }
                 if (auraHeight) {
-                    if (!await heightCheck(source, target, radius)) continue
+                    if (!await AAmeasure.heightCheck(source, target, radius, r)) continue
                 }
-                else {
-                    return true
-                }
+                return true
             }
         }
         return false
     }
 
-    async heightCheck(source, target, radius) {
+    static async heightCheck(source, target, radius, r) {
         let distance;
         switch (game.settings.get("ActiveAuras", "vertical-euclidean")) {
             case true: {
-                let heightChange = Math.abs(source.data.elevation - target.data.elevation)
-                distance = distance > heightChange ? distance : heightChange
+                distance = Math.abs(source.data.elevation - target.data.elevation)
             }
                 break;
             case false: {
-                let a = distance;
+                let g = canvas.dimensions
+                let a = r.distance / g.size * g.distance;
                 let b = (source.data.elevation - target.data.elevation)
                 let c = (a * a) + (b * b)
                 distance = Math.sqrt(c)

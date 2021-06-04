@@ -162,7 +162,7 @@ class ActiveAuras {
                     }
                     if (!AAhelpers.DispositionCheck(auraTargets, auraEntity.data.disposition, canvasToken.data.disposition)) continue;
                     if (type) {
-                        if (!ActiveAuras.CheckType(canvasToken, type)) continue
+                        if (!AAhelpers.CheckType(canvasToken, type)) continue
                     }
                     if (hostile && canvasToken.data._id !== game.combats.active?.current.tokenId) continue;
                     let shape = getAuraShape(auraEntity, radius)
@@ -192,7 +192,7 @@ class ActiveAuras {
                         if (alignment !== "" && !tokenAlignment.includes(alignment) && !tokenAlignment.includes("any")) continue;
                     }
                     if (type) {
-                        if (!ActiveAuras.CheckType(canvasToken, type)) continue
+                        if (!AAhelpers.CheckType(canvasToken, type)) continue
                     }
                     if (hostile && canvasToken.data._id !== game.combats.active.current.tokenId) return;
                     let shape = DrawingShape(auraEntity.data)
