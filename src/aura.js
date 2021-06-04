@@ -1,6 +1,6 @@
 let existingActiveEffectsApply;
 const MODULE_NAME = "ActiveAuras";
-
+let AAsocket;
 let AuraMap = new Map()
 let AAdebug = false
 class ActiveAuras {

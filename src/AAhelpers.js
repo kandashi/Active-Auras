@@ -125,4 +125,8 @@ class AAhelpers {
         }
 
     }
+
+    static UserCollateAuras(sceneID, checkAuras, removeAuras, source) {
+        AAsocket.executeForOtherGMs("userCollate", sceneID, checkAuras, removeAuras, source)
+    }
 }

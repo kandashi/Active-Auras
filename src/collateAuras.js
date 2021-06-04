@@ -1,4 +1,5 @@
 async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
+    if(!AAgm) return;
     if (sceneID !== canvas.id) return ui.notifications.warn("Collate Auras called on a non viewed scene, auras will be updated when you return to that scene")
     if (AAdebug) console.log(source)
     let MapKey = sceneID;

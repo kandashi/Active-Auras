@@ -78,7 +78,13 @@
       "private": false
     }
   ],
-  "socket": false,
+  "dependencies" : [
+    {
+      "name": "socketlib",
+      "manifest": "https://raw.githubusercontent.com/manuelVo/foundryvtt-socketlib/master/module.json"
+    }
+  ],
+  "socket": true,
   "manifest": "https://raw.githubusercontent.com/kandashi/Active-Auras/main/module.json",
   "download": "https://github.com/kandashi/Active-Auras/archive/main.zip",
   "protected": false,

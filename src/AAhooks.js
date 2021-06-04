@@ -1,5 +1,10 @@
 let AAgm;
 const debouncedCollate = debounce((a, b, c, d) => CollateAuras(a, b, c, d), 200)
+Hooks.once("socketlib.ready", () => {
+	AAsocket = socketlib.registerModule("ActiveAuras");
+	AAsocket.register("userCollate", CollateAuras);
+});
+
 Hooks.on("ready", () => {
     AAgm = game.user === game.users.find((u) => u.isGM && u.active)
     CollateAuras(canvas.id, true, false)
