@@ -46,7 +46,6 @@ class AAmeasure {
 
             for (let s of sourceCorners) {
                 let r = new Ray(t, s)
-                debugger
                 if (wallblocking) {
                     if (canvas.walls.checkCollision(r)) continue
                 }
