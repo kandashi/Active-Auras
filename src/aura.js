@@ -1,21 +1,27 @@
 let existingActiveEffectsApply;
-const MODULE_NAME = "ActiveAuras";
+const AA_MODULE_NAME = "ActiveAuras";
 let AAsocket;
 let AuraMap = new Map()
 let AAdebug = false
 class ActiveAuras {
-    
+
     /**
      * 
      * @param {Token} movedToken - optional value for further extension, currently unused
      * Locate all auras on the canvas, create map of tokens to update, update tokens 
      */
     static async MainAura(movedToken, source, sceneID) {
-        if(typeof movedToken?.documentName !== "String") movedToken = movedToken?.document ?? undefined
+        let perfStart;
+        let perfEnd;
+        if (AAdebug) perfStart = performance.now()
+        if (typeof movedToken?.documentName !== "String") movedToken = movedToken?.document ?? undefined
         if (AAdebug) console.log(source)
         if (!AAgm) return;
         let sceneCombat = game.combats.filter(c => c.scene?.id === sceneID)
-        if (game.settings.get("ActiveAuras", "combatOnly") && !sceneCombat[0]?.started) return;
+        if (game.settings.get("ActiveAuras", "combatOnly") && !sceneCombat[0]?.started) {
+            console.warn("Active Auras not active when not in combat")
+            return;
+        }
         if (sceneID !== canvas.id) return ui.notifications.warn("An update was called on a non viewed scene, auras will be updated when you return to that scene")
 
         let map = new Map();
@@ -35,6 +41,10 @@ class ActiveAuras {
             }
         }
         map = await ActiveAuras.UpdateAllTokens(map, updateTokens, auraTokenId)
+        if(AAdebug){
+            perfEnd = performance.now()
+            console.log(`Active Auras Find Auras took ${perfEnd-perfStart} ms, FPS:${Math.round(canvas.app.ticker.FPS)}`)
+          }
 
         for (let mapEffect of map) {
             let MapKey = mapEffect[0]
@@ -85,6 +95,10 @@ class ActiveAuras {
                 await ActiveAuras.RemoveActiveEffects(update[1].token.id, update[1].effect.label)
             }
         }
+        if(AAdebug){
+            perfEnd = performance.now()
+            console.log(`Active Auras Main Function took ${perfEnd-perfStart} ms, FPS:${Math.round(canvas.app.ticker.FPS)}`)
+          }
     }
 
     /**
@@ -106,7 +120,7 @@ class ActiveAuras {
      * @param {Array} auraEffectArray - array of auras to test against 
      * @param {Token} canvasToken - single token to test
      */
-     static async UpdateToken(map, canvasToken, tokenId) {
+    static async UpdateToken(map, canvasToken, tokenId) {
         if (canvasToken.data.flags['multilevel-tokens']) return;
         if (canvasToken.actor === null) return;
 

@@ -27,61 +27,61 @@ Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
 
 
     const tab = `<a class="item" data-tab="ActiveAuras"><i class="fas fa-broadcast-tower"></i> ${AuraTab}</a>`;
-    let type = flags[MODULE_NAME]?.type ? flags[MODULE_NAME]?.type : "";
-    let alignment = flags[MODULE_NAME]?.alignment ? flags[MODULE_NAME]?.alignment : "";
+    let type = flags[AA_MODULE_NAME]?.type ? flags[AA_MODULE_NAME]?.type : "";
+    let alignment = flags[AA_MODULE_NAME]?.alignment ? flags[AA_MODULE_NAME]?.alignment : "";
 
     let contents = `
         <div class="tab" data-tab="ActiveAuras">
             <div class="form-group">
                 <label>${FormIsAura}?</label>
-                <input name="flags.${MODULE_NAME}.isAura" type="checkbox" ${flags[MODULE_NAME]?.isAura ? 'checked' : ''}></input>
+                <input name="flags.${AA_MODULE_NAME}.isAura" type="checkbox" ${flags[AA_MODULE_NAME]?.isAura ? 'checked' : ''}></input>
              </div>
              <div class="form-group">
                 <label>${FormRadius}</label>
-                <input id="radius" name="flags.${MODULE_NAME}.radius" type="number" min="0" step="any" value="${flags[MODULE_NAME]?.radius}" placeholder="${FormRadiusPrompt}"></input>
+                <input id="radius" name="flags.${AA_MODULE_NAME}.radius" type="number" min="0" step="any" value="${flags[AA_MODULE_NAME]?.radius}" placeholder="${FormRadiusPrompt}"></input>
             </div>            
             <div class="form-group">
             <label>${FormTargetsName}:</label>
-            <select name="flags.${MODULE_NAME}.aura" data-dtype="String" value=${flags[MODULE_NAME]?.aura}>
-                <option value="None" ${flags[MODULE_NAME]?.aura === 'None' ? 'selected' : ''}></option>
-                <option value="Enemy"${flags[MODULE_NAME]?.aura === 'Enemy' ? 'selected' : ''}>${FormTargetsEnemy}</option>
-                <option value="Allies"${flags[MODULE_NAME]?.aura === 'Allies' ? 'selected' : ''}>${FormTargetsAllies}</option>
-                <option value="All"${flags[MODULE_NAME]?.aura === 'All' ? 'selected' : ''}>${FormTargetsAll}</option>
+            <select name="flags.${AA_MODULE_NAME}.aura" data-dtype="String" value=${flags[AA_MODULE_NAME]?.aura}>
+                <option value="None" ${flags[AA_MODULE_NAME]?.aura === 'None' ? 'selected' : ''}></option>
+                <option value="Enemy"${flags[AA_MODULE_NAME]?.aura === 'Enemy' ? 'selected' : ''}>${FormTargetsEnemy}</option>
+                <option value="Allies"${flags[AA_MODULE_NAME]?.aura === 'Allies' ? 'selected' : ''}>${FormTargetsAllies}</option>
+                <option value="All"${flags[AA_MODULE_NAME]?.aura === 'All' ? 'selected' : ''}>${FormTargetsAll}</option>
             </select>
         </div>
         <div class="form-group">
         <label>${FormCheckAlignment}:</label>
-        <select name="flags.${MODULE_NAME}.alignment" data-dtype="String" value=${alignment}>
-            <option value="" ${flags[MODULE_NAME]?.alignment === '' ? 'selected' : ''}></option>
-            <option value="good"${flags[MODULE_NAME]?.alignment === 'good' ? 'selected' : ''}>${FormGood}</option>
-            <option value="neutral"${flags[MODULE_NAME]?.alignment === 'neutral' ? 'selected' : ''}>${FormNeutral}</option>
-            <option value="evil"${flags[MODULE_NAME]?.alignment === 'evil' ? 'selected' : ''}>${FormEvil}</option>
+        <select name="flags.${AA_MODULE_NAME}.alignment" data-dtype="String" value=${alignment}>
+            <option value="" ${flags[AA_MODULE_NAME]?.alignment === '' ? 'selected' : ''}></option>
+            <option value="good"${flags[AA_MODULE_NAME]?.alignment === 'good' ? 'selected' : ''}>${FormGood}</option>
+            <option value="neutral"${flags[AA_MODULE_NAME]?.alignment === 'neutral' ? 'selected' : ''}>${FormNeutral}</option>
+            <option value="evil"${flags[AA_MODULE_NAME]?.alignment === 'evil' ? 'selected' : ''}>${FormEvil}</option>
         </select>
     </div>
     <div class="form-group">
         <label>${FormCheckType}</label>
-        <input id="type" name="flags.${MODULE_NAME}.type" type="text" value="${type}" placeholder="${FormTypePrompt}"></input>
+        <input id="type" name="flags.${AA_MODULE_NAME}.type" type="text" value="${type}" placeholder="${FormTypePrompt}"></input>
     </div>
              <div class="form-group">
                 <label>${FormIgnoreSelf}?</label>
-                <input name="flags.${MODULE_NAME}.ignoreSelf" type="checkbox" ${flags[MODULE_NAME]?.ignoreSelf ? 'checked' : ''}></input>
+                <input name="flags.${AA_MODULE_NAME}.ignoreSelf" type="checkbox" ${flags[AA_MODULE_NAME]?.ignoreSelf ? 'checked' : ''}></input>
             </div>
             <div class="form-group">
                 <label>${FormCheckHeight}</label>
-                <input name="flags.${MODULE_NAME}.height" type="checkbox" ${flags[MODULE_NAME]?.height ? 'checked' : ''}></input>
+                <input name="flags.${AA_MODULE_NAME}.height" type="checkbox" ${flags[AA_MODULE_NAME]?.height ? 'checked' : ''}></input>
             </div>
 
             <div class="form-group">
                 <label>${FormHidden}?</label>
-                <input name="flags.${MODULE_NAME}.hidden" type="checkbox" ${flags[MODULE_NAME]?.hidden ? 'checked' : ''}></input>
+                <input name="flags.${AA_MODULE_NAME}.hidden" type="checkbox" ${flags[AA_MODULE_NAME]?.hidden ? 'checked' : ''}></input>
             </div>
             <div class="form-group">
                 <label>${HostileTurn}</label>
-                <input name="flags.${MODULE_NAME}.hostile" type="checkbox" ${flags[MODULE_NAME]?.hostile ? 'checked' : ''}></input>
+                <input name="flags.${AA_MODULE_NAME}.hostile" type="checkbox" ${flags[AA_MODULE_NAME]?.hostile ? 'checked' : ''}></input>
             </div>
             <div class="form-group">
                 <label>${ActivateOnce}</label>
-                <input name="flags.${MODULE_NAME}.onlyOnce" type="checkbox" ${flags[MODULE_NAME]?.onlyOnce ? 'checked' : ''}></input>
+                <input name="flags.${AA_MODULE_NAME}.onlyOnce" type="checkbox" ${flags[AA_MODULE_NAME]?.onlyOnce ? 'checked' : ''}></input>
             </div>
             </div>`
         ;
@@ -92,6 +92,6 @@ Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
         </div>`;
 
     html.find(".tabs .item").last().after(tab);
-    if (!flags[MODULE_NAME]?.applied) html.find(".tab").last().after(contents);
+    if (!flags[AA_MODULE_NAME]?.applied) html.find(".tab").last().after(contents);
     else html.find(".tab").last().after(appliedAuraContent);
 });
