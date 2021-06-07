@@ -1,3 +1,8 @@
+Hooks.once('ready', () => {
+    if(!game.modules.get('lib-wrapper')?.active && game.user.isGM)
+        ui.notifications.error("Module XYZ requires the 'libWrapper' module. Please install and activate it.");
+});
+
 let AAgm;
 const debouncedCollate = debounce((a, b, c, d) => CollateAuras(a, b, c, d), 200)
 Hooks.once("socketlib.ready", () => {
@@ -11,20 +16,8 @@ Hooks.on("ready", () => {
     AAgm = game.user === game.users.find((u) => u.isGM && u.active)
     CollateAuras(canvas.id, true, false)
 
-
-    /**
-     * Bind a filter to the ActiveEffect.apply() prototype chain
-     */
-    existingActiveEffectsApply = CONFIG.ActiveEffect.entityClass.prototype.apply;
-    CONFIG.ActiveEffect.entityClass.prototype.apply = ActiveAurasApply;
-
-    function ActiveAurasApply(actor, change) {
-        if (actor.id == change.effect.data.origin?.split('.')[1] && change.effect.data.flags?.ActiveAuras?.ignoreSelf) {
-            console.log(game.i18n.format("ACTIVEAURAS.IgnoreSelfLog", { effectDataLabel: change.effect.data.label, changeKey: change.key, actorName: actor.name }));
-            return null;
-        }
-        return existingActiveEffectsApply.bind(this)(actor, change);
-    }
+    libWrapper.register("ActiveAuras", "ActiveEffect.prototype.apply", AAhelpers.applyWrapper, "WRAPPER")
+    
 
     if (game.settings.get("ActiveAuras", "debug")) AAdebug = true
 

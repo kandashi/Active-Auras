@@ -1,6 +1,9 @@
 # Active-Auras
+## Important
+- Auras will only work in combat unless the setting is turned off in the module settings
+- Auras will only work on the Active Scene
 
-Active Auras will propigate Active Effects that are labeled as auras onto nearby tokens. 
+Active Auras will propagate Active Effects that are labeled as auras onto nearby tokens. 
 The distance and targeting of the aura are both configurable.
 Any ```@``` fields from DAE will be correctly parsed before being applied to the effected token.
 Macros from DAE will fire once when applied and once when removed (work is being done for damage over time effects)

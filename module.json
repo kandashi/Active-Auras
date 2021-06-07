@@ -82,7 +82,10 @@
     {
       "name": "socketlib",
       "manifest": "https://raw.githubusercontent.com/manuelVo/foundryvtt-socketlib/master/module.json"
-    }
+    },
+    {
+      "name": "lib-wrapper"
+  }
   ],
   "socket": true,
   "manifest": "https://raw.githubusercontent.com/kandashi/Active-Auras/main/module.json",

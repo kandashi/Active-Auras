@@ -129,4 +129,19 @@ class AAhelpers {
     static UserCollateAuras(sceneID, checkAuras, removeAuras, source) {
         AAsocket.executeForOtherGMs("userCollate", sceneID, checkAuras, removeAuras, source)
     }
+
+    /**
+     * Bind a filter to the ActiveEffect.apply() prototype chain
+     */
+
+     static applyWrapper(wrapped, ...args) {
+         let actor = args[0]
+         let change = args[1]
+         if (actor.id == change.effect.data.origin?.split('.')[1] && change.effect.data.flags?.ActiveAuras?.ignoreSelf) {
+             console.log(game.i18n.format("ACTIVEAURAS.IgnoreSelfLog", { effectDataLabel: change.effect.data.label, changeKey: change.key, actorName: actor.name }));
+             args[1] = {}
+             return wrapped(...args);
+         }
+         return wrapped(...args)
+     }
 }
