@@ -100,7 +100,7 @@ Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
             </div>`
         }
         else {
-            contents =+ `</div>`
+            contents += `</div>`
         }
 
     const appliedAuraContent = `
