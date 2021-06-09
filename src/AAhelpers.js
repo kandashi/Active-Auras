@@ -44,7 +44,13 @@ class AAhelpers {
     }
 
     static CheckType(canvasToken, type) {
-
+        switch(game.system.id) {
+            case("dnd5e"): ;
+            case("sw5e"): return AAhelpers.typeCheck5e(canvasToken, type)
+            case("swade") : return AAhelpers.typeCheckSWADE(canvasToken, type);
+        }
+    }
+    static typeCheck5e(canvasToken, type){
         let tokenType;
         switch (canvasToken.actor.data.type) {
             case "npc": {
@@ -87,6 +93,53 @@ class AAhelpers {
         }
         if (tokenType === type || tokenType === "any") return true;
         return false
+    }
+
+    static typeCheckSWADE(canvasToken, type){
+        let tokenType;
+        switch (canvasToken.actor.data.type) {
+            case "npc": {
+                try {
+                    tokenType = canvasToken.actor?.data.data.details.species.name.toLowerCase();
+                } catch (error) {
+                    console.error([`ActiveAuras: the token has an unreadable type`, canvasToken])
+                }
+            }
+                break;
+            case "character": {
+                try {
+                    tokenType = canvasToken.actor?.data.data.details.species.name.toLowerCase();
+                } catch (error) {
+                    console.error([`ActiveAuras: the token has an unreadable type`, canvasToken])
+                }
+            }
+                break;
+            case "vehicle": return;
+        }
+        return tokenType === type
+    }
+
+    static Wildcard(canvasToken, wildcard, extra){
+        if(game.system.id !== "swade") return true
+        let Wild = canvasToken.actor.isWildcard
+        if(Wild && wildcard) return true
+        else if(!Wild && extra) return true
+        else return false
+    }
+
+    static HPCheck(token){
+        switch(game.system.id){
+            case "dnd5e": ;
+            case "sw5e": {
+                if(getProperty(token, "actor.data.data.attributes.hp.value") <= 0) return false
+                else return true
+            }
+            case "swade" : {
+                let {max, value, ignored } = token.actor.data.data.wounds
+                if(value-ignored >= max) return false
+                else return true
+            }
+        }
     }
 
     static ExtractAuraById(entityId, sceneID) {

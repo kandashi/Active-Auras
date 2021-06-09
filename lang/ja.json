@@ -36,7 +36,9 @@
     "ACTIVEAURAS.FORM_TimePrompt": "適用効果の特別な有効期限",
     "ACTIVEAURAS.FORM_HostileTurn": "現戦闘参加者のターン中のみ適用",
     "ACTIVEAURAS.FORM_ActivateOnce": "ターン中に一度だけオーラを発動", 
-
+    "ACTIVEAURAS.FORM_Wildcard": "[EN] Apply to Wildcard Tokens",
+    "ACTIVEAURAS.FORM_Extra": "[EN] Apply to Extra Tokens",
+    
     "ACTIVEAURAS.ApplyLog":"Active Auras | {effectDataLabel}が{tokenName}に適用されました。",
     "ACTIVEAURAS.RemoveLog":"Active Auras | {effectDataLabel}が{tokenName}から取り除かれました。",
     "ACTIVEAURAS.IgnoreSelfLog":"ActiveAuras | '{effectDataLabel}'を無視し、{changeKey}を{actorName}に変更しました。",

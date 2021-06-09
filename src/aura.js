@@ -41,10 +41,10 @@ class ActiveAuras {
             }
         }
         map = await ActiveAuras.UpdateAllTokens(map, updateTokens, auraTokenId)
-        if(AAdebug){
+        if (AAdebug) {
             perfEnd = performance.now()
-            console.log(`Active Auras Find Auras took ${perfEnd-perfStart} ms, FPS:${Math.round(canvas.app.ticker.FPS)}`)
-          }
+            console.log(`Active Auras Find Auras took ${perfEnd - perfStart} ms, FPS:${Math.round(canvas.app.ticker.FPS)}`)
+        }
 
         for (let mapEffect of map) {
             let MapKey = mapEffect[0]
@@ -95,10 +95,10 @@ class ActiveAuras {
                 await ActiveAuras.RemoveActiveEffects(update[1].token.id, update[1].effect.label)
             }
         }
-        if(AAdebug){
+        if (AAdebug) {
             perfEnd = performance.now()
-            console.log(`Active Auras Main Function took ${perfEnd-perfStart} ms, FPS:${Math.round(canvas.app.ticker.FPS)}`)
-          }
+            console.log(`Active Auras Main Function took ${perfEnd - perfStart} ms, FPS:${Math.round(canvas.app.ticker.FPS)}`)
+        }
     }
 
     /**
@@ -125,10 +125,12 @@ class ActiveAuras {
         if (canvasToken.actor === null) return;
 
         let tokenAlignment;
-        try {
-            tokenAlignment = canvasToken.actor?.data.data.details.alignment.toLowerCase();
-        } catch (error) {
-            console.error([`ActiveAuras: the token has an unreadable alignment`, canvasToken])
+        if (game.system.id === "dnd5e" || game.system.id === "sw5e") {
+            try {
+                tokenAlignment = canvasToken.actor?.data.data.details.alignment.toLowerCase();
+            } catch (error) {
+                console.error([`ActiveAuras: the token has an unreadable alignment`, canvasToken])
+            }
         }
         let MapKey = canvasToken.scene.id;
         let MapObject = AuraMap.get(MapKey)
@@ -144,7 +146,7 @@ class ActiveAuras {
         for (let auraEffect of checkEffects) {
             let auraTargets = auraEffect.data.flags?.ActiveAuras?.aura
 
-            let { radius, height, type, alignment, hostile } = auraEffect.data.flags?.ActiveAuras;
+            let { radius, height, type, alignment, hostile, wildcard, extra } = auraEffect.data.flags?.ActiveAuras;
             let { parentActorLink, parentActorId } = auraEffect
             type = type !== undefined ? type.toLowerCase() : "";
             alignment = alignment !== undefined ? alignment.toLowerCase() : "";
@@ -180,6 +182,10 @@ class ActiveAuras {
                         if (!AAhelpers.CheckType(canvasToken, type)) continue
                     }
                     if (hostile && canvasToken.data._id !== game.combats.active?.current.tokenId) continue;
+
+                    if (game.system.id === "swade") {
+                        if (!AAhelpers.Wildcard(canvasToken, wildcard, extra)) continue
+                    }
                     let shape = getAuraShape(auraEntity, radius)
                     distance = await AAmeasure.inAura(canvasToken, auraEntity, game.settings.get("ActiveAuras", "wall-block"), height, radius, shape)
                 }

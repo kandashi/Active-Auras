@@ -36,6 +36,8 @@
     "ACTIVEAURAS.FORM_TimePrompt": "Expiration Spéciale pour l'effet appliqué",
     "ACTIVEAURAS.FORM_HostileTurn": "Appliquer seulement pendant le tour actuel du combatant",
     "ACTIVEAURAS.FORM_ActivateOnce": "Se déclenche une fois seulement par tour de jeu",
+    "ACTIVEAURAS.FORM_Wildcard": "[EN] Apply to Wildcard Tokens",
+    "ACTIVEAURAS.FORM_Extra": "[EN] Apply to Extra Tokens",
 
     "ACTIVEAURAS.ApplyLog":"ActiveAuras | Applique un effet '{effectDataLabel}' à {tokenName}",
     "ACTIVEAURAS.RemoveLog":"ActiveAuras | Retire un effet '{effectDataLabel}' à {tokenName}",
