@@ -9,7 +9,7 @@ The distance and targeting of the aura are both configurable.
 Any ```@``` fields from DAE will be correctly parsed before being applied to the effected token.
 Macros from DAE will fire once when applied and once when removed (work is being done for damage over time effects)
 
-The "Apply while inactive" option allows for effects to propagate to other tokens while not applying to the Aura Token. This is usefull for debuff style effects that should not effect the owner of the effect
+The "Apply while inactive" option allows for effects to propagate to other tokens while not applying to the Aura Token. This is useful for debuff style effects that should not effect the owner of the effect
 
 ## Demo setup for Aura of Protection
 - We setup the aura status as Allies, as we only want the aura to effect allied tokens
@@ -40,13 +40,13 @@ The "Apply while inactive" option allows for effects to propagate to other token
 
 ## Templates and drawings
 - Any template effect can now call a AA macro (included in the compendium) in the Midi QoL OnUse field to apply any active effects to the template rather than the targeted tokens. 
-    - This template will then act as its own source of an aura, any tokens that move inside the template will have the arua applied to them (not radius from the placement)
+    - This template will then act as its own source of an aura, any tokens that move inside the template will have the aura applied to them (not radius from the placement)
     - For setting up auras like this, simply call the "AA ApplyEffectsToTemplate" macro in Midi QoL OnUse, any effects in the item will be applied to the aura
 - Auras can now be added to drawings through macros and will apply via the same logic as templates
     - Any token within a drawing will have the aura applied to them
     - Freehand drawings are not supported
     - `drawing.setFlag("ActiveAuras", "IsAura", [effect.data])` where effect is the active effect to apply
-    - There is a bundled macro to select an active effect from a premade actor avaliable in the compendium, which has several "zone effect" style auras setup
+    - There is a bundled macro to select an active effect from a pre-made actor available in the compendium, which has several "zone effect" style auras setup
 
 
 ## Notes

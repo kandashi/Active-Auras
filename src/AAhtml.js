@@ -24,6 +24,8 @@ Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
     const FormRadiusPrompt = game.i18n.format("ACTIVEAURAS.FORM_RadiusPrompt")
     const HostileTurn = game.i18n.format("ACTIVEAURAS.FORM_HostileTurn")
     const ActivateOnce = game.i18n.format("ACTIVEAURAS.FORM_ActivateOnce")
+    const Wildcard = game.i18n.format("ACTIVEAURAS.FORM_Wildcard")
+    const Extra = game.i18n.format("ACTIVEAURAS.FORM_Extra")
 
 
     const tab = `<a class="item" data-tab="ActiveAuras"><i class="fas fa-broadcast-tower"></i> ${AuraTab}</a>`;
@@ -82,9 +84,24 @@ Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
             <div class="form-group">
                 <label>${ActivateOnce}</label>
                 <input name="flags.${AA_MODULE_NAME}.onlyOnce" type="checkbox" ${flags[AA_MODULE_NAME]?.onlyOnce ? 'checked' : ''}></input>
-            </div>
             </div>`
         ;
+
+        if(game.system.id === "swade") {
+            contents += `
+            <div class="form-group">
+                <label>${Wildcard}</label>
+                <input name="flags.${AA_MODULE_NAME}.wildcard" type="checkbox" ${flags[AA_MODULE_NAME]?.wildcard ? 'checked' : ''}></input>
+            </div>
+            <div class="form-group">
+                <label>${Extra}</label>
+                <input name="flags.${AA_MODULE_NAME}.extra" type="checkbox" ${flags[AA_MODULE_NAME]?.extra ? 'checked' : ''}></input>
+            </div>
+            </div>`
+        }
+        else {
+            contents =+ `</div>`
+        }
 
     const appliedAuraContent = `
         <div class="tab" data-tab="ActiveAuras">

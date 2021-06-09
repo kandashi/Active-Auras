@@ -11,7 +11,6 @@
     "ACTIVEAURAS.combatOnly" : "전투시 오러",
     "ACTIVEAURAS.combatHint" : "전투 중에만 오러를 확인한다. 성능상 관련하여 굳이 해제할 필요가 있지 않은한 키져 있는 게 좋다.",
     
-
     "ACTIVEAURAS.walltoptions_name": "벽 오러 차단",
     "ACTIVEAURAS.walltoptions_hint":"벽에 가로막히면 오러 효과가 차단된다.",
 
@@ -37,6 +36,8 @@
     "ACTIVEAURAS.FORM_TimePrompt": "적용된 효과에 대한 특수 만료 시간",
     "ACTIVEAURAS.FORM_HostileTurn": "현재 전투원의 턴 중에만 적용",
     "ACTIVEAURAS.FORM_ActivateOnce": "턴당 1회만 오러를 발동",    
+    "ACTIVEAURAS.FORM_Wildcard": "[EN] Apply to Wildcard Tokens",
+    "ACTIVEAURAS.FORM_Extra": "[EN] Apply to Extra Tokens",
 
     "ACTIVEAURAS.ApplyLog":"ActiveAuras | '{effectDataLabel}' 효과가 {tokenName} 캐릭터에게 적용되었습니다",
     "ACTIVEAURAS.RemoveLog":"ActiveAuras | '{effectDataLabel}' 효과가 {tokenName} 캐릭터에게 제거되었습니다.",

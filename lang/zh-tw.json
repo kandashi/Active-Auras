@@ -36,6 +36,8 @@
     "ACTIVEAURAS.FORM_TimePrompt": "所應用效果的特別有效期",
     "ACTIVEAURAS.FORM_HostileTurn": "僅在當前戰鬥人員回合期間適用",
     "ACTIVEAURAS.FORM_ActivateOnce": "每回合僅觸發一次光環",
+    "ACTIVEAURAS.FORM_Wildcard": "[EN] Apply to Wildcard Tokens",
+    "ACTIVEAURAS.FORM_Extra": "[EN] Apply to Extra Tokens",
 
     "ACTIVEAURAS.ApplyLog": "ActiveAuras |將 '{effectDataLabel}' 應用於 {tokenName} ",
     "ACTIVEAURAS.RemoveLog": "ActiveAuras |已從 {tokenName} 中刪除 '{effectDataLabel}' ",

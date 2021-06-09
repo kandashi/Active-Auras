@@ -61,3 +61,8 @@ Any of these spells will still work with the old versions, but the new ones will
 
 ## 0.3.01
 Added LibWrapper dependency 
+
+## 0.3.02
+added SWADE support
+changed lib wrapper function to MIXED instead of WRAPPED to prevent DAE conflicts
+extrapolated some of the "core" functions out to helper functions to allow for easier system addition

@@ -12,14 +12,14 @@ async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
         //Skips over MLT coppied tokens
         if (testToken.data.flags["multilevel-tokens"]) continue
 
-        if ((testToken.data.actorData?.attributes?.hp?.value <= 0 || testToken.actor?.data.data.attributes.hp.value <= 0) && game.settings.get("ActiveAuras", "dead-aura")) {
+        if (!AAhelpers.HPCheck(testToken) && game.settings.get("ActiveAuras", "dead-aura")) {
             if (AAdebug) console.log(`Skipping ${testToken.name}, 0hp`)
             continue
         }
         for (let testEffect of testToken?.actor?.effects.contents) {
             if (testEffect.data.flags?.ActiveAuras?.isAura) {
                 if (testEffect.data.disabled) continue;
-                let newEffect = { data: duplicate(testEffect.data), parentActorLink: testEffect.parent.data.token.actorLink, parentActorId: testEffect.parent._id, entityType: "token", entityId: testToken.id }
+                let newEffect = { data: duplicate(testEffect.data), parentActorLink: testEffect.parent.data.token.actorLink, parentActorId: testEffect.parent.id, entityType: "token", entityId: testToken.id }
                 let re = /@[\w\.]+/g
                 let rollData = testToken.actor.getRollData()
                 for (let change of newEffect.data.changes) {
