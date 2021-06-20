@@ -14,7 +14,7 @@ class ActiveAuras {
         let perfStart;
         let perfEnd;
         if (AAdebug) perfStart = performance.now()
-        if (typeof movedToken?.documentName !== "String") movedToken = movedToken?.document ?? undefined
+        if (typeof movedToken?.documentName !== "string") movedToken = movedToken?.document ?? undefined
         if (AAdebug) console.log(source)
         if (!AAgm) return;
         let sceneCombat = game.combats.filter(c => c.scene?.id === sceneID)
@@ -30,7 +30,7 @@ class ActiveAuras {
 
         if (movedToken !== undefined) {
             if (AAhelpers.IsAuraToken(movedToken, sceneID)) {
-                auraTokenId = movedToken._id
+                auraTokenId = movedToken.data._id
             }
             else if (getProperty(movedToken, "flags.token-attacher")) {
                 if (AAdebug) console.log("ActiveAuras: token attacher movement")
