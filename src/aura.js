@@ -14,11 +14,11 @@ class ActiveAuras {
         let perfStart;
         let perfEnd;
         if (AAdebug) perfStart = performance.now()
-        if (typeof movedToken?.documentName !== "String") movedToken = movedToken?.document ?? undefined
+        if (typeof movedToken?.documentName !== "string") movedToken = movedToken?.document ?? undefined
         if (AAdebug) console.log(source)
         if (!AAgm) return;
         let sceneCombat = game.combats.filter(c => c.scene?.id === sceneID)
-        if (game.settings.get("ActiveAuras", "combatOnly") && !sceneCombat[0]?.started) {
+        if (game.settings.get("ActiveAuras", "combatOnly") && !sceneCombat[0]?.started && AAdebug) {
             console.warn("Active Auras not active when not in combat")
             return;
         }
@@ -30,7 +30,7 @@ class ActiveAuras {
 
         if (movedToken !== undefined) {
             if (AAhelpers.IsAuraToken(movedToken, sceneID)) {
-                auraTokenId = movedToken._id
+                auraTokenId = movedToken.data._id
             }
             else if (getProperty(movedToken, "flags.token-attacher")) {
                 if (AAdebug) console.log("ActiveAuras: token attacher movement")
@@ -262,8 +262,9 @@ class ActiveAuras {
         }
         let effectData = duplicate(oldEffectData)
         if (effectData.flags.ActiveAuras.onlyOnce) {
-            if (token.data.flags.ActiveAuras?.[`${oldEffectData.origin}`]) return;
-            else await token.setFlag("ActiveAuras", `${oldEffectData.origin}`, true)
+            let AAID = oldEffectData.origin.replaceAll(".", "")
+            if (token.data.flags.ActiveAuras?.[AAID]) return;
+            else await token.setFlag("ActiveAuras", AAID, true)
         }
         if (effectData.flags.ActiveAuras?.isMacro) {
             for (let change of effectData.changes) {

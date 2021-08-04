@@ -47,7 +47,15 @@ class AAmeasure {
             for (let s of sourceCorners) {
                 let r = new Ray(t, s)
                 if (wallblocking) {
-                    if (canvas.walls.checkCollision(r)) continue
+                    let collision;
+                    if (game.modules.get("levels")?.active) {
+
+                        collision = _levels.testCollision({ x: t.x, y: t.y, z: target.data.elevation }, { x: s.x, y: s.y, z: source.data.elevation ?? source.data.flags?.levels?.elevation }, "collision")
+                    }
+                    else {
+                        collision = canvas.walls.checkCollision(r)
+                    }
+                    if (collision) continue
                 }
                 if (auraHeight) {
                     if (!await AAmeasure.heightCheck(source, target, radius, r)) continue
