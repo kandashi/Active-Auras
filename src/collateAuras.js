@@ -31,7 +31,6 @@ async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
                 }
                 newEffect.data.disabled = false
                 let macro = newEffect.data.flags.ActiveAuras.isMacro !== undefined ? newEffect.data.flags.ActiveAuras.isMacro : false;
-
                 newEffect.data.flags.ActiveAuras.isAura = false;
                 newEffect.data.flags.ActiveAuras.applied = true;
                 newEffect.data.flags.ActiveAuras.isMacro = macro;
