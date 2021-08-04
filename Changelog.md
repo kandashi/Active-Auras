@@ -66,3 +66,11 @@ Added LibWrapper dependency
 added SWADE support
 changed lib wrapper function to MIXED instead of WRAPPED to prevent DAE conflicts
 extrapolated some of the "core" functions out to helper functions to allow for easier system addition
+
+## 0.3.05
+Updated for DnD5e 1.3.6+ change in NPC type
+Added Levels Support for wallheight/floor collision checks
+Added support for ItemMacro. Active Effects will now pull from the original item when looking for a macro to execute, you will still need the Apply Effects to Template macro for any template spells
+Added fancy animations to the aura tab
+Limited some console logs to the debug setting to prevent spam
+Fixed/updated all compendium items so they contain the macro in an Item Macro, these will need replacing to update
