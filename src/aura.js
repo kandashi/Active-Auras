@@ -13,13 +13,13 @@ class ActiveAuras {
     static async MainAura(movedToken, source, sceneID) {
         let perfStart;
         let perfEnd;
-        if (AAdebug) perfStart = performance.now()
+        if (AAdebug) { perfStart = performance.now() }
         if (typeof movedToken?.documentName !== "string") movedToken = movedToken?.document ?? undefined
-        if (AAdebug) console.log(source)
+        if (AAdebug) { console.log(source) }
         if (!AAgm) return;
         let sceneCombat = game.combats.filter(c => c.scene?.id === sceneID)
-        if (game.settings.get("ActiveAuras", "combatOnly") && !sceneCombat[0]?.started && AAdebug) {
-            console.warn("Active Auras not active when not in combat")
+        if (game.settings.get("ActiveAuras", "combatOnly") && !sceneCombat[0]?.started) {
+            if (AAdebug) { console.warn("Active Auras not active when not in combat") }
             return;
         }
         if (sceneID !== canvas.id) return ui.notifications.warn("An update was called on a non viewed scene, auras will be updated when you return to that scene")

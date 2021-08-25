@@ -156,10 +156,10 @@ Hooks.on("preUpdateActor", (actor, update) => {
     }
 })
 
-Hooks.on("updateMeasuredTemplate", (scene, data, update) => {
+Hooks.on("updateMeasuredTemplate", (data, update) => {
     if(canvas.scene === null) {if(AAdebug) {console.log("Active Auras disabled due to no canvas")} return}
     if (!getProperty(data, "flags.ActiveAuras")) return;
-    ActiveAuras.MainAura(undefined, "template movement", scene.id)
+    ActiveAuras.MainAura(undefined, "template movement", data.parent.id)
 })
 
 Hooks.on("deleteMeasuredTemplate", (doc) => {
