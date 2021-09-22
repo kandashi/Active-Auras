@@ -1,5 +1,5 @@
 async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
-    if(!AAgm) return;
+    if (!AAgm) return;
     if (sceneID !== canvas.id) return ui.notifications.warn("Collate Auras called on a non viewed scene, auras will be updated when you return to that scene")
     if (AAdebug) console.log(source)
     let MapKey = sceneID;
@@ -25,7 +25,14 @@ async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
                 for (let change of newEffect.data.changes) {
                     if (typeof change.value !== "string") continue
                     let s = change.value
-                    for (let match of s.match(re) || []) s = s.replace(match, getProperty(rollData, match.slice(1)))
+                    for (let match of s.match(re) || []) {
+                        if (s.includes("@@")) {
+                            s = s.replace(match, match.slice(1))
+                        }
+                        else {
+                            s = s.replace(match, getProperty(rollData, match.slice(1)))
+                        }
+                    }
                     change.value = s
                     if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.data.flags.ActiveAuras.isMacro = true
                 }
