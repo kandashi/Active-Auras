@@ -12,8 +12,6 @@ Hooks.once("socketlib.ready", () => {
 
 Hooks.on("init", () => {
     libWrapper.register("ActiveAuras", "ActiveEffect.prototype.apply", AAhelpers.applyWrapper, "MIXED")
-    libWrapper.register("ActiveAuras", "Actor.prototype.applyActiveEffects", AAhelpers.actorEffects, "MIXED")
-
 })
 
 Hooks.on("ready", () => {
