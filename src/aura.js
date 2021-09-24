@@ -123,9 +123,9 @@ class ActiveAuras {
     static async UpdateToken(map, canvasToken, tokenId) {
         if (canvasToken.data.flags['multilevel-tokens']) return;
         if (canvasToken.actor === null) return;
-
+        if (canvasToken.actor.data.type == "vehicle") return
         let tokenAlignment;
-        if (game.system.id === "dnd5e" || game.system.id === "sw5e") {
+        if (game.system.id === "dnd5e" || game.system.id === "sw5e" ) {
             try {
                 tokenAlignment = canvasToken.actor?.data.data.details.alignment.toLowerCase();
             } catch (error) {
