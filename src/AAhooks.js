@@ -10,14 +10,18 @@ Hooks.once("socketlib.ready", () => {
 	AAsocket.register("userCollate", CollateAuras);
 });
 
+Hooks.on("init", () => {
+    libWrapper.register("ActiveAuras", "ActiveEffect.prototype.apply", AAhelpers.applyWrapper, "MIXED")
+    libWrapper.register("ActiveAuras", "Actor.prototype.applyActiveEffects", AAhelpers.actorEffects, "MIXED")
+
+})
+
 Hooks.on("ready", () => {
     if(canvas.scene === null) {if(AAdebug) {console.log("Active Auras disabled due to no canvas")} return}
 
     AAgm = game.user === game.users.find((u) => u.isGM && u.active)
     CollateAuras(canvas.id, true, false)
 
-    libWrapper.register("ActiveAuras", "ActiveEffect.prototype.apply", AAhelpers.applyWrapper, "MIXED")
-    
 
     if (game.settings.get("ActiveAuras", "debug")) AAdebug = true
 
@@ -77,14 +81,13 @@ Hooks.on("updateToken", async (token, update, _flags, _id) => {
         if (AAdebug) console.log("movement, main aura")
         await ActiveAuras.MainAura(token, "movement update", token.parent.id)
     }
-
-    if ("hidden" in update && AAhelpers.IsAuraToken(token, token.parent.id)) {
+    else if ("hidden" in update && AAhelpers.IsAuraToken(token, token.parent.id)) {
         setTimeout(() => {
             if (AAdebug) console.log("hidden, collate auras true true")
             CollateAuras(canvas.scene, true, true, "updateToken")
         }, 20)
     }
-    if (AAhelpers.IsAuraToken(token, token.parent.id) && AAhelpers.HPCheck(token)) {
+    else if (AAhelpers.IsAuraToken(token, token.parent.id) && AAhelpers.HPCheck(token)) {
         setTimeout(() => {
             if (AAdebug) console.log("0hp, collate auras true true")
             CollateAuras(canvas.scene.id, true, true, "updateToken, dead")
