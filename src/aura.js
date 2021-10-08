@@ -87,13 +87,29 @@ class ActiveAuras {
 
         }
 
+        let linkedActorUpdates = []
+        let unlinkedActorUpdates = []
         for (let update of map) {
             if (update[1].add) {
-                await ActiveAuras.CreateActiveEffect(update[1].token.id, update[1].effect)
+                let token = canvas.tokens.get(update[1].token.id)
+                if (token.data.actorLink) {
+                    let updates = await ActiveAuras.CreateActiveEffect(token, update[1].effect)
+                    linkedActorUpdates.push(updates)
+                }
+                else {
+                    let updates = await ActiveAuras.CreateActiveEffect(token, update[1].effect)
+                    unlinkedActorUpdates.push(updates)
+                }
             }
             else {
                 await ActiveAuras.RemoveActiveEffects(update[1].token.id, update[1].effect.label)
             }
+        }
+        if(linkedActorUpdates.length > 0){
+            await Actor.updateDocuments(linkedActorUpdates)
+        }
+        if(unlinkedActorUpdates.length > 0){
+            await canvas.scene.updateEmbeddedDocuments("Token", unlinkedActorUpdates)
         }
         if (AAdebug) {
             perfEnd = performance.now()
@@ -125,7 +141,7 @@ class ActiveAuras {
         if (canvasToken.actor === null) return;
         if (canvasToken.actor.data.type == "vehicle") return
         let tokenAlignment;
-        if (game.system.id === "dnd5e" || game.system.id === "sw5e" ) {
+        if (game.system.id === "dnd5e" || game.system.id === "sw5e") {
             try {
                 tokenAlignment = canvasToken.actor?.data.data.details.alignment.toLowerCase();
             } catch (error) {
@@ -250,21 +266,28 @@ class ActiveAuras {
         * @param {Token} token - token to apply effect too
         * @param {ActiveEffect} effectData - effect data to generate effect
         */
-    static async CreateActiveEffect(tokenID, oldEffectData) {
-        let token = canvas.tokens.get(tokenID)
-
-        let duplicateEffect = token.document.actor.effects.contents.find(e => e.data.label === oldEffectData.label)
-        if (getProperty(duplicateEffect, "data.flags.ActiveAuras.isAura")) return;
+    static async CreateActiveEffect(token, oldEffectData) {
+        let actor = token.actor;
+        let effects = duplicate(actor.effects)
+        let update = token.data.actorLink ? {_id : actor.id, effects : effects} : {_id : token.id, "actorData.effects" : effects}
+        let duplicateEffect = effects.find(e => e.label === oldEffectData.label)
         if (duplicateEffect) {
-            if (duplicateEffect.data.origin === oldEffectData.origin) return;
-            if (JSON.stringify(duplicateEffect.data.changes) === JSON.stringify(oldEffectData.changes)) return;
-            else await ActiveAuras.RemoveActiveEffects(tokenID, oldEffectData.label)
+            if (duplicateEffect.origin === oldEffectData.origin) return update;
+            if (JSON.stringify(duplicateEffect.data.changes) === JSON.stringify(oldEffectData.changes)) return update;
+            //look into removal
+            //else await ActiveAuras.RemoveActiveEffects(tokenID, oldEffectData.label)
         }
         let effectData = duplicate(oldEffectData)
         if (effectData.flags.ActiveAuras.onlyOnce) {
             let AAID = oldEffectData.origin.replaceAll(".", "")
-            if (token.data.flags.ActiveAuras?.[AAID]) return;
-            else await token.setFlag("ActiveAuras", AAID, true)
+            if (token.data.flags.ActiveAuras?.[AAID]) return update;
+            else {
+                /** @todo rework this
+                update[flags] = actor.data.flags
+                update[flags].ActiveAuras = mergeObject(actor.flags.ActiveAuras, {} 
+                "ActiveAuras", AAID, true)*/
+                
+            }
         }
         if (effectData.flags.ActiveAuras?.isMacro) {
             for (let change of effectData.changes) {
@@ -299,8 +322,9 @@ class ActiveAuras {
             effectData.flags.dae?.specialDuration?.push(effectData.flags.ActiveAuras.time)
         }
 
-        await token.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
-        console.log(game.i18n.format("ACTIVEAURAS.ApplyLog", { effectDataLabel: effectData.label, tokenName: token.name }))
+        effects.push(effectData)
+        token.data.actorLink ? update.effects = effects : update["actorData.effects"] = effects
+        return update
     }
 
     /**
@@ -319,4 +343,10 @@ class ActiveAuras {
         }
     }
 
+
+    static linkUpdate(actor, effect) {
+        let effects = duplicate(actor.effects)
+        effects.push(effect)
+        return { _id: actor.id, effects: effects }
+    }
 }
