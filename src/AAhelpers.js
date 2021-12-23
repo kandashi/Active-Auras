@@ -52,6 +52,7 @@ class AAhelpers {
     }
     static typeCheck5e(canvasToken, type) {
         let tokenType;
+        let filteredType = type.split("/")
         switch (canvasToken.actor.data.type) {
             case "npc": {
                 try {
@@ -66,7 +67,7 @@ class AAhelpers {
                     if (game.system.data.name === "sw5e") {
                         tokenType = canvasToken.actor?.data.data.details.species.toLowerCase();
                     }
-                    else tokenType = [canvasToken.actor?.data.data.details.race.toLowerCase().replace("-", " ").split(" ")];
+                    else tokenType = canvasToken.actor?.data.data.details.race.toLowerCase().replace("-", " ").split(" ");
                 } catch (error) {
                     console.error([`ActiveAuras: the token has an unreadable type`, canvasToken])
                 }
@@ -79,8 +80,8 @@ class AAhelpers {
             humanoidRaces = ["abyssin", "aingtii", "aleena", "anzellan", "aqualish", "arcona", "ardennian", "arkanian", "balosar", "barabel", "baragwin", "besalisk", "bith", "bothan", "cathar", "cerean", "chadrafan", "chagrian", "chevin", "chironian", "chiss", "clawdite", "codruji", "colicoid", "dashade", "defel", "devoronian", "draethos", "dug", "duros", "echani", "eshkha", "ewok", "falleen", "felucian", "fleshraider", "gamorrean", "gand", "geonosian", "givin", "gotal", "gran", "gungan", "halfhuman", "harch", "herglic", "ho’din", "human", "hutt", "iktotchi", "ithorian", "jawa", "kage", "kaleesh", "kaminoan", "karkarodon", "keldor", "killik", "klatooinian", "kubaz", "kushiban", "kyuzo", "lannik", "lasat", "lurmen", "miraluka", "mirialan", "moncalamari", "mustafarian", "muun", "nautolan", "neimoidian", "noghri", "ortolan", "patrolian", "pau’an", "pa’lowick", "pyke", "quarren", "rakata", "rattataki", "rishii", "rodian", "ryn", "selkath", "shistavanen", "sithpureblood", "squib", "ssiruu", "sullustan", "talz", "tarasin", "thisspiasian", "togorian", "togruta", "toydarian", "trandoshan", "tusken", "twi'lek", "ugnaught", "umbaran", "verpine", "voss", "vurk", "weequay", "wookie", "yevetha", "zabrak", "zeltron", "zygerrian"];
         }
         else humanoidRaces = ["human", "orc", "elf", "tiefling", "gnome", "aaracokra", "dragonborn", "dwarf", "halfling", "leonin", "satyr", "genasi", "goliath", "aasimar", "bugbear", "firbolg", "goblin", "lizardfolk", "tabxi", "triton", "yuan-ti", "tortle", "changling", "kalashtar", "shifter", "warforged", "gith", "centaur", "loxodon", "minotaur", "simic hybrid", "vedalken", "verdan", "locathah", "grung"];
-
-        if (tokenType.includes(type)) return true
+        if (tokenType === "any") return true;
+        if (filteredType.some(i => tokenType.includes(i))) return true
 
         for (let x of tokenType) {
             if (humanoidRaces.includes(x)) {
@@ -88,7 +89,6 @@ class AAhelpers {
                 continue;
             }
         }
-        if (tokenType === type || tokenType === "any") return true;
         return false
     }
 
@@ -168,7 +168,7 @@ class AAhelpers {
     static async RemoveAllAppliedAuras() {
         for (let removeToken of canvas.tokens.placeables) {
             if (removeToken?.actor?.effects.size > 0) {
-                let effects = removeToken.actor.effects.reduce((a, v) => { if (v.data?.flags?.ActiveAuras?.applied) return a.concat(v.id) }, [])
+                let effects = removeToken.actor.effects.filter(e => e.data?.flags?.ActiveAuras?.applied).map(v => v.id)
                 await removeToken.actor.deleteEmbeddedDocuments("ActiveEffect", effects)
                 console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { tokenName: removeToken.name }))
             }

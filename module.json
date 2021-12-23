@@ -8,8 +8,8 @@
   "bugs": "https://github.com/kandashi/Active-Auras/issues",
   "flags": {},
   "version": "0.3.02",
-  "minimumCoreVersion": "0.8.5",
-  "compatibleCoreVersion": "0.8.6",
+  "minimumCoreVersion": "9",
+  "compatibleCoreVersion": "9",
   "scripts": [
     "src/aura.js",
     "src/AAhelpers.js",

@@ -146,16 +146,11 @@ class ActiveAuras {
         for (let auraEffect of checkEffects) {
             let auraTargets = auraEffect.data.flags?.ActiveAuras?.aura
 
-            let { radius, height, type, alignment, hostile, wildcard, extra } = auraEffect.data.flags?.ActiveAuras;
+            let { radius, height, type, alignment, hostile, wildcard, extra, hidden } = auraEffect.data.flags?.ActiveAuras;
             let { parentActorLink, parentActorId } = auraEffect
             type = type !== undefined ? type.toLowerCase() : "";
             alignment = alignment !== undefined ? alignment.toLowerCase() : "";
             let auraEntity, distance;
-            /*
-            let auraType = auraEffect.data.flags?.ActiveAuras?.type !== undefined ? auraEffect.data.flags?.ActiveAuras?.type.toLowerCase() : "";
-            let auraAlignment = auraEffect.data.flags?.ActiveAuras?.alignment !== undefined ? auraEffect.data.flags?.ActiveAuras?.alignment.toLowerCase() : "";
-            let hostileTurn = auraEffect.data.flags?.ActiveAuras?.hostile
-            */
             let auraEntityType = auraEffect.entityType
 
             switch (auraEntityType) {
@@ -172,7 +167,9 @@ class ActiveAuras {
                         else auraEntity = auraTokenArray[0]
                     }
                     else auraEntity = canvas.tokens.get(auraEffect.entityId)
-
+                    if(hidden){
+                        if(auraEntity.data.hidden)continue
+                    }
                     if (auraEntity.id === canvasToken.id) continue;
                     if (alignment) {
                         if (alignment !== "" && !tokenAlignment.includes(alignment) && !tokenAlignment.includes("any")) continue;
