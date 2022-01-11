@@ -53,7 +53,7 @@ Hooks.on("updateCombat", async (combat, changed, options, userId) => {
     if (!AAgm) return;
     let combatant = canvas.tokens.get(combat.current.tokenId)
     let previousCombatant = canvas.tokens.get(combat.previous.tokenId)
-    await previousCombatant.update({ "flags.ActiveAuras": false })
+    await previousCombatant.document.update({ "flags.ActiveAuras": false })
     if (AAdebug) console.log("updateCombat, main aura")
     await ActiveAuras.MainAura(combatant.data, "combat update", combatant.scene.id)
 });
