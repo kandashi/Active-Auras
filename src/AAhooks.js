@@ -150,7 +150,7 @@ Hooks.on("preUpdateActor", (actor, update) => {
             })
         }
     }
-    if (actor.data.data.attributes.hp.value === 0 && update?.data?.attributes?.hp?.value > 0) {
+    if (actor.data.data?.attributes?.hp?.value === 0 && update?.data?.attributes?.hp?.value > 0) {
         Hooks.once("updateActor", (a, b) => {
             if (!AAgm) return;
             debouncedCollate(canvas.scene.id, true, false, "updateActor, revived")
