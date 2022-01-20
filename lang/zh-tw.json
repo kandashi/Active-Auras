@@ -10,6 +10,8 @@
     "ACTIVEAURAS.removeDeadHint": "在棋子達到0 hp時, 刪除提供給它們的任何光環,默認為啓用",
     "ACTIVEAURAS.combatOnly" : "[EN]Auras in combat",
     "ACTIVEAURAS.combatHint" : "[EN] Only check auras while a combat is active, this is for performance reasons and should be on unless you really need it off",
+    "ACTIVEAURAS.scrollingAura": "[EN] Disable scrolling text for auras",
+    "ACTIVEAURAS.scrollingAuraHint" : "[EN] Removes the Active Effect scrolling text for any applied aura",
 
     "ACTIVEAURAS.walltoptions_name": "牆壁阻隔光環",
     "ACTIVEAURAS.walltoptions_hint": "介入兩者的牆壁將阻止光環效果",
@@ -38,6 +40,7 @@
     "ACTIVEAURAS.FORM_ActivateOnce": "每回合僅觸發一次光環",
     "ACTIVEAURAS.FORM_Wildcard": "[EN] Apply to Wildcard Tokens",
     "ACTIVEAURAS.FORM_Extra": "[EN] Apply to Extra Tokens",
+    "ACTIVEAURAS.FORM_Temporary" : "[EN] Apply Active Effect icon to affected tokens",
 
     "ACTIVEAURAS.ApplyLog": "ActiveAuras |將 '{effectDataLabel}' 應用於 {tokenName} ",
     "ACTIVEAURAS.RemoveLog": "ActiveAuras |已從 {tokenName} 中刪除 '{effectDataLabel}' ",

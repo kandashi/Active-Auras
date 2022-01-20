@@ -36,12 +36,20 @@ Hooks.on('init', () => {
         hint: game.i18n.format("ACTIVEAURAS.combatHint"),
         scope: "world",
         config: true,
-        default: true,
+        default: false,
         type: Boolean,
         onChange: () => {
             if (game.settings.get("ActiveAuras", "combatOnly") === false) ActiveAuras.CollateAuras(canvas.id, true, true, "settings change")
             else ActiveAuras.RemoveAllAppliedAuras()
         }
+    })
+    game.settings.register("ActiveAuras", "scrollingAura", {
+        name: game.i18n.format("ACTIVEAURAS.scrollingAura"),
+        hint: game.i18n.format("ACTIVEAURAS.scrollingAuraHint"),
+        scope: "world",
+        config: true,
+        default: true,
+        type: Boolean,
     })
     game.settings.register("ActiveAuras", "debug", {
         name: game.i18n.format("ACTIVEAURAS.debug_name"),

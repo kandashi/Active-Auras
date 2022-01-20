@@ -10,7 +10,9 @@
     "ACTIVEAURAS.removeDeadHint": "コマのhpが0になったとき、オーラの影響を取り除きます。デフォルトはオンです。",
     "ACTIVEAURAS.combatOnly" : "[EN]Auras in combat",
     "ACTIVEAURAS.combatHint" : "[EN] Only check auras while a combat is active, this is for performance reasons and should be on unless you really need it off",
-    
+    "ACTIVEAURAS.scrollingAura": "[EN] Disable scrolling text for auras",
+    "ACTIVEAURAS.scrollingAuraHint" : "[EN] Removes the Active Effect scrolling text for any applied aura",
+
     "ACTIVEAURAS.walltoptions_name": "壁はオーラを遮る",
     "ACTIVEAURAS.walltoptions_hint":"オーラが壁に干渉すると、効果がブロックされます。",
 
@@ -38,7 +40,8 @@
     "ACTIVEAURAS.FORM_ActivateOnce": "ターン中に一度だけオーラを発動", 
     "ACTIVEAURAS.FORM_Wildcard": "[EN] Apply to Wildcard Tokens",
     "ACTIVEAURAS.FORM_Extra": "[EN] Apply to Extra Tokens",
-    
+    "ACTIVEAURAS.FORM_Temporary" : "[EN] Apply Active Effect icon to affected tokens",
+
     "ACTIVEAURAS.ApplyLog":"Active Auras | {effectDataLabel}が{tokenName}に適用されました。",
     "ACTIVEAURAS.RemoveLog":"Active Auras | {effectDataLabel}が{tokenName}から取り除かれました。",
     "ACTIVEAURAS.IgnoreSelfLog":"ActiveAuras | '{effectDataLabel}'を無視し、{changeKey}を{actorName}に変更しました。",

@@ -7,9 +7,9 @@
   "url": "https://github.com/kandashi/Active-Auras",
   "bugs": "https://github.com/kandashi/Active-Auras/issues",
   "flags": {},
-  "version": "0.3.02",
-  "minimumCoreVersion": "0.8.5",
-  "compatibleCoreVersion": "0.8.6",
+  "version": "0.4.0",
+  "minimumCoreVersion": "9",
+  "compatibleCoreVersion": "9.242",
   "scripts": [
     "src/aura.js",
     "src/AAhelpers.js",
@@ -59,7 +59,8 @@
       "path": "packs/AuraItems",
       "entity": "Item",
       "module": "ActiveAuras",
-      "private": false
+      "private": false,
+      "system" : "dnd5e"
     },
     {
       "name": "Active Auras Zone Actors",

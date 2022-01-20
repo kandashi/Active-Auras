@@ -12,6 +12,7 @@ Hooks.once("socketlib.ready", () => {
 
 Hooks.on("init", () => {
     libWrapper.register("ActiveAuras", "ActiveEffect.prototype.apply", AAhelpers.applyWrapper, "MIXED")
+    libWrapper.register("ActiveAuras", "ActiveEffect.prototype._displayScrollingStatus", AAhelpers.scrollingText, "WRAPPER")
 })
 
 Hooks.on("ready", () => {
@@ -53,7 +54,7 @@ Hooks.on("updateCombat", async (combat, changed, options, userId) => {
     if (!AAgm) return;
     let combatant = canvas.tokens.get(combat.current.tokenId)
     let previousCombatant = canvas.tokens.get(combat.previous.tokenId)
-    await previousCombatant.update({ "flags.ActiveAuras": false })
+    await previousCombatant.document.update({ "flags.ActiveAuras": false })
     if (AAdebug) console.log("updateCombat, main aura")
     await ActiveAuras.MainAura(combatant.data, "combat update", combatant.scene.id)
 });
@@ -172,6 +173,7 @@ Hooks.on("deleteMeasuredTemplate", (doc) => {
 })
 
 Hooks.on("deleteCombat", (combat) => {
+    if (!AAgm) return;
     if(canvas.scene === null) {if(AAdebug) {console.log("Active Auras disabled due to no canvas")} return}
     if (game.settings.get("ActiveAuras", "combatOnly")) {
         AAhelpers.RemoveAllAppliedAuras()
@@ -179,12 +181,14 @@ Hooks.on("deleteCombat", (combat) => {
 })
 
 Hooks.on("deleteCombatant", (combatant) => {
+    if (!AAgm) return;
     if (AAhelpers.IsAuraToken(combatant.token, combatant.parent.scene.id)) {
         AAhelpers.ExtractAuraById(combatant.data.tokenId, combatant.parent.scene.id)
     }
 });
 
 Hooks.on("createCombatant", (combat, combatant) => {
+    if (!AAgm) return;
     if(canvas.scene === null) {if(AAdebug) {console.log("Active Auras disabled due to no canvas")} return}
     if (!combat.active) return;
     combatant = canvas.tokens.get(combatant.tokenId)

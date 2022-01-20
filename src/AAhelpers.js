@@ -195,4 +195,42 @@ class AAhelpers {
         }
         return wrapped(...args)
     }
+
+    static scrollingText(wrapped, ...args) {
+        if (game.settings.get("ActiveAuras", "scrollingAura")) {
+            if (this.data.flags["ActiveAuras"]?.applied) { this.isSuppressed = true }
+        }
+        return wrapped(...args)
+    }
+
+    static async applyTemplate(args) {
+
+        let duration
+        const convertedDuration = globalThis.DAE.convertDuration(args[0].itemData.data.duration, true);
+        if (convertedDuration?.type === "seconds") {
+            duration = { seconds: convertedDuration.seconds, startTime: game.time.worldTime };
+        }
+        else if (convertedDuration?.type === "turns") {
+            duration = {
+                rounds: convertedDuration.rounds,
+                turns: convertedDuration.turns,
+                startRound: game.combat?.round,
+                startTurn: game.combat?.turn
+            };
+        }
+        let template = canvas.templates.get(args[0].templateId)
+        let disposition = args[0].actor.token.disposition
+        let effects = args[0].item.effects
+        let templateEffectData = []
+        for (let effect of effects) {
+            let data = { data: duplicate(effect), parentActorId: false, parentActorLink: false, entityType: "template", entityId: template.id, casterDisposition: disposition, castLevel: args[0].spellLevel }
+            if (effect.data.flags["ActiveAuras"].displayTemp) { data.data.duration = duration }
+            data.data.origin = `Actor.${args[0].actor._id}.Item.${args[0].item._id}`
+            templateEffectData.push(data)
+        }
+        await template.document.setFlag("ActiveAuras", "IsAura", templateEffectData)
+        AAhelpers.UserCollateAuras(canvas.scene.id, true, false, "spellCast")
+        return { haltEffectsApplication: true }
+
+    }
 }

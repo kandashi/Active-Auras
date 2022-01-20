@@ -8,6 +8,7 @@ Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
     const FormIsAura = game.i18n.format("ACTIVEAURAS.FORM_IsAura");
     const FormIgnoreSelf = game.i18n.format("ACTIVEAURAS.FORM_IgnoreSelf");
     const FormHidden = game.i18n.format("ACTIVEAURAS.FORM_Hidden");
+    const FormTemporary = game.i18n.format("ACTIVEAURAS.FORM_Temporary");
     const FormTargetsName = game.i18n.format("ACTIVEAURAS.FORM_TargetsName");
     const FormTargetsEnemy = game.i18n.format("ACTIVEAURAS.FORM_TargetsEnemy");
     const FormTargetsAllies = game.i18n.format("ACTIVEAURAS.FORM_TargetsAllies");
@@ -76,6 +77,10 @@ Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
                 <div class="form-group">
                     <label>${FormHidden}?</label>
                     <input name="flags.${AA_MODULE_NAME}.hidden" type="checkbox" ${flags[AA_MODULE_NAME]?.hidden ? 'checked' : ''}></input>
+                </div>
+                <div class="form-group">
+                    <label>${FormTemporary}?</label>
+                    <input name="flags.${AA_MODULE_NAME}.displayTemp" type="checkbox" ${flags[AA_MODULE_NAME]?.displayTemp ? 'checked' : ''}></input>
                 </div>
                 <div class="form-group">
                     <label>${HostileTurn}</label>

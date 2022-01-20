@@ -22,6 +22,7 @@ async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
                 let newEffect = { data: duplicate(testEffect.data), parentActorLink: testEffect.parent.data.token.actorLink, parentActorId: testEffect.parent.id, entityType: "token", entityId: testToken.id }
                 let re = /@[\w\.]+/g
                 let rollData = testToken.actor.getRollData()
+
                 for (let change of newEffect.data.changes) {
                     if (typeof change.value !== "string") continue
                     let s = change.value
@@ -113,14 +114,16 @@ function RetrieveDrawingAuras(effectArray) {
             const parts = testEffect.origin.split(".")
             const [entityName, entityId, embeddedName, embeddedId] = parts;
             let actor = game.actors.get(entityId)
-            let rollData = actor.getRollData()
-            for (let change of newEffect.data.changes) {
-                if (typeof change.value !== "string") continue
-                let re = /@[\w\.]+/g
-                let s = change.value
-                for (let match of s.match(re) || []) s = s.replace(match, getProperty(rollData, match.slice(1)))
-                change.value = s
-                if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.data.flags.ActiveAuras.isMacro = true
+            if (!!actor) {
+                let rollData = actor.getRollData()
+                for (let change of newEffect.data.changes) {
+                    if (typeof change.value !== "string") continue
+                    let re = /@[\w\.]+/g
+                    let s = change.value
+                    for (let match of s.match(re) || []) s = s.replace(match, getProperty(rollData, match.slice(1)))
+                    change.value = s
+                    if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.data.flags.ActiveAuras.isMacro = true
+                }
             }
             newEffect.disabled = false
             let macro = newEffect.data.flags.ActiveAuras.isMacro !== undefined ? newEffect.data.flags.ActiveAuras.isMacro : false;

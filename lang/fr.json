@@ -10,7 +10,9 @@
     "ACTIVEAURAS.removeDeadHint": "Quand les tokens atteignent 0 hp, supprime toutes les auras qu'ils pouvaient donner. Actif par défaut.",
     "ACTIVEAURAS.combatOnly" : "[EN]Auras in combat",
     "ACTIVEAURAS.combatHint" : "[EN] Only check auras while a combat is active, this is for performance reasons and should be on unless you really need it off",
-    
+    "ACTIVEAURAS.scrollingAura": "[EN] Disable scrolling text for auras",
+    "ACTIVEAURAS.scrollingAuraHint" : "[EN] Removes the Active Effect scrolling text for any applied aura",
+
     "ACTIVEAURAS.walltoptions_name": "Les murs bloquent les Auras",
     "ACTIVEAURAS.walltoptions_hint":"Les murs bloquent le passage des effets des auras",
 
@@ -38,6 +40,7 @@
     "ACTIVEAURAS.FORM_ActivateOnce": "Se déclenche une fois seulement par tour de jeu",
     "ACTIVEAURAS.FORM_Wildcard": "[EN] Apply to Wildcard Tokens",
     "ACTIVEAURAS.FORM_Extra": "[EN] Apply to Extra Tokens",
+    "ACTIVEAURAS.FORM_Temporary" : "[EN] Apply Active Effect icon to affected tokens",
 
     "ACTIVEAURAS.ApplyLog":"ActiveAuras | Applique un effet '{effectDataLabel}' à {tokenName}",
     "ACTIVEAURAS.RemoveLog":"ActiveAuras | Retire un effet '{effectDataLabel}' à {tokenName}",

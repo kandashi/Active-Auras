@@ -7,13 +7,13 @@
 class AAmeasure {
 
 
-    static async inAura(target, source, wallblocking = false, auraHeight, radius, shape) {
+    static inAura(target, source, wallblocking = false, auraHeight, radius, shape) {
         const gs = canvas.dimensions.size
         const g2 = gs / 2;
 
-        AAmeasure.boundingCheck(target, source, radius)
+        if (!AAmeasure.boundingCheck(target, source, radius)) return false;
         const auraPoly = shape
-        if (AAdebug) {
+        if (AAdebug && shape) {
             canvas.foreground.children.find(i => i.inAura)?.destroy()
             let g = new PIXI.Graphics()
             g.beginFill(0, 0.2).drawShape(shape)
@@ -58,7 +58,7 @@ class AAmeasure {
                     if (collision) continue
                 }
                 if (auraHeight) {
-                    if (!await AAmeasure.heightCheck(source, target, radius, r)) continue
+                    if (!AAmeasure.heightCheck(source, target, radius, r)) continue
                 }
                 return true
             }
@@ -66,7 +66,7 @@ class AAmeasure {
         return false
     }
 
-    static async heightCheck(source, target, radius, r) {
+    static heightCheck(source, target, radius, r) {
         let distance;
         switch (game.settings.get("ActiveAuras", "vertical-euclidean")) {
             case true: {
@@ -105,7 +105,7 @@ class AAmeasure {
             let check = canvas.foreground.addChild(g)
             check.boundingCheck = true
         }
-        if (t1.data.x < xMin || t1.data.x > xMax || t1.data.y > yMax || t1.data.y < yMin) return false;
+        return !(t1.data.x < xMin || t1.data.x > xMax || t1.data.y > yMax || t1.data.y < yMin);
     }
 
 
