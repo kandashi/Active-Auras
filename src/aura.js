@@ -166,10 +166,8 @@ class ActiveAuras {
                     if (parentActorLink) {
                         const auraTokenArray = game.actors.get(parentActorId).getActiveTokens()
                         if (auraTokenArray.length > 1) {
-                            auraEntity = auraTokenArray.reduce(FindClosestToken, auraTokenArray[0])
-                            function FindClosestToken(tokenA, tokenB) {
-                                return AAmeasure.inAura(tokenA, canvasToken, game.settings.get("ActiveAuras", "wall-block"), height, radius) < AAmeasure.inAura(tokenB, canvasToken, game.settings.get("ActiveAuras", "wall-block"), height) ? tokenA : tokenB
-                            }
+                            auraEntity = auraTokenArray[0]
+                            console.error("AA: Duplicate Linked Tokens detected, defaulting to first token.")
                         }
                         else auraEntity = auraTokenArray[0]
                     }

@@ -224,7 +224,7 @@ class AAhelpers {
         let templateEffectData = []
         for (let effect of effects) {
             let data = { data: duplicate(effect), parentActorId: false, parentActorLink: false, entityType: "template", entityId: template.id, casterDisposition: disposition, castLevel: args[0].spellLevel }
-            if (effect.data.flags["ActiveAuras"].displayTemp) { data.data.duration = duration }
+            if (effect.flags["ActiveAuras"].displayTemp) { data.data.duration = duration }
             data.data.origin = `Actor.${args[0].actor._id}.Item.${args[0].item._id}`
             templateEffectData.push(data)
         }
