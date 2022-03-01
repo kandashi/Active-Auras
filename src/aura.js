@@ -295,6 +295,7 @@ class ActiveAuras {
         }
 
         await token.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
+        await token.actor.applyActiveEffects();
         console.log(game.i18n.format("ACTIVEAURAS.ApplyLog", { effectDataLabel: effectData.label, tokenName: token.name }))
     }
 
