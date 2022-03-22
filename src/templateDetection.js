@@ -23,28 +23,28 @@ function getTemplateShape(template) {
     }
     shape.x = template.data.x
     shape.y = template.data.y
-    return shape
+    return shape;
 }
 
 function getAuraShape(source, radius) {
-    const gs = canvas.dimensions.size
-    const gd = gs / canvas.dimensions.distance
-    return new PIXI.Circle(source.center.x, source.center.y, ((radius * gd) + (source.data.width / 2 * gs)))
+    const gs = canvas.dimensions.size;
+    const gd = gs / canvas.dimensions.distance;
+    return new PIXI.Circle(source.center.x, source.center.y, ((radius * gd) + (source.data.width / 2 * gs)));
 }
 
 function PixiFromPolygon(data) {
-    let pixiPoints = data.points.map(p => new PIXI.Point(p[0] + data.x, p[1] + data.y))
-    return new PIXI.Polygon(pixiPoints)
+    let pixiPoints = data.points.map(p => new PIXI.Point(p[0] + data.x, p[1] + data.y));
+    return new PIXI.Polygon(pixiPoints);
 }
 
 function PixiFromEllipse(data) {
-    let { x, y, width, height } = data
-    return new PIXI.Ellipse(x + width / 2, y + height / 2, width / 2, height / 2)
+    let { x, y, width, height } = data;
+    return new PIXI.Ellipse(x + width / 2, y + height / 2, width / 2, height / 2);
 }
 
 function PixiFromRect(data) {
-    let { x, y, width, height } = data
-    return new PIXI.Rectangle(x, y, width, height)
+    let { x, y, width, height } = data;
+    return new PIXI.Rectangle(x, y, width, height);
 }
 
 function DrawingShape(data) {
@@ -56,5 +56,5 @@ function DrawingShape(data) {
         break;
         case CONST.DRAWING_TYPES.POLYGON : shape = PixiFromPolygon(data)
     }
-    return shape
+    return shape;
 }
