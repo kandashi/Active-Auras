@@ -198,9 +198,11 @@ class ActiveAuras {
                     if (auraEffect.casterDisposition) {
                         if (!AAhelpers.DispositionCheck(auraTargets, auraEffect.casterDisposition, canvasToken.data.disposition)) continue;
                     }
-                    const shape = getTemplateShape(auraEntity)
-                    distance = AAmeasure.inAura(canvasToken, auraEntity, game.settings.get("ActiveAuras", "wall-block"), height, radius, shape)
+                    const shape = getTemplateShape(auraEntity);
 
+                    // if using template, and no radius passed in, use template distance
+                    const templateRadius = radius ? radius : auraEntity.data.distance;
+                    distance = AAmeasure.inAura(canvasToken, auraEntity, game.settings.get("ActiveAuras", "wall-block"), height, templateRadius, shape);
                 }
                     break;
                 case "drawing": {
