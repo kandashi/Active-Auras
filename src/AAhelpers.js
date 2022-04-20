@@ -198,9 +198,21 @@ class AAhelpers {
 
     static scrollingText(wrapped, ...args) {
         if (game.settings.get("ActiveAuras", "scrollingAura")) {
-            if (this.data.flags["ActiveAuras"]?.applied) { this.isSuppressed = true }
+          if (this.data.flags["ActiveAuras"]?.applied) {
+            Object.defineProperty(this, "isSuppressed", {
+              get: () => {
+                if (new Error('').stack.includes("ActiveEffect5e._displayScrollingStatus")){
+                    return true;
+                }
+                return this._isSuppressed;
+              },
+              set: (v) => {
+                 this._isSuppressed = v;
+              },
+            });
+          }
         }
-        return wrapped(...args)
+        return wrapped(...args);
     }
 
     static async applyTemplate(args) {
