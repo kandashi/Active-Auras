@@ -1,3 +1,11 @@
+/**
+ * 
+ * @param {String} sceneID Scene to check upon
+ * @param {Boolean} checkAuras Can apply auras
+ * @param {Boolean} removeAuras Can remove auras
+ * @param {String} source For console logging
+ * @returns 
+ */
 async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
     if (!AAgm) return;
     if (sceneID !== canvas.id) return ui.notifications.warn("Collate Auras called on a non viewed scene, auras will be updated when you return to that scene")
