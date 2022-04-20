@@ -19,12 +19,12 @@ class AAhelpers {
      * @param {*} sceneID 
      * @returns 
      */
-    static IsAuraToken(token, sceneID) {
+    static IsAuraToken(tokenID, sceneID) {
         let MapKey = sceneID;
         let MapObject = AuraMap.get(MapKey);
         if (!MapObject?.effects) return false;
         for (let effect of MapObject.effects) {
-            if (effect.entityId === token.id) return true;
+            if (effect.entityId === tokenID) return true;
         }
         return false
     }
@@ -232,5 +232,12 @@ class AAhelpers {
         AAhelpers.UserCollateAuras(canvas.scene.id, true, false, "spellCast")
         return { haltEffectsApplication: true }
 
+    }
+
+    static async removeAurasOnToken(token){
+        if(!token.data.actorLink) return
+        let auras = token.actor.effects.filter(i => i.data.flags?.["ActiveAuras"]?.applied).map(i => i.id)
+        if(!auras) return
+        await token.actor.deleteEmbeddedDocuments("ActiveEffect", auras)
     }
 }

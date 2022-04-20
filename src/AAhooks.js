@@ -66,6 +66,7 @@ Hooks.on("preDeleteToken", async (token) => {
         if (AAdebug) console.log("preDelete, collate auras false true")
         AAhelpers.ExtractAuraById(token.id, token.parent.id)
     }
+    AAhelpers.removeAurasOnToken(token)
 });
 
 /**
@@ -182,7 +183,7 @@ Hooks.on("deleteCombat", (combat) => {
 
 Hooks.on("deleteCombatant", (combatant) => {
     if (!AAgm) return;
-    if (AAhelpers.IsAuraToken(combatant.token, combatant.parent.scene.id)) {
+    if (AAhelpers.IsAuraToken(combatant.data.tokenId, combatant.parent.scene.id)) {
         AAhelpers.ExtractAuraById(combatant.data.tokenId, combatant.parent.scene.id)
     }
 });
