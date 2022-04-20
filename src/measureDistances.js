@@ -25,22 +25,34 @@ class AAmeasure {
             [{ x: source.center.x, y: source.center.y }] :
             [
                 { x: source.center.x, y: source.center.y },
-                { x: source.x + g2, y: source.y + g2 },
-                { x: source.x + (source.data.width * gs) - g2, y: source.y + g2 },
-                { x: source.x + g2, y: source.y + (source.data.height * gs) - g2 },
-                { x: source.x + (source.data.width * gs) - g2, y: source.y + (source.data.height * gs) - g2 }
+                { x: source.data.x + g2, y: source.data.y + g2 },
+                { x: source.data.x + (source.data.width * gs) - g2, y: source.data.y + g2 },
+                { x: source.data.x + g2, y: source.data.y + (source.data.height * gs) - g2 },
+                { x: source.data.x + (source.data.width * gs) - g2, y: source.data.y + (source.data.height * gs) - g2 }
             ]
 
         let targetCorners = target.data.height === 1 && target.data.width === 1 ?
             [{ x: target.center.x, y: target.center.y, collides: false }] :
             [
                 { x: target.center.x, y: target.center.y, collides: false },
-                { x: target.x + g2, y: target.y + g2, collides: false },
-                { x: target.x + (target.data.width * gs) - g2, y: target.y + g2, collides: false },
-                { x: target.x + g2, y: target.y + (target.data.height * gs) - g2, collides: false },
-                { x: target.x + (target.data.width * gs) - g2, y: target.y + (target.data.height * gs) - g2, collides: false }
+                { x: target.data.x + g2, y: target.data.y + g2, collides: false },
+                { x: target.data.x + (target.data.width * gs) - g2, y: target.data.y + g2, collides: false },
+                { x: target.data.x + g2, y: target.data.y + (target.data.height * gs) - g2, collides: false },
+                { x: target.data.x + (target.data.width * gs) - g2, y: target.data.y + (target.data.height * gs) - g2, collides: false }
             ]
+        if (AAdebug) {
+            canvas.foreground.children.filter(i => i.squares)?.forEach(i => i.destroy())
+            function drawSquare(point) {
+                let {x, y} = point
+                let g = new PIXI.Graphics()
+                g.beginFill(0xFF0000, 0.2).drawRect(x-5, y-5, 10, 10)
+                let aura = canvas.foreground.addChild(g)
+                aura.squares = true
+            }
+            sourceCorners.forEach(i => drawSquare(i))
+            targetCorners.forEach(i => drawSquare(i))
 
+        }
         for (let t of targetCorners) {
             if (!auraPoly.contains(t.x, t.y)) continue; // quick exit if not in the aura
 
@@ -86,18 +98,18 @@ class AAmeasure {
 
     /**
      * 
-     * @param {object} t1 source token
-     * @param {object} t2 target token
+     * @param {object} t1 target token
+     * @param {object} t2 source token
      * @param {number} radius 
      * @returns boolean
      */
     static boundingCheck(t1, t2, radius) {
         let { size, distance } = canvas.dimensions
         let rad = (radius / distance) * size
-        const xMax = t2.data.x + rad + t2.w + size
-        const xMin = t2.data.x - rad - size
-        const yMax = t2.data.y + rad + t2.h + size
-        const yMin = t2.data.y - rad - size
+        const xMax = t2.data.x + rad + t2.w + (size * t1.data.width)
+        const xMin = t2.data.x - rad - (size * t1.data.width)
+        const yMax = t2.data.y + rad + t2.h + (size * t1.data.height)
+        const yMin = t2.data.y - rad - (size * t1.data.height)
         if (AAdebug) {
             canvas.foreground.children.find(i => i.boundingCheck)?.destroy()
             let g = new PIXI.Graphics()

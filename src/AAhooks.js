@@ -1,13 +1,13 @@
 Hooks.once('ready', () => {
-    if(!game.modules.get('lib-wrapper')?.active && game.user.isGM)
+    if (!game.modules.get('lib-wrapper')?.active && game.user.isGM)
         ui.notifications.error("Module XYZ requires the 'libWrapper' module. Please install and activate it.");
 });
 
 let AAgm;
 const debouncedCollate = debounce((a, b, c, d) => CollateAuras(a, b, c, d), 200)
 Hooks.once("socketlib.ready", () => {
-	AAsocket = socketlib.registerModule("ActiveAuras");
-	AAsocket.register("userCollate", CollateAuras);
+    AAsocket = socketlib.registerModule("ActiveAuras");
+    AAsocket.register("userCollate", CollateAuras);
 });
 
 Hooks.on("init", () => {
@@ -16,7 +16,7 @@ Hooks.on("init", () => {
 })
 
 Hooks.on("ready", () => {
-    if(canvas.scene === null) {if(AAdebug) {console.log("Active Auras disabled due to no canvas")} return}
+    if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
 
     AAgm = game.user === game.users.find((u) => u.isGM && u.active)
     CollateAuras(canvas.id, true, false)
@@ -27,7 +27,7 @@ Hooks.on("ready", () => {
 })
 
 Hooks.on("createToken", (token) => {
-    if(canvas.scene === null) {if(AAdebug) {console.log("Active Auras disabled due to no canvas")} return}
+    if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (!AAgm) return;
     try {
         if (getProperty(token, "data.flags.multilevel-tokens")) return
@@ -45,7 +45,7 @@ Hooks.on("createToken", (token) => {
 });
 
 Hooks.on("updateCombat", async (combat, changed, options, userId) => {
-    if(canvas.scene === null) {if(AAdebug) {console.log("Active Auras disabled due to no canvas")} return}
+    if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (changed.round === 1) {
         ActiveAuras.MainAura(undefined, "combat start", canvas.id)
         return;
@@ -60,7 +60,7 @@ Hooks.on("updateCombat", async (combat, changed, options, userId) => {
 });
 
 Hooks.on("preDeleteToken", async (token) => {
-    if(canvas.scene === null) {if(AAdebug) {console.log("Active Auras disabled due to no canvas")} return}
+    if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (!AAgm) return;
     if (AAhelpers.IsAuraToken(token, token.parent.id)) {
         if (AAdebug) console.log("preDelete, collate auras false true")
@@ -72,7 +72,7 @@ Hooks.on("preDeleteToken", async (token) => {
  * On token movement run MainAura
  */
 Hooks.on("updateToken", async (token, update, _flags, _id) => {
-    if(canvas.scene === null) {if(AAdebug) {console.log("Active Auras disabled due to no canvas")} return}
+    if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (!AAgm) return;
     if (("y" in update || "x" in update || "elevation" in update)) {
         let MapObject = AuraMap.get(token.parent.id);
@@ -98,7 +98,7 @@ Hooks.on("updateToken", async (token, update, _flags, _id) => {
 /**
  */
 Hooks.on("updateActiveEffect", (effect, _update) => {
-    if(canvas.scene === null) {if(AAdebug) {console.log("Active Auras disabled due to no canvas")} return}
+    if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (!AAgm) return;
     if (effect.data.flags?.ActiveAuras?.isAura) {
         if (AAdebug) console.log("updateAE, collate auras true true")
@@ -110,7 +110,7 @@ Hooks.on("updateActiveEffect", (effect, _update) => {
  * On removal of active effect from linked actor, if aura remove from canvas.tokens
  */
 Hooks.on("deleteActiveEffect", (effect) => {
-    if(canvas.scene === null) {if(AAdebug) {console.log("Active Auras disabled due to no canvas")} return}
+    if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (!AAgm) return;
     let applyStatus = effect.data.flags?.ActiveAuras?.applied;
     let auraStatus = effect.data.flags?.ActiveAuras?.isAura;
@@ -124,7 +124,7 @@ Hooks.on("deleteActiveEffect", (effect) => {
  * On creation of active effect on linked actor, run MainAura
  */
 Hooks.on("createActiveEffect", (effect) => {
-    if(canvas.scene === null) {if(AAdebug) {console.log("Active Auras disabled due to no canvas")} return}
+    if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (!AAgm) return;
     if (!effect.data.flags?.ActiveAuras?.applied && effect.data.flags?.ActiveAuras?.isAura) {
         if (AAdebug) console.log("deleteAE, collate auras true false")
@@ -134,13 +134,13 @@ Hooks.on("createActiveEffect", (effect) => {
 
 Hooks.on("canvasReady", (canvas) => {
     if (!AAgm) return;
-    if(canvas.scene === null) {if(AAdebug) {console.log("Active Auras disabled due to no canvas")} return}
+    if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (AAdebug) console.log("canvasReady, collate auras true false")
     debouncedCollate(canvas.scene.id, true, false, "ready")
 })
 
 Hooks.on("preUpdateActor", (actor, update) => {
-    if(canvas.scene === null) {if(AAdebug) {console.log("Active Auras disabled due to no canvas")} return}
+    if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (update.data?.attributes?.hp?.value <= 0) {
         if (AAhelpers.IsAuraToken(actor.getActiveTokens()[0].data, canvas.id)) {
             if (AAdebug) console.log("0hp, collate auras true true")
@@ -159,13 +159,13 @@ Hooks.on("preUpdateActor", (actor, update) => {
 })
 
 Hooks.on("updateMeasuredTemplate", (data, update) => {
-    if(canvas.scene === null) {if(AAdebug) {console.log("Active Auras disabled due to no canvas")} return}
+    if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (!getProperty(data, "flags.ActiveAuras")) return;
     ActiveAuras.MainAura(undefined, "template movement", data.parent.id)
 })
 
 Hooks.on("deleteMeasuredTemplate", (doc) => {
-    if(canvas.scene === null) {if(AAdebug) {console.log("Active Auras disabled due to no canvas")} return}
+    if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     //if (!getProperty(data, "flags.ActiveAuras")) return;
     AAhelpers.ExtractAuraById(doc.id, doc.parent.id)
     //ActiveAuras.CollateAuras(scene._id, false, true, "template deletion")
@@ -174,7 +174,7 @@ Hooks.on("deleteMeasuredTemplate", (doc) => {
 
 Hooks.on("deleteCombat", (combat) => {
     if (!AAgm) return;
-    if(canvas.scene === null) {if(AAdebug) {console.log("Active Auras disabled due to no canvas")} return}
+    if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (game.settings.get("ActiveAuras", "combatOnly")) {
         AAhelpers.RemoveAllAppliedAuras()
     }
@@ -189,7 +189,7 @@ Hooks.on("deleteCombatant", (combatant) => {
 
 Hooks.on("createCombatant", (combat, combatant) => {
     if (!AAgm) return;
-    if(canvas.scene === null) {if(AAdebug) {console.log("Active Auras disabled due to no canvas")} return}
+    if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (!combat.active) return;
     combatant = canvas.tokens.get(combatant.tokenId)
     if (combatant.actor.effects?.entries) {
@@ -203,4 +203,17 @@ Hooks.on("createCombatant", (combat, combatant) => {
             }
         }
     }
+})
+
+Hooks.on("createWall", () => {
+    if (AAdebug) console.log("createWall, collate auras false true")
+    debouncedCollate(canvas.scene.id, false, true, "Wall Created")
+})
+Hooks.on("updateWall", () => {
+    if (AAdebug) console.log("updateWall, collate auras true true")
+    debouncedCollate(canvas.scene.id, true, true, "Wall Updated")
+})
+Hooks.on("deleteWall", () => {
+    if (AAdebug) console.log("updateWall, collate auras true false")
+    debouncedCollate(canvas.scene.id, true, false, "Wall Deleted")
 })
