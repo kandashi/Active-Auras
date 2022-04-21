@@ -29,7 +29,7 @@ class ActiveAuras {
         let auraTokenId;
 
         if (movedToken !== undefined) {
-            if (AAhelpers.IsAuraToken(movedToken, sceneID)) {
+            if (AAhelpers.IsAuraToken(movedToken.id, sceneID)) {
                 auraTokenId = movedToken.data._id
             }
             else if (getProperty(movedToken, "flags.token-attacher")) {

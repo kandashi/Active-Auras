@@ -62,7 +62,7 @@ Hooks.on("updateCombat", async (combat, changed, options, userId) => {
 Hooks.on("preDeleteToken", async (token) => {
     if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (!AAgm) return;
-    if (AAhelpers.IsAuraToken(token, token.parent.id)) {
+    if (AAhelpers.IsAuraToken(token.id, token.parent.id)) {
         if (AAdebug) console.log("preDelete, collate auras false true")
         AAhelpers.ExtractAuraById(token.id, token.parent.id)
     }
@@ -81,13 +81,13 @@ Hooks.on("updateToken", async (token, update, _flags, _id) => {
         if (AAdebug) console.log("movement, main aura")
         await ActiveAuras.MainAura(token, "movement update", token.parent.id)
     }
-    else if ("hidden" in update && AAhelpers.IsAuraToken(token, token.parent.id)) {
+    else if ("hidden" in update && AAhelpers.IsAuraToken(token.id, token.parent.id)) {
         setTimeout(() => {
             if (AAdebug) console.log("hidden, collate auras true true")
             CollateAuras(canvas.scene, true, true, "updateToken")
         }, 20)
     }
-    else if (AAhelpers.IsAuraToken(token, token.parent.id) && AAhelpers.HPCheck(token)) {
+    else if (AAhelpers.IsAuraToken(token.id, token.parent.id) && AAhelpers.HPCheck(token)) {
         setTimeout(() => {
             if (AAdebug) console.log("0hp, collate auras true true")
             CollateAuras(canvas.scene.id, true, true, "updateToken, dead")
@@ -143,7 +143,7 @@ Hooks.on("canvasReady", (canvas) => {
 Hooks.on("preUpdateActor", (actor, update) => {
     if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (update.data?.attributes?.hp?.value <= 0) {
-        if (AAhelpers.IsAuraToken(actor.getActiveTokens()[0].data, canvas.id)) {
+        if (AAhelpers.IsAuraToken(actor.getActiveTokens()[0].data.id, canvas.id)) {
             if (AAdebug) console.log("0hp, collate auras true true")
             Hooks.once("updateActor", (a, b) => {
                 if (!AAgm) return;
