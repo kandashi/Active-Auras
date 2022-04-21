@@ -32,8 +32,8 @@ function getAuraShape(source, radius) {
     if(game.settings.get("dnd5e", "diagonalMovement") === "555") return new PIXI.Rectangle(
         source.data.x - (radius * gd),
         source.data.y - (radius * gd),
-        (radius * gd)*2 + source.data.width,
-        (radius * gd)*2 + source.data.height,
+        (radius * gd)*2 + source.data.width *gs,
+        (radius * gd)*2 + source.data.height *gs,
     )
     return new PIXI.Circle(source.center.x, source.center.y, ((radius * gd) + (source.data.width / 2 * gs)))
 }
