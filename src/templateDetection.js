@@ -34,7 +34,7 @@ function getAuraShape(source, radius) {
         source.data.y - (radius * gd),
         (radius * gd)*2 + source.data.width *gs,
         (radius * gd)*2 + source.data.height *gs,
-    )
+    ) 
     return new PIXI.Circle(source.center.x, source.center.y, ((radius * gd) + (source.data.width / 2 * gs)))
 }
 
