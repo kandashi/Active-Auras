@@ -91,7 +91,7 @@ class ActiveAuras {
                 await ActiveAuras.CreateActiveEffect(update[1].token.id, update[1].effect)
             }
             else {
-                await ActiveAuras.RemoveActiveEffects(update[1].token.id, update[1].effect.label)
+                await ActiveAuras.RemoveActiveEffects(update[1].token.id, update[1].effect.origin)
             }
         }
         if (AAdebug) {
@@ -199,8 +199,9 @@ class ActiveAuras {
                         if (!AAhelpers.DispositionCheck(auraTargets, auraEffect.casterDisposition, canvasToken.data.disposition)) continue;
                     }
                     const shape = getTemplateShape(auraEntity)
-                    const templateRadius = radius ? radius : auraEntity.data.distance;
-                    distance = AAmeasure.inAura(canvasToken, auraEntity, game.settings.get("ActiveAuras", "wall-block"), height, templateRadius, shape);
+                    let templateDetails = auraEntity
+                    //templateDetails.shape = shape
+                    distance = AAmeasure.isTokenInside(templateDetails, canvasToken, game.settings.get("ActiveAuras", "wall-block"));
                 }
                     break;
                 case "drawing": {
@@ -215,7 +216,7 @@ class ActiveAuras {
                 }
                     break;
             }
-            const MapKey = auraEffect.data.label + "-" + canvasToken.id + "-" + auraEntity.id;
+            const MapKey = auraEffect.data.origin + "-" + canvasToken.id + "-" + auraEntity.id;
             MapObject = map.get(MapKey);
 
 
@@ -227,7 +228,7 @@ class ActiveAuras {
                     map.set(MapKey, { add: true, token: canvasToken, effect: auraEffect })
                 }
             }
-            else if (!MapObject?.add && canvasToken.document.actor?.effects.contents.some(e => e.data.label === auraEffect.data.label)) {
+            else if (!MapObject?.add && canvasToken.document.actor?.effects.contents.some(e => e.data.origin === auraEffect.data.origin)) {
                 if (MapObject) {
                     MapObject.add = false
                 }
@@ -247,12 +248,12 @@ class ActiveAuras {
     static async CreateActiveEffect(tokenID, oldEffectData) {
         const token = canvas.tokens.get(tokenID)
 
-        const duplicateEffect = token.document.actor.effects.contents.find(e => e.data.label === oldEffectData.label)
+        const duplicateEffect = token.document.actor.effects.contents.find(e => e.data.origin === oldEffectData.origin)
         if (getProperty(duplicateEffect, "data.flags.ActiveAuras.isAura")) return;
         if (duplicateEffect) {
             if (duplicateEffect.data.origin === oldEffectData.origin) return;
             if (JSON.stringify(duplicateEffect.data.changes) === JSON.stringify(oldEffectData.changes)) return;
-            else await ActiveAuras.RemoveActiveEffects(tokenID, oldEffectData.label)
+            else await ActiveAuras.RemoveActiveEffects(tokenID, oldEffectData.origin)
         }
         let effectData = duplicate(oldEffectData)
         if (effectData.flags.ActiveAuras.onlyOnce) {
@@ -301,14 +302,14 @@ class ActiveAuras {
     /**
      * 
      * @param {Token} token - token instance to remove effect from
-     * @param {String} effectLabel - label of effect to remove
+     * @param {String} effectOrigin - origin of effect to remove
      */
-    static async RemoveActiveEffects(tokenID, effectLabel) {
+    static async RemoveActiveEffects(tokenID, effectOrigin) {
         const token = canvas.tokens.get(tokenID)
         for (const tokenEffects of token.actor.effects) {
-            if (tokenEffects.data.label === effectLabel && tokenEffects.data.flags?.ActiveAuras?.applied === true) {
+            if (tokenEffects.data.origin === effectOrigin && tokenEffects.data.flags?.ActiveAuras?.applied === true) {
                 await token.actor.deleteEmbeddedDocuments("ActiveEffect", [tokenEffects.id])
-                console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: effectLabel, tokenName: token.name }))
+                console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: effectOrigin, tokenName: token.name }))
 
             }
         }

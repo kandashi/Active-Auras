@@ -74,3 +74,8 @@ Added support for ItemMacro. Active Effects will now pull from the original item
 Added fancy animations to the aura tab
 Limited some console logs to the debug setting to prevent spam
 Fixed/updated all compendium items so they contain the macro in an Item Macro, these will need replacing to update
+
+
+## 0.4.07
+Fixed for non-circular templates
+Fixes for duplicate DF CE effects as the name would not match the aura-name
