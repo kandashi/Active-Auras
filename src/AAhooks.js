@@ -142,8 +142,8 @@ Hooks.on("canvasReady", (canvas) => {
 
 Hooks.on("preUpdateActor", (actor, update) => {
     if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
-    if (update.data?.attributes?.hp?.value <= 0) {
-        if (AAhelpers.IsAuraToken(actor.getActiveTokens()[0].data.id, canvas.id)) {
+    if (AAhelpers.HPCheck(actor)) {
+        if (AAhelpers.IsAuraToken(actor.getActiveTokens()[0].data._id, canvas.id)) {
             if (AAdebug) console.log("0hp, collate auras true true")
             Hooks.once("updateActor", (a, b) => {
                 if (!AAgm) return;

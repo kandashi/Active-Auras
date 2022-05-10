@@ -20,7 +20,7 @@ class ActiveAuras {
         const sceneCombat = game.combats.filter(c => c.scene?.id === sceneID)
         if (game.settings.get("ActiveAuras", "combatOnly") && !sceneCombat[0]?.started) {
             if (AAdebug) { console.warn("Active Auras not active when not in combat") }
-            return;
+            return;w
         }
         if (sceneID !== canvas.id) return ui.notifications.warn("An update was called on a non viewed scene, auras will be updated when you return to that scene")
 
@@ -216,7 +216,7 @@ class ActiveAuras {
                 }
                     break;
             }
-            const MapKey = auraEffect.data.origin + "-" + canvasToken.id + "-" + auraEntity.id;
+            const MapKey = auraEffect.data.origin + "-" + canvasToken.id + "-" + auraEntity.id + "-" + auraEffect.data.label;
             MapObject = map.get(MapKey);
 
 
@@ -228,7 +228,7 @@ class ActiveAuras {
                     map.set(MapKey, { add: true, token: canvasToken, effect: auraEffect })
                 }
             }
-            else if (!MapObject?.add && canvasToken.document.actor?.effects.contents.some(e => e.data.origin === auraEffect.data.origin)) {
+            else if (!MapObject?.add && canvasToken.document.actor?.effects.contents.some(e => e.data.origin === auraEffect.data.origin && e.data.label === auraEffect.data.label)) {
                 if (MapObject) {
                     MapObject.add = false
                 }
@@ -248,7 +248,7 @@ class ActiveAuras {
     static async CreateActiveEffect(tokenID, oldEffectData) {
         const token = canvas.tokens.get(tokenID)
 
-        const duplicateEffect = token.document.actor.effects.contents.find(e => e.data.origin === oldEffectData.origin)
+        const duplicateEffect = token.document.actor.effects.contents.find(e => e.data.origin === oldEffectData.origin && e.data.label === oldEffectData.label)
         if (getProperty(duplicateEffect, "data.flags.ActiveAuras.isAura")) return;
         if (duplicateEffect) {
             if (duplicateEffect.data.origin === oldEffectData.origin) return;

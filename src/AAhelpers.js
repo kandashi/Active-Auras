@@ -124,15 +124,18 @@ class AAhelpers {
         else return false
     }
 
-    static HPCheck(token) {
+    static HPCheck(entity) {
+        let actor = entity.actor
+        if(entity.collectionName === "actors") actor = entity
         switch (game.system.id) {
             case "dnd5e": ;
             case "sw5e": {
-                if (getProperty(token, "actor.data.data.attributes.hp.value") <= 0) return false
+                if (getProperty(actor, "data.data.attributes.hp.max") === 0) return true
+                if (getProperty(actor, "data.data.attributes.hp.value") <= 0) return false
                 else return true
             }
             case "swade": {
-                let { max, value, ignored } = token.actor.data.data.wounds
+                let { max, value, ignored } = actor.data.data.wounds
                 if (value - ignored >= max) return false
                 else return true
             }
