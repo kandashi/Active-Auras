@@ -102,7 +102,7 @@ class AAmeasure {
                         ty = ty + templateDetails.shape.height / 2;
                     }
                     const r = new Ray({ x: tx, y: ty }, { x: currGrid.x + templatePos.x, y: currGrid.y + templatePos.y });
-                    if (configSettings.optionalRules.wallsBlockRange === "centerLevels" && installedModules.get("levels")) {
+                    if (wallsBlockTargeting && game.modules.get("levels")?.active) {
                         let p1 = {
                             x: currGrid.x + templatePos.x, y: currGrid.y + templatePos.y,
                             //@ts-ignore
