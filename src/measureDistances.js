@@ -102,7 +102,7 @@ class AAmeasure {
                         ty = ty + templateDetails.shape.height / 2;
                     }
                     const r = new Ray({ x: tx, y: ty }, { x: currGrid.x + templatePos.x, y: currGrid.y + templatePos.y });
-                    if (wallsBlockTargeting && game.modules.get("levels")?.active) {
+                    /**if (wallsBlockTargeting && game.modules.get("levels")?.active) {
                         let p1 = {
                             x: currGrid.x + templatePos.x, y: currGrid.y + templatePos.y,
                             //@ts-ignore
@@ -119,10 +119,10 @@ class AAmeasure {
                         //@ts-ignore
                         contains = contains && !game.modules.get("levels")?.testCollision(p1, p2, "collision");
                         //@ts-ignore
-                    }
-                    else {
+                    }*/
+                    
                         contains = !canvas?.walls?.checkCollision(r);
-                    }
+                    
                 }
                 // Check the distance from origin.
                 if (contains)
