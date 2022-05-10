@@ -108,8 +108,8 @@ class AAmeasure {
                             //@ts-ignore
                             z: token.data.elevation
                         };
-                        const p2z = installedModules.get("levels")?.lastTokenForTemplate.data.elevation
-                            ?? installedModules.get("levels")?.nextTemplateHeight ?? 0;
+                        const p2z = game.modules.get("levels")?.lastTokenForTemplate.data.elevation
+                            ?? game.modules.get("levels")?.nextTemplateHeight ?? 0;
                         let p2 = {
                             x: tx, y: ty,
                             //@ts-ignore
@@ -117,7 +117,7 @@ class AAmeasure {
                         };
                         contains = getUnitDist(p2.x, p2.y, p2.z, token) <= templateDetails.distance;
                         //@ts-ignore
-                        contains = contains && !installedModules.get("levels").testCollision(p1, p2, "collision");
+                        contains = contains && !game.modules.get("levels")?.testCollision(p1, p2, "collision");
                         //@ts-ignore
                     }
                     else {
