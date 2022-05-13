@@ -29,7 +29,7 @@ function getTemplateShape(template) {
 function getAuraShape(source, radius) {
     const gs = canvas.dimensions.size
     const gd = gs / canvas.dimensions.distance
-    if(game.settings.get("dnd5e", "diagonalMovement") === "555") return new PIXI.Rectangle(
+    if(game.settings.get(game.system.id, "diagonalMovement") === "555") return new PIXI.Rectangle(
         source.data.x - (radius * gd),
         source.data.y - (radius * gd),
         (radius * gd)*2 + source.data.width *gs,
