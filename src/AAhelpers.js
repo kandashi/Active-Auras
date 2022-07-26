@@ -80,7 +80,9 @@ class AAhelpers {
         }
         else humanoidRaces = ["human", "orc", "elf", "tiefling", "gnome", "aaracokra", "dragonborn", "dwarf", "halfling", "leonin", "satyr", "genasi", "goliath", "aasimar", "bugbear", "firbolg", "goblin", "lizardfolk", "tabxi", "triton", "yuan-ti", "tortle", "changling", "kalashtar", "shifter", "warforged", "gith", "centaur", "loxodon", "minotaur", "simic hybrid", "vedalken", "verdan", "locathah", "grung"];
 
-        if (tokenType.includes(type)) return true
+        let types = type.split('/');
+        const typesIntersection = tokenType.filter(t => types.includes(t));
+        if (typesIntersection.length > 0) return true
 
         for (let x of tokenType) {
             if (humanoidRaces.includes(x)) {
