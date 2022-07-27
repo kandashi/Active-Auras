@@ -64,7 +64,7 @@ class AAhelpers {
             case "character": {
                 try {
                     if (game.system.data.name === "sw5e") {
-                        tokenType = canvasToken.actor?.data.data.details.species.toLowerCase();
+                        tokenType = [canvasToken.actor?.data.data.details.species.toLowerCase()];
                     }
                     else tokenType = canvasToken.actor?.data.data.details.race.toLowerCase().replace("-", " ").split(" ");
                 } catch (error) {
