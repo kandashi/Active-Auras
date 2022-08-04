@@ -161,8 +161,11 @@ class AAhelpers {
             if (removeToken?.actor?.effects.size > 0) {
                 for (let testEffect of removeToken.actor.effects) {
                     if (!EffectsArray.includes(testEffect.data.origin) && testEffect.data?.flags?.ActiveAuras?.applied) {
-                        await removeToken.actor.deleteEmbeddedDocuments("ActiveEffect", [testEffect.id])
-                        console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: testEffect.data.label, tokenName: removeToken.name }))
+                        try {
+                            await removeToken.actor.deleteEmbeddedDocuments("ActiveEffect", [testEffect.id]);
+                        } finally {
+                            console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: testEffect.data.label, tokenName: removeToken.name }));
+                        }
                     }
                 }
             }
@@ -171,9 +174,12 @@ class AAhelpers {
     static async RemoveAllAppliedAuras() {
         for (let removeToken of canvas.tokens.placeables) {
             if (removeToken?.actor?.effects.size > 0) {
-                let effects = removeToken.actor.effects.reduce((a, v) => { if (v.data?.flags?.ActiveAuras?.applied) return a.concat(v.id) }, [])
-                await removeToken.actor.deleteEmbeddedDocuments("ActiveEffect", effects)
-                console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { tokenName: removeToken.name }))
+                let effects = removeToken.actor.effects.reduce((a, v) => { if (v.data?.flags?.ActiveAuras?.applied) return a.concat(v.id) }, []);
+                try {
+                    await removeToken.actor.deleteEmbeddedDocuments("ActiveEffect", effects);
+                } finally {
+                    console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { tokenName: removeToken.name }));
+                }
             }
         }
 

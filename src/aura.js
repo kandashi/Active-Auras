@@ -300,17 +300,18 @@ class ActiveAuras {
     }
 
     /**
-     * 
-     * @param {Token} token - token instance to remove effect from
+     * @param {String} tokenID - token instance to remove effect from
      * @param {String} effectOrigin - origin of effect to remove
      */
     static async RemoveActiveEffects(tokenID, effectOrigin) {
-        const token = canvas.tokens.get(tokenID)
+        const token = canvas.tokens.get(tokenID);
         for (const tokenEffects of token.actor.effects) {
             if (tokenEffects.data.origin === effectOrigin && tokenEffects.data.flags?.ActiveAuras?.applied === true) {
-                await token.actor.deleteEmbeddedDocuments("ActiveEffect", [tokenEffects.id])
-                console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: effectOrigin, tokenName: token.name }))
-
+                try {
+                    await token.actor.deleteEmbeddedDocuments("ActiveEffect", [tokenEffects.id]);
+                } finally {
+                    console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: effectOrigin, tokenName: token.name }));
+                }
             }
         }
     }
