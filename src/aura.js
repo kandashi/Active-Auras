@@ -20,7 +20,7 @@ class ActiveAuras {
         const sceneCombat = game.combats.filter(c => c.scene?.id === sceneID)
         if (game.settings.get("ActiveAuras", "combatOnly") && !sceneCombat[0]?.started) {
             if (AAdebug) { console.warn("Active Auras not active when not in combat") }
-            return;w
+            return;
         }
         if (sceneID !== canvas.id) return ui.notifications.warn("An update was called on a non viewed scene, auras will be updated when you return to that scene")
 
@@ -122,7 +122,7 @@ class ActiveAuras {
     static UpdateToken(map, canvasToken, tokenId) {
         if (canvasToken.data.flags['multilevel-tokens']) return;
         if (canvasToken.actor === null) return;
-        if (canvasToken.actor.data.type == "vehicle") return
+        if (canvasToken.actor.data.type == "vehicle") return;
         let tokenAlignment;
         if (game.system.id === "dnd5e" || game.system.id === "sw5e") {
             try {
@@ -132,32 +132,47 @@ class ActiveAuras {
             }
         }
         const MapKey = canvasToken.scene.id;
-        let MapObject = AuraMap.get(MapKey)
+        let MapObject = AuraMap.get(MapKey);
         let checkEffects = MapObject.effects;
         //Check for other types of X aura if the aura token is moved
         if (tokenId && canvasToken.id !== tokenId) {
-            checkEffects = checkEffects.filter(i => i.entityId === tokenId)
-            let duplicateEffect = []
+            checkEffects = checkEffects.filter(i => i.entityId === tokenId);
+            let duplicateEffect = [];
             checkEffects.forEach(e => duplicateEffect = (MapObject.effects.filter(i => (i.data?.label === e.data?.label) && i.entityId !== tokenId)));
-            checkEffects = checkEffects.concat(duplicateEffect)
+            checkEffects = checkEffects.concat(duplicateEffect);
         }
 
         for (const auraEffect of checkEffects) {
-            const auraTargets = auraEffect.data.flags?.ActiveAuras?.aura
+            const auraTargets = auraEffect.data.flags?.ActiveAuras?.aura;
 
             const { radius, height, hostile, wildcard, extra } = auraEffect.data.flags?.ActiveAuras;
             let { type, alignment } = auraEffect.data.flags?.ActiveAuras;
-            const { parentActorLink, parentActorId } = auraEffect
+            const { parentActorLink, parentActorId } = auraEffect;
             type = type !== undefined ? type.toLowerCase() : "";
-            alignment = alignment !== undefined ? alignment.toLowerCase() : "";
-            if (alignment && !tokenAlignment.includes(alignment) && !tokenAlignment.includes("any")) continue; // cleaned up alignment check and moved here. 
+            if (alignment !== undefined && (alignment?.gne !== undefined || alignment?.lnc !== undefined)) {
+                let gne = alignment?.gne !== undefined ? alignment?.gne.toLowerCase() : '';
+                let lnc = alignment?.lnc !== undefined ? alignment?.lnc.toLowerCase() : '';
+                if (gne === '' && lnc === '') {
+                    alignment = "[a-z ]+";
+                }
+                else if (gne === 'neutral' && lnc === 'neutral') {
+                    alignment = '((true|neutral) )?neutral';
+                }
+                else if (gne === 'neutral' && lnc === '') {
+                    alignment = '((lawful|neutral|chaotic|true) )?neutral';
+                }
+                else if (lnc === 'neutral' && gne === '') {
+                    alignment = '((true )?neutral|neutral (good|neutral|evil))';
+                }
+                else {
+                    alignment = `${lnc !== '' ? lnc : '(lawful|neutral|chaotic)'} ${gne !== '' ? gne : '(good|neutral|evil)'}`;
+                }
+            } else {
+                alignment = "[a-z ]+";
+            }
+            if (alignment && !tokenAlignment.match(new RegExp(`^${alignment}$`)) && !tokenAlignment.includes("any")) continue;
 
             let auraEntity, distance;
-            /*
-            let auraType = auraEffect.data.flags?.ActiveAuras?.type !== undefined ? auraEffect.data.flags?.ActiveAuras?.type.toLowerCase() : "";
-            let auraAlignment = auraEffect.data.flags?.ActiveAuras?.alignment !== undefined ? auraEffect.data.flags?.ActiveAuras?.alignment.toLowerCase() : "";
-            let hostileTurn = auraEffect.data.flags?.ActiveAuras?.hostile
-            */
             const auraEntityType = auraEffect.entityType
 
             switch (auraEntityType) {
