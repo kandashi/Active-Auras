@@ -17,21 +17,26 @@ Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
     const AuraTab = game.i18n.format("ACTIVEAURAS.tabname");
     const FormCheckHeight = game.i18n.format("ACTIVEAURAS.FORM_Height");
     const FormCheckAlignment = game.i18n.format("ACTIVEAURAS.FORM_Alignment");
-    const FormCheckType = game.i18n.format("ACTIVEAURAS.FORM_Type")
-    const FormGood = game.i18n.format("ACTIVEAURAS.FORM_Good")
-    const FormNeutral = game.i18n.format("ACTIVEAURAS.FORM_Neutral")
-    const FormEvil = game.i18n.format("ACTIVEAURAS.FORM_Evil")
-    const FormTypePrompt = game.i18n.format("ACTIVEAURAS.FORM_TypePrompt")
-    const FormRadiusPrompt = game.i18n.format("ACTIVEAURAS.FORM_RadiusPrompt")
-    const HostileTurn = game.i18n.format("ACTIVEAURAS.FORM_HostileTurn")
-    const ActivateOnce = game.i18n.format("ACTIVEAURAS.FORM_ActivateOnce")
-    const Wildcard = game.i18n.format("ACTIVEAURAS.FORM_Wildcard")
-    const Extra = game.i18n.format("ACTIVEAURAS.FORM_Extra")
+    const FormCheckType = game.i18n.format("ACTIVEAURAS.FORM_Type");
+    const FormAny = game.i18n.format("ACTIVEAURAS.FORM_Any");
+    const FormGood = game.i18n.format("ACTIVEAURAS.FORM_Good");
+    const FormNeutral = game.i18n.format("ACTIVEAURAS.FORM_Neutral");
+    const FormEvil = game.i18n.format("ACTIVEAURAS.FORM_Evil");
+    const FormLawful = game.i18n.format("ACTIVEAURAS.FORM_Lawful");
+    const FormChaotic = game.i18n.format("ACTIVEAURAS.FORM_Chaotic");
+    const FormTypePrompt = game.i18n.format("ACTIVEAURAS.FORM_TypePrompt");
+    const FormRadiusPrompt = game.i18n.format("ACTIVEAURAS.FORM_RadiusPrompt");
+    const HostileTurn = game.i18n.format("ACTIVEAURAS.FORM_HostileTurn");
+    const ActivateOnce = game.i18n.format("ACTIVEAURAS.FORM_ActivateOnce");
+    const Wildcard = game.i18n.format("ACTIVEAURAS.FORM_Wildcard");
+    const Extra = game.i18n.format("ACTIVEAURAS.FORM_Extra");
 
 
     const tab = `<a class="item" data-tab="ActiveAuras"><i class="fas fa-broadcast-tower"></i> ${AuraTab}</a>`;
     let type = flags[AA_MODULE_NAME]?.type ? flags[AA_MODULE_NAME]?.type : "";
-    let alignment = flags[AA_MODULE_NAME]?.alignment ? flags[AA_MODULE_NAME]?.alignment : "";
+    let alignment = flags[AA_MODULE_NAME]?.alignment ? flags[AA_MODULE_NAME]?.alignment : {};
+    let gne_alignment = alignment?.gne ? alignment?.gne : "";
+    let lnc_alignment = alignment?.lnc ? alignment?.lnc : "";
 
     let contents = `
         <div class="tab" data-tab="ActiveAuras">
@@ -43,9 +48,9 @@ Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
                     <label>${FormTargetsName}:</label>
                     <select name="flags.${AA_MODULE_NAME}.aura" data-dtype="String" value=${flags[AA_MODULE_NAME]?.aura}>
                         <option value="None" ${flags[AA_MODULE_NAME]?.aura === 'None' ? 'selected' : ''}></option>
-                        <option value="Enemy"${flags[AA_MODULE_NAME]?.aura === 'Enemy' ? 'selected' : ''}>${FormTargetsEnemy}</option>
-                        <option value="Allies"${flags[AA_MODULE_NAME]?.aura === 'Allies' ? 'selected' : ''}>${FormTargetsAllies}</option>
-                        <option value="All"${flags[AA_MODULE_NAME]?.aura === 'All' ? 'selected' : ''}>${FormTargetsAll}</option>
+                        <option value="Enemy" ${flags[AA_MODULE_NAME]?.aura === 'Enemy' ? 'selected' : ''}>${FormTargetsEnemy}</option>
+                        <option value="Allies" ${flags[AA_MODULE_NAME]?.aura === 'Allies' ? 'selected' : ''}>${FormTargetsAllies}</option>
+                        <option value="All" ${flags[AA_MODULE_NAME]?.aura === 'All' ? 'selected' : ''}>${FormTargetsAll}</option>
                     </select>
                 </div>          
             <div id="specifics">
@@ -55,11 +60,17 @@ Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
                 </div>            
                 <div class="form-group">
                     <label>${FormCheckAlignment}:</label>
-                    <select name="flags.${AA_MODULE_NAME}.alignment" data-dtype="String" value=${alignment}>
-                        <option value="" ${flags[AA_MODULE_NAME]?.alignment === '' ? 'selected' : ''}></option>
-                        <option value="good"${flags[AA_MODULE_NAME]?.alignment === 'good' ? 'selected' : ''}>${FormGood}</option>
-                        <option value="neutral"${flags[AA_MODULE_NAME]?.alignment === 'neutral' ? 'selected' : ''}>${FormNeutral}</option>
-                        <option value="evil"${flags[AA_MODULE_NAME]?.alignment === 'evil' ? 'selected' : ''}>${FormEvil}</option>
+                    <select name="flags.${AA_MODULE_NAME}.alignment.gne" data-dtype="String" value=${gne_alignment}>
+                        <option value="" ${gne_alignment === '' ? 'selected' : ''}>${FormAny}</option>
+                        <option value="good" ${gne_alignment === 'good' ? 'selected' : ''}>${FormGood}</option>
+                        <option value="neutral" ${gne_alignment === 'neutral' ? 'selected' : ''}>${FormNeutral}</option>
+                        <option value="evil" ${gne_alignment === 'evil' ? 'selected' : ''}>${FormEvil}</option>
+                    </select>
+                    <select name="flags.${AA_MODULE_NAME}.alignment.lnc" data-dtype="String" value=${lnc_alignment}>
+                        <option value="" ${lnc_alignment === '' ? 'selected' : ''}>${FormAny}</option>
+                        <option value="lawful" ${lnc_alignment === 'lawful' ? 'selected' : ''}>${FormLawful}</option>
+                        <option value="neutral" ${lnc_alignment === 'neutral' ? 'selected' : ''}>${FormNeutral}</option>
+                        <option value="chaotic" ${lnc_alignment === 'chaotic' ? 'selected' : ''}>${FormChaotic}</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -114,12 +125,16 @@ Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
         </div>`;
 
     html.find(".tabs .item").last().after(tab);
-    if (!flags[AA_MODULE_NAME]?.applied) html.find(".tab").last().after(contents);
-    else html.find(".tab").last().after(appliedAuraContent);
+    if (!flags[AA_MODULE_NAME]?.applied) {
+        html.find(".tab").last().after(contents);
+    }
+    else {
+        html.find(".tab").last().after(appliedAuraContent);
+    }
 
-    let $isAura = html.find(`input[name="flags.${AA_MODULE_NAME}.isAura"]`)
-    let $specifics = html.find(`#specifics`)
-    let $targets = html.find(`select[name="flags.${AA_MODULE_NAME}.aura"]`)
+    let $isAura = html.find(`input[name="flags.${AA_MODULE_NAME}.isAura"]`);
+    let $specifics = html.find(`#specifics`);
+    let $targets = html.find(`select[name="flags.${AA_MODULE_NAME}.aura"]`);
 
 
     $isAura.on("change", function () {
@@ -130,12 +145,12 @@ Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
                 break;
             case false:
                 $targets.closest(".form-group").hide(500);
-                $specifics.hide(500)
+                $specifics.hide(500);
                 break;
         }
         html.css({ height: "auto" });
         $targets.trigger("change")
-    })
+    });
     $targets.on("change", function () {
         const targets = $(this).val();
 
@@ -148,7 +163,7 @@ Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
             }
         }
         html.css({ height: "auto" });
-    })
+    });
     $isAura.trigger("change");
     html.css({ height: "auto" });
 });
