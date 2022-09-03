@@ -211,7 +211,7 @@ class ActiveAuras {
                         if (!AAhelpers.CheckType(canvasToken, type)) continue
                     }
                     if (hostile && canvasToken.data._id !== game.combats.active.current.tokenId) return;
-                    const shape = DrawingShape(auraEntity.data)
+                    const shape = getDrawingShape(auraEntity.data)
                     distance = AAmeasure.inAura(canvasToken, auraEntity, game.settings.get("ActiveAuras", "wall-block"), height, radius, shape)
                 }
                     break;
