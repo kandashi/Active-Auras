@@ -1,15 +1,18 @@
 {
-  "name": "ActiveAuras",
+  "id": "ActiveAuras",
   "title": "Active-Auras",
   "description": "Active-Auras",
-  "author": "Kandashi",
-  "authors": [],
+  "authors": [{
+    "name": "Kandashi"
+  }],
   "url": "https://github.com/kandashi/Active-Auras",
   "bugs": "https://github.com/kandashi/Active-Auras/issues",
   "flags": {},
   "version": "0.4.0",
-  "minimumCoreVersion": "9",
-  "compatibleCoreVersion": "9.242",
+  "compatibility": {
+    "minimum": 10,
+    "verified": 10
+  },
   "scripts": [
     "src/aura.js",
     "src/AAhelpers.js",
@@ -57,7 +60,7 @@
       "name": "Active Auras Auras",
       "label": "Active Auras Auras",
       "path": "packs/AuraItems",
-      "entity": "Item",
+      "type": "Item",
       "module": "ActiveAuras",
       "private": false,
       "system" : "dnd5e"
@@ -66,7 +69,7 @@
       "name": "Active Auras Zone Actors",
       "label": "Active Auras Zone Actors",
       "path": "packs/ZoneActors",
-      "entity": "Actor",
+      "type": "Actor",
       "system": "dnd5e",
       "module": "ActiveAuras",
       "private": false
@@ -75,20 +78,21 @@
       "name": "Active Auras Macros",
       "label": "Active Auras Macros",
       "path": "packs/macros",
-      "entity": "Macro",
+      "type": "Macro",
       "module": "ActiveAuras",
       "private": false
     }
   ],
-  "dependencies" : [
-    {
-      "name": "socketlib",
-      "manifest": "https://raw.githubusercontent.com/manuelVo/foundryvtt-socketlib/master/module.json"
-    },
-    {
-      "name": "lib-wrapper"
-  }
-  ],
+  "relationships": {
+    "requires" : [
+      {
+        "id": "socketlib"
+      },
+      {
+        "id": "lib-wrapper"
+      }
+    ]
+  },
   "socket": true,
   "manifest": "https://raw.githubusercontent.com/kandashi/Active-Auras/main/module.json",
   "download": "https://github.com/kandashi/Active-Auras/archive/main.zip",
