@@ -30,7 +30,7 @@ class ActiveAuras {
 
         if (movedToken !== undefined) {
             if (AAhelpers.IsAuraToken(movedToken.id, sceneID)) {
-                auraTokenId = movedToken.data._id
+                auraTokenId = movedToken.id
             }
             else if (getProperty(movedToken, "flags.token-attacher")) {
                 if (AAdebug) console.log("ActiveAuras: token attacher movement")
@@ -120,13 +120,13 @@ class ActiveAuras {
      * @param {Token} canvasToken - single token to test
      */
     static UpdateToken(map, canvasToken, tokenId) {
-        if (canvasToken.data.flags['multilevel-tokens']) return;
+        if (canvasToken.document.flags['multilevel-tokens']) return;
         if (canvasToken.actor === null) return;
-        if (canvasToken.actor.data.type == "vehicle") return
+        if (canvasToken.actor.type == "vehicle") return
         let tokenAlignment;
         if (game.system.id === "dnd5e" || game.system.id === "sw5e") {
             try {
-                tokenAlignment = canvasToken.actor?.data.data.details.alignment.toLowerCase();
+                tokenAlignment = canvasToken.actor?.system.details.alignment.toLowerCase();
             } catch (error) {
                 console.error([`ActiveAuras: the token has an unreadable alignment`, canvasToken])
             }
@@ -175,11 +175,11 @@ class ActiveAuras {
 
                     if (auraEntity.id === canvasToken.id) continue;
 
-                    if (!AAhelpers.DispositionCheck(auraTargets, auraEntity.data.disposition, canvasToken.data.disposition)) continue;
+                    if (!AAhelpers.DispositionCheck(auraTargets, auraEntity.document.disposition, canvasToken.document.disposition)) continue;
                     if (type) {
                         if (!AAhelpers.CheckType(canvasToken, type)) continue
                     }
-                    if (hostile && canvasToken.data._id !== game.combats.active?.current.tokenId) continue;
+                    if (hostile && canvasToken.id !== game.combats.active?.current.tokenId) continue;
 
                     if (game.system.id === "swade") {
                         if (!AAhelpers.Wildcard(canvasToken, wildcard, extra)) continue
@@ -194,9 +194,9 @@ class ActiveAuras {
                     if (type) {
                         if (!AAhelpers.CheckType(canvasToken, type)) continue
                     }
-                    if (hostile && canvasToken.data._id !== game.combats.active.current.tokenId) return;
+                    if (hostile && canvasToken.id !== game.combats.active.current.tokenId) return;
                     if (auraEffect.casterDisposition) {
-                        if (!AAhelpers.DispositionCheck(auraTargets, auraEffect.casterDisposition, canvasToken.data.disposition)) continue;
+                        if (!AAhelpers.DispositionCheck(auraTargets, auraEffect.casterDisposition, canvasToken.disposition)) continue;
                     }
                     const shape = getTemplateShape(auraEntity)
                     let templateDetails = auraEntity
@@ -210,7 +210,7 @@ class ActiveAuras {
                     if (type) {
                         if (!AAhelpers.CheckType(canvasToken, type)) continue
                     }
-                    if (hostile && canvasToken.data._id !== game.combats.active.current.tokenId) return;
+                    if (hostile && canvasToken.id !== game.combats.active.current.tokenId) return;
                     const shape = DrawingShape(auraEntity.data)
                     distance = AAmeasure.inAura(canvasToken, auraEntity, game.settings.get("ActiveAuras", "wall-block"), height, radius, shape)
                 }
@@ -228,7 +228,7 @@ class ActiveAuras {
                     map.set(MapKey, { add: true, token: canvasToken, effect: auraEffect })
                 }
             }
-            else if (!MapObject?.add && canvasToken.document.actor?.effects.contents.some(e => e.data.origin === auraEffect.data.origin && e.data.label === auraEffect.data.label)) {
+            else if (!MapObject?.add && canvasToken.document.actor?.effects.contents.some(e => e.origin === auraEffect.data.origin && e.label === auraEffect.data.label)) {
                 if (MapObject) {
                     MapObject.add = false
                 }
@@ -248,17 +248,17 @@ class ActiveAuras {
     static async CreateActiveEffect(tokenID, oldEffectData) {
         const token = canvas.tokens.get(tokenID)
 
-        const duplicateEffect = token.document.actor.effects.contents.find(e => e.data.origin === oldEffectData.origin && e.data.label === oldEffectData.label)
-        if (getProperty(duplicateEffect, "data.flags.ActiveAuras.isAura")) return;
+        const duplicateEffect = token.document.actor.effects.contents.find(e => e.origin === oldEffectData.origin && e.label === oldEffectData.label)
+        if (getProperty(duplicateEffect, "flags.ActiveAuras.isAura")) return;
         if (duplicateEffect) {
-            if (duplicateEffect.data.origin === oldEffectData.origin) return;
-            if (JSON.stringify(duplicateEffect.data.changes) === JSON.stringify(oldEffectData.changes)) return;
+            if (duplicateEffect.origin === oldEffectData.origin) return;
+            if (JSON.stringify(duplicateEffect.changes) === JSON.stringify(oldEffectData.changes)) return;
             else await ActiveAuras.RemoveActiveEffects(tokenID, oldEffectData.origin)
         }
         let effectData = duplicate(oldEffectData)
         if (effectData.flags.ActiveAuras.onlyOnce) {
             const AAID = oldEffectData.origin.replaceAll(".", "")
-            if (token.data.flags.ActiveAuras?.[AAID]) return;
+            if (token.document.flags.ActiveAuras?.[AAID]) return;
             else await token.document.setFlag("ActiveAuras", AAID, true)
         }
         if (effectData.flags.ActiveAuras?.isMacro) {
@@ -276,7 +276,7 @@ class ActiveAuras {
                             }
                             else if (typeof val === "string" && val.includes("@token")) {
                                 let re = /([\s]*@token)/gms
-                                return val.replaceAll(re, ` ${token.data._id}`)
+                                return val.replaceAll(re, ` ${token.id}`)
                             }
                             return val;
                         });
@@ -307,7 +307,7 @@ class ActiveAuras {
     static async RemoveActiveEffects(tokenID, effectOrigin) {
         const token = canvas.tokens.get(tokenID)
         for (const tokenEffects of token.actor.effects) {
-            if (tokenEffects.data.origin === effectOrigin && tokenEffects.data.flags?.ActiveAuras?.applied === true) {
+            if (tokenEffects.origin === effectOrigin && tokenEffects.flags?.ActiveAuras?.applied === true) {
                 await token.actor.deleteEmbeddedDocuments("ActiveEffect", [tokenEffects.id])
                 console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: effectOrigin, tokenName: token.name }))
 
