@@ -250,7 +250,7 @@ class AAhelpers {
     }
 
     static async removeAurasOnToken(token){
-        if(!token.document.actorLink) return
+        if(!token.actorLink) return
         let auras = token.actor.effects.filter(i => i.flags?.["ActiveAuras"]?.applied).map(i => i.id)
         if(!auras) return
         await token.actor.deleteEmbeddedDocuments("ActiveEffect", auras)
