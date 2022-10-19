@@ -14,10 +14,10 @@ class AAmeasure {
         if (!AAmeasure.boundingCheck(target, source, radius)) return false;
         const auraPoly = shape
         if (AAdebug && shape) {
-            canvas.foreground.children.find(i => i.inAura)?.destroy()
+            canvas.layers.find((l) => l.name === "DrawingsLayer").children.find(i => i.inAura)?.destroy()
             let g = new PIXI.Graphics()
             g.beginFill(0, 0.2).drawShape(shape)
-            let aura = canvas.foreground.addChild(g)
+            let aura = canvas.layers.find((l) => l.name === "DrawingsLayer").addChild(g)
             aura.inAura = true
         }
 
@@ -41,12 +41,12 @@ class AAmeasure {
                 { x: target.x + (target.document.width * gs) - g2, y: target.y + (target.document.height * gs) - g2, collides: false }
             ]
         if (AAdebug) {
-            canvas.foreground.children.filter(i => i.squares)?.forEach(i => i.destroy())
+            canvas.layers.find((l) => l.name === "DrawingsLayer").children.filter(i => i.squares)?.forEach(i => i.destroy())
             function drawSquare(point) {
                 let {x, y} = point
                 let g = new PIXI.Graphics()
                 g.beginFill(0xFF0000, 0.2).drawRect(x-5, y-5, 10, 10)
-                let aura = canvas.foreground.addChild(g)
+                let aura = canvas.layers.find((l) => l.name === "DrawingsLayer").addChild(g)
                 aura.squares = true
             }
             sourceCorners.forEach(i => drawSquare(i))
@@ -164,10 +164,10 @@ class AAmeasure {
         const yMax = t2.y + rad + t2.h + (size * t1.document.height)
         const yMin = t2.y - rad - (size * t1.document.height)
         if (AAdebug) {
-            canvas.foreground.children.find(i => i.boundingCheck)?.destroy()
+            canvas.layers.find((l) => l.name === "DrawingsLayer").children.find(i => i.boundingCheck)?.destroy()
             let g = new PIXI.Graphics()
             g.beginFill(0, 0.1).drawRect(xMin, yMin, (xMax - xMin), (yMax - yMin))
-            let check = canvas.foreground.addChild(g)
+            let check = canvas.layers.find((l) => l.name === "DrawingsLayer").addChild(g)
             check.boundingCheck = true
         }
         return !(t1.x < xMin || t1.x > xMax || t1.y > yMax || t1.y < yMin);
