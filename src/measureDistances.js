@@ -21,24 +21,24 @@ class AAmeasure {
             aura.inAura = true
         }
 
-        let sourceCorners = source.data.height === 1 && source.data.width === 1 ?
+        let sourceCorners = source.document.height === 1 && source.document.width === 1 ?
             [{ x: source.center.x, y: source.center.y }] :
             [
                 { x: source.center.x, y: source.center.y },
-                { x: source.data.x + g2, y: source.data.y + g2 },
-                { x: source.data.x + (source.data.width * gs) - g2, y: source.data.y + g2 },
-                { x: source.data.x + g2, y: source.data.y + (source.data.height * gs) - g2 },
-                { x: source.data.x + (source.data.width * gs) - g2, y: source.data.y + (source.data.height * gs) - g2 }
+                { x: source.x + g2, y: source.y + g2 },
+                { x: source.x + (source.document.width * gs) - g2, y: source.y + g2 },
+                { x: source.x + g2, y: source.y + (source.document.height * gs) - g2 },
+                { x: source.x + (source.document.width * gs) - g2, y: source.y + (source.document.height * gs) - g2 }
             ]
 
-        let targetCorners = target.data.height === 1 && target.data.width === 1 ?
+        let targetCorners = target.document.height === 1 && target.document.width === 1 ?
             [{ x: target.center.x, y: target.center.y, collides: false }] :
             [
                 { x: target.center.x, y: target.center.y, collides: false },
-                { x: target.data.x + g2, y: target.data.y + g2, collides: false },
-                { x: target.data.x + (target.data.width * gs) - g2, y: target.data.y + g2, collides: false },
-                { x: target.data.x + g2, y: target.data.y + (target.data.height * gs) - g2, collides: false },
-                { x: target.data.x + (target.data.width * gs) - g2, y: target.data.y + (target.data.height * gs) - g2, collides: false }
+                { x: target.x + g2, y: target.y + g2, collides: false },
+                { x: target.x + (target.document.width * gs) - g2, y: target.y + g2, collides: false },
+                { x: target.x + g2, y: target.y + (target.document.height * gs) - g2, collides: false },
+                { x: target.x + (target.document.width * gs) - g2, y: target.y + (target.document.height * gs) - g2, collides: false }
             ]
         if (AAdebug) {
             canvas.foreground.children.filter(i => i.squares)?.forEach(i => i.destroy())
@@ -62,7 +62,7 @@ class AAmeasure {
                     let collision;
                     if (game.modules.get("levels")?.active) {
 
-                        collision = _levels.testCollision({ x: t.x, y: t.y, z: target.data.elevation }, { x: s.x, y: s.y, z: source.data.elevation ?? source.data.flags?.levels?.elevation }, "collision")
+                        collision = _levels.testCollision({ x: t.x, y: t.y, z: target.document.elevation }, { x: s.x, y: s.y, z: source.document.elevation ?? source.flags?.levels?.elevation }, "collision")
                     }
                     else {
                         collision = canvas.walls.checkCollision(r)
@@ -135,13 +135,13 @@ class AAmeasure {
         let distance;
         switch (game.settings.get("ActiveAuras", "vertical-euclidean")) {
             case true: {
-                distance = Math.abs(source.data.elevation - target.data.elevation)
+                distance = Math.abs(source.document.elevation - target.document.elevation)
             }
                 break;
             case false: {
                 let g = canvas.dimensions
                 let a = r.distance / g.size * g.distance;
-                let b = (source.data.elevation - target.data.elevation)
+                let b = (source.document.elevation - target.document.elevation)
                 let c = (a * a) + (b * b)
                 distance = Math.sqrt(c)
             }
@@ -159,10 +159,10 @@ class AAmeasure {
     static boundingCheck(t1, t2, radius) {
         let { size, distance } = canvas.dimensions
         let rad = (radius / distance) * size
-        const xMax = t2.data.x + rad + t2.w + (size * t1.data.width)
-        const xMin = t2.data.x - rad - (size * t1.data.width)
-        const yMax = t2.data.y + rad + t2.h + (size * t1.data.height)
-        const yMin = t2.data.y - rad - (size * t1.data.height)
+        const xMax = t2.x + rad + t2.w + (size * t1.document.width)
+        const xMin = t2.x - rad - (size * t1.document.width)
+        const yMax = t2.y + rad + t2.h + (size * t1.document.height)
+        const yMin = t2.y - rad - (size * t1.document.height)
         if (AAdebug) {
             canvas.foreground.children.find(i => i.boundingCheck)?.destroy()
             let g = new PIXI.Graphics()
@@ -170,7 +170,7 @@ class AAmeasure {
             let check = canvas.foreground.addChild(g)
             check.boundingCheck = true
         }
-        return !(t1.data.x < xMin || t1.data.x > xMax || t1.data.y > yMax || t1.data.y < yMin);
+        return !(t1.x < xMin || t1.x > xMax || t1.y > yMax || t1.y < yMin);
     }
 
 

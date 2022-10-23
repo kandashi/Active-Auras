@@ -3,12 +3,12 @@ function getTemplateShape(template) {
     let d = canvas.dimensions;
 
     // Extract and prepare data
-    let {direction, distance, angle, width} = template.data;
+    let {direction, distance, angle, width} = template.document;
     distance *= (d.size / d.distance);
     width *= (d.size / d.distance);
     direction = Math.toRadians(direction);
     let shape;
-    switch (template.data.t) {
+    switch (template.document.t) {
         case "circle":
             shape = template._getCircleShape( distance);
             break;
@@ -21,8 +21,8 @@ function getTemplateShape(template) {
         case "ray":
             shape = template._getRayShape( direction, distance, width);
     }
-    shape.x = template.data.x
-    shape.y = template.data.y
+    shape.x = template.x
+    shape.y = template.y
     return shape
 }
 
@@ -30,12 +30,12 @@ function getAuraShape(source, radius) {
     const gs = canvas.dimensions.size
     const gd = gs / canvas.dimensions.distance
     if(game.settings.get(game.system.id, "diagonalMovement") === "555") return new PIXI.Rectangle(
-        source.data.x - (radius * gd),
-        source.data.y - (radius * gd),
-        (radius * gd)*2 + source.data.width *gs,
-        (radius * gd)*2 + source.data.height *gs,
+        source.x - (radius * gd),
+        source.y - (radius * gd),
+        (radius * gd)*2 + source.document.width *gs,
+        (radius * gd)*2 + source.document.height *gs,
     ) 
-    return new PIXI.Circle(source.center.x, source.center.y, ((radius * gd) + (source.data.width / 2 * gs)))
+    return new PIXI.Circle(source.center.x, source.center.y, ((radius * gd) + (source.document.width / 2 * gs)))
 }
 
 function PixiFromPolygon(data) {

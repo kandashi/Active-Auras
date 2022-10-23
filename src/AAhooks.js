@@ -29,11 +29,11 @@ Hooks.on("createToken", (token) => {
     if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (!AAgm) return;
     try {
-        if (getProperty(token, "data.flags.multilevel-tokens")) return;
+        if (getProperty(token, "flags.multilevel-tokens")) return
         for (let effect of token.actor.effects?.contents) {
-            if (effect.data.flags.ActiveAuras?.isAura) {
-                if (AAdebug) console.log("createToken, collate auras true false");
-                debouncedCollate(canvas.scene.id, true, false, "createToken");
+            if (effect.flags.ActiveAuras?.isAura) {
+                if (AAdebug) console.log("createToken, collate auras true false")
+                debouncedCollate(canvas.scene.id, true, false, "createToken")
                 break;
             }
         }
@@ -96,7 +96,7 @@ Hooks.on("updateToken", async (token, update, _flags, _id) => {
 Hooks.on("updateActiveEffect", (effect, _update) => {
     if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (!AAgm) return;
-    if (effect.data.flags?.ActiveAuras?.isAura) {
+    if (effect.flags?.ActiveAuras?.isAura) {
         if (AAdebug) console.log("updateAE, collate auras true true");
         debouncedCollate(canvas.scene.id, true, true, "updateActiveEffect");
     }
@@ -108,8 +108,8 @@ Hooks.on("updateActiveEffect", (effect, _update) => {
 Hooks.on("deleteActiveEffect", (effect) => {
     if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (!AAgm) return;
-    let applyStatus = effect.data.flags?.ActiveAuras?.applied;
-    let auraStatus = effect.data.flags?.ActiveAuras?.isAura;
+    let applyStatus = effect.flags?.ActiveAuras?.applied;
+    let auraStatus = effect.flags?.ActiveAuras?.isAura;
     if (!applyStatus && auraStatus) {
         if (AAdebug) console.log("deleteAE, collate auras true false");
         debouncedCollate(canvas.scene.id, false, true, "deleteActiveEffect");
@@ -122,7 +122,7 @@ Hooks.on("deleteActiveEffect", (effect) => {
 Hooks.on("createActiveEffect", (effect) => {
     if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (!AAgm) return;
-    if (!effect.data.flags?.ActiveAuras?.applied && effect.data.flags?.ActiveAuras?.isAura) {
+    if (!effect.flags?.ActiveAuras?.applied && effect.flags?.ActiveAuras?.isAura) {
         if (AAdebug) console.log("deleteAE, collate auras true false");
         debouncedCollate(canvas.scene.id, true, false, "createActiveEffect");
     }
@@ -139,15 +139,15 @@ Hooks.on("preUpdateActor", (actor, update) => {
     if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (AAhelpers.HPCheck(actor)) {
         const activeTokens = actor.getActiveTokens();
-        if (activeTokens.length > 0 && AAhelpers.IsAuraToken(activeTokens[0].data._id, canvas.id)) {
-            if (AAdebug) console.log("0hp, collate auras true true");
+        if (activeTokens.length > 0 && AAhelpers.IsAuraToken(activeTokens[0].id, canvas.id)) {
+            if (AAdebug) console.log("0hp, collate auras true true")
             Hooks.once("updateActor", (a, b) => {
                 if (!AAgm) return;
                 debouncedCollate(canvas.scene.id, true, true, "updateActor, dead");
             })
         }
     }
-    if (actor.data.data?.attributes?.hp?.value === 0 && update?.data?.attributes?.hp?.value > 0) {
+    if (actor.system?.attributes?.hp?.value === 0 && update?.system?.attributes?.hp?.value > 0) {
         Hooks.once("updateActor", (a, b) => {
             if (!AAgm) return;
             debouncedCollate(canvas.scene.id, true, false, "updateActor, revived");
@@ -178,8 +178,8 @@ Hooks.on("deleteCombat", (combat) => {
 
 Hooks.on("deleteCombatant", (combatant) => {
     if (!AAgm) return;
-    if (AAhelpers.IsAuraToken(combatant.data.tokenId, combatant.parent.scene.id)) {
-        AAhelpers.ExtractAuraById(combatant.data.tokenId, combatant.parent.scene.id)
+    if (AAhelpers.IsAuraToken(combatant.tokenId, combatant.parent.scene.id)) {
+        AAhelpers.ExtractAuraById(combatant.tokenId, combatant.parent.scene.id)
     }
 });
 

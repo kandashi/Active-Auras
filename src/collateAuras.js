@@ -18,16 +18,16 @@ async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
         //Skips over null actor tokens
         if (testToken.actor === null || testToken.actor === undefined) continue;
         //Skips over MLT coppied tokens
-        if (testToken.data.flags["multilevel-tokens"]) continue
+        if (testToken.flags["multilevel-tokens"]) continue
 
         if (!AAhelpers.HPCheck(testToken) && game.settings.get("ActiveAuras", "dead-aura")) {
             if (AAdebug) console.log(`Skipping ${testToken.name}, 0hp`)
             continue
         }
         for (let testEffect of testToken?.actor?.effects.contents) {
-            if (testEffect.data.flags?.ActiveAuras?.isAura) {
-                if (testEffect.data.disabled) continue;
-                let newEffect = { data: duplicate(testEffect.data), parentActorLink: testEffect.parent.data.token.actorLink, parentActorId: testEffect.parent.id, entityType: "token", entityId: testToken.id }
+            if (testEffect.flags?.ActiveAuras?.isAura) {
+                if (testEffect.disabled) continue;
+                let newEffect = { data: duplicate(testEffect), parentActorLink: testEffect.parent.prototypeToken.actorLink, parentActorId: testEffect.parent.id, entityType: "token", entityId: testToken.id }
                 let re = /@[\w\.]+/g
                 let rollData = testToken.actor.getRollData()
 
@@ -51,7 +51,7 @@ async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
                 newEffect.data.flags.ActiveAuras.applied = true;
                 newEffect.data.flags.ActiveAuras.isMacro = macro;
                 newEffect.data.flags.ActiveAuras.ignoreSelf = false;
-                if (testEffect.data.flags.ActiveAuras?.hidden && testToken.data.hidden) newEffect.data.flags.ActiveAuras.Paused = true;
+                if (testEffect.flags.ActiveAuras?.hidden && testToken.hidden) newEffect.data.flags.ActiveAuras.Paused = true;
                 else newEffect.data.flags.ActiveAuras.Paused = false;
                 effectArray.push(newEffect)
             }
@@ -78,7 +78,7 @@ async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
 }
 
 function RetrieveTemplateAuras(effectArray) {
-    let auraTemplates = canvas.templates.placeables.filter(i => i.data.flags?.ActiveAuras?.IsAura !== undefined)
+    let auraTemplates = canvas.templates.placeables.filter(i => i.flags?.ActiveAuras?.IsAura !== undefined)
 
     for (let template of auraTemplates) {
         for (let testEffect of template.data.flags?.ActiveAuras?.IsAura) {
@@ -113,7 +113,7 @@ function RetrieveTemplateAuras(effectArray) {
 
 function RetrieveDrawingAuras(effectArray) {
     if (!effectArray) effectArray = AuraMap.get(canvas.scene._id)?.effects;
-    let auraDrawings = canvas.drawings.placeables.filter(i => i.data.flags?.ActiveAuras?.IsAura !== undefined)
+    let auraDrawings = canvas.drawings.placeables.filter(i => i.flags?.ActiveAuras?.IsAura !== undefined)
 
     for (let drawing of auraDrawings) {
         for (let testEffect of drawing.data.flags?.ActiveAuras?.IsAura) {
