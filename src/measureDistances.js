@@ -79,19 +79,19 @@ class AAmeasure {
     }
 
     static isTokenInside(templateDetails, token, wallsBlockTargeting = false) {
-        const grid = canvas?.scene?.data.grid;
+        const grid = canvas?.scene?.grid;
         if (!grid)
             return false;
         const templatePos = { x: templateDetails.x, y: templateDetails.y };
         // Check for center of  each square the token uses.
         // e.g. for large tokens all 4 squares
-        const startX = token.data.width >= 1 ? 0.5 : (token.data.width / 2);
-        const startY = token.data.height >= 1 ? 0.5 : (token.data.height / 2);
-        for (let x = startX; x < token.data.width; x++) {
-            for (let y = startY; y < token.data.height; y++) {
+        const startX = token.width >= 1 ? 0.5 : (token.width / 2);
+        const startY = token.height >= 1 ? 0.5 : (token.height / 2);
+        for (let x = startX; x < token.width; x++) {
+            for (let y = startY; y < token.height; y++) {
                 const currGrid = {
-                    x: token.data.x + x * grid - templatePos.x,
-                    y: token.data.y + y * grid - templatePos.y,
+                    x: token.x + x * grid - templatePos.x,
+                    y: token.y + y * grid - templatePos.y,
                 };
                 let contains = templateDetails.shape?.contains(currGrid.x, currGrid.y);
                 if (contains && wallsBlockTargeting) {
@@ -121,12 +121,11 @@ class AAmeasure {
                         //@ts-ignore
                     }*/
                     
-                        contains = !canvas?.walls?.checkCollision(r);
+                    contains = !canvas?.walls?.checkCollision(r);
                     
                 }
                 // Check the distance from origin.
-                if (contains)
-                    return true;
+                if (contains) return true;
             }
         }
         return false;
