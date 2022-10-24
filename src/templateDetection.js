@@ -53,7 +53,7 @@ function PixiFromRect(data) {
     return new PIXI.Rectangle(x, y, width, height)
 }
 
-function DrawingShape(data) {
+function getDrawingShape(data) {
     let shape;
     switch (data.type) {
         case CONST.DRAWING_TYPES.RECTANGLE : shape = PixiFromRect(data);
