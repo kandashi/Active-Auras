@@ -78,10 +78,10 @@ async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
 }
 
 function RetrieveTemplateAuras(effectArray) {
-    let auraTemplates = canvas.templates.placeables.filter(i => i.flags?.ActiveAuras?.IsAura !== undefined)
+    let auraTemplates = canvas.templates.placeables.filter(i => i.document.flags?.ActiveAuras?.IsAura !== undefined)
 
     for (let template of auraTemplates) {
-        for (let testEffect of template.data.flags?.ActiveAuras?.IsAura) {
+        for (let testEffect of template.document.flags?.ActiveAuras?.IsAura) {
             if (testEffect.disabled) continue;
             let newEffect = duplicate(testEffect)
             const parts = testEffect.data.origin.split(".")
@@ -113,10 +113,10 @@ function RetrieveTemplateAuras(effectArray) {
 
 function RetrieveDrawingAuras(effectArray) {
     if (!effectArray) effectArray = AuraMap.get(canvas.scene._id)?.effects;
-    let auraDrawings = canvas.drawings.placeables.filter(i => i.flags?.ActiveAuras?.IsAura !== undefined)
+    let auraDrawings = canvas.drawings.placeables.filter(i => i.document.flags?.ActiveAuras?.IsAura !== undefined)
 
     for (let drawing of auraDrawings) {
-        for (let testEffect of drawing.data.flags?.ActiveAuras?.IsAura) {
+        for (let testEffect of drawing.document.flags?.ActiveAuras?.IsAura) {
             if (testEffect.disabled) continue;
             let newEffect = { data: duplicate(testEffect), parentActorId: false, parentActorLink: false, entityType: "drawing", entityId: drawing.id, }
             const parts = testEffect.origin.split(".")

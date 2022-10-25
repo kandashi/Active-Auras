@@ -234,7 +234,7 @@ class AAhelpers {
             };
         }
         let template = canvas.templates.get(args[0].templateId)
-        let disposition = args[0].actor.token.disposition
+        let disposition = args[0].actor.prototypeToken.disposition
         let effects = args[0].item.effects
         let templateEffectData = []
         for (let effect of effects) {
