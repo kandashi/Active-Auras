@@ -33,7 +33,7 @@ async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
 
                 for (const change of newEffect.data.changes) {
                     if (typeof change.value !== "string") continue
-                    const s = change.value
+                    let s = change.value
                     for (const match of s.match(re) || []) {
                         if (s.includes("@@")) {
                             s = s.replace(match, match.slice(1))
