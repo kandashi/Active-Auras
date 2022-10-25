@@ -259,7 +259,7 @@ class AAhelpers {
             data.data.origin = `Actor.${args[0].actor._id}.Item.${args[0].item._id}`;
             templateEffectData.push(data);
         }
-        console.log("Applying template effect", templateEffectData);
+        if (AAdebug) console.log("Applying template effect", templateEffectData);
         await template.document.setFlag("ActiveAuras", "IsAura", templateEffectData);
         AAhelpers.UserCollateAuras(canvas.scene.id, true, false, "spellCast");
         return { haltEffectsApplication: true };

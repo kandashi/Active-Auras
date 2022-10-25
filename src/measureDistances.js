@@ -79,19 +79,19 @@ class AAmeasure {
     }
 
     static isTokenInside(templateDetails, token, wallsBlockTargeting = false) {
-        const grid = canvas?.scene?.grid;
+        const grid = canvas?.scene?.grid?.size;
         if (!grid)
             return false;
         const templatePos = { x: templateDetails.x, y: templateDetails.y };
         // Check for center of  each square the token uses.
         // e.g. for large tokens all 4 squares
-        const startX = token.width >= 1 ? 0.5 : (token.width / 2);
-        const startY = token.height >= 1 ? 0.5 : (token.height / 2);
-        for (let x = startX; x < token.width; x++) {
-            for (let y = startY; y < token.height; y++) {
+        const startX = token.document.width >= 1 ? 0.5 : (token.document.width / 2);
+        const startY = token.document.height >= 1 ? 0.5 : (token.document.height / 2);
+        for (let x = startX; x < token.document.width; x++) {
+            for (let y = startY; y < token.document.height; y++) {
                 const currGrid = {
-                    x: token.x + x * grid - templatePos.x,
-                    y: token.y + y * grid - templatePos.y,
+                    x: token.document.x + x * grid - templatePos.x,
+                    y: token.document.y + y * grid - templatePos.y,
                 };
                 let contains = templateDetails.shape?.contains(currGrid.x, currGrid.y);
                 if (contains && wallsBlockTargeting) {
