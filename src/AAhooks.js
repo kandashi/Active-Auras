@@ -1,3 +1,12 @@
+// DEBUG function to disable animate on tokens
+// Hooks.on("preUpdateToken", (tokenDoc, update, options) => {
+//     const x = foundry.utils.hasProperty(update, "x");
+//     const y = foundry.utils.hasProperty(update, "y");
+//     if ( !x && !y ) return;
+//     console.warn(options)
+//     foundry.utils.setProperty(options, "animate", false);
+// });
+
 Hooks.once('ready', () => {
     if (!game.modules.get('lib-wrapper')?.active && game.user.isGM)
         ui.notifications.error("Module XYZ requires the 'libWrapper' module. Please install and activate it.");
@@ -68,26 +77,38 @@ Hooks.on("preDeleteToken", async (token) => {
     AAhelpers.removeAurasOnToken(token);
 });
 
+
 /**
  * On token movement run MainAura
  */
 Hooks.on("updateToken", async (token, update, _flags, _id) => {
+    if (AAdebug) console.warn("updateTokenHookArgs", {token, update, _flags, _id});
     if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (!AAgm) return;
     if (("y" in update || "x" in update || "elevation" in update)) {
         // we need to wait for the movement to finish due to the animation in v10, listen to refresh hook
-        const moveHookId = Hooks.on("refreshToken", async (rToken) => {
-            if (rToken.id !== token.id
-                || ("x" in update && rToken.x !== update.x)
-                || ("y" in update && rToken.y !== update.y)
-                || ("elevation" in update && rToken.document.elevation !== update.elevation)
-            ) return;
-            Hooks.off("refreshToken", moveHookId);
+
+        async function movementUpdate() {
             let MapObject = AuraMap.get(token.parent.id);
             if (!MapObject || MapObject?.effects.length < 1) return;
             if (AAdebug) console.log("movement, main aura");
             await ActiveAuras.MainAura(token, "movement update", token.parent.id);
-        })
+        };
+
+        if(_flags.animate === false) {
+            movementUpdate();
+        } else {
+            const moveHookId = Hooks.on("refreshToken", async (rToken) => {
+                if (rToken.id !== token.id
+                    || ("x" in update && rToken.x !== update.x)
+                    || ("y" in update && rToken.y !== update.y)
+                    || ("elevation" in update && rToken.document.elevation !== update.elevation)
+                ) return;
+                Hooks.off("refreshToken", moveHookId);
+                movementUpdate();
+            })
+            movementUpdate();
+        }
     }
     else if ("hidden" in update && AAhelpers.IsAuraToken(token.id, token.parent.id)) {
         if (AAdebug) console.log("hidden, collate auras true true");
