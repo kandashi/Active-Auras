@@ -14,23 +14,23 @@ class ActiveAuras {
         let perfStart;
         let perfEnd;
         if (AAdebug) { perfStart = performance.now() }
-        if (typeof movedToken?.documentName !== "string") movedToken = movedToken?.document ?? undefined
+        if (typeof movedToken?.documentName !== "string") movedToken = movedToken?.document ?? undefined;
         if (AAdebug) { console.log(source) }
         if (!AAgm) return;
-        const sceneCombat = game.combats.filter(c => c.scene?.id === sceneID)
+        const sceneCombat = game.combats.filter(c => c.scene?.id === sceneID);
         if (game.settings.get("ActiveAuras", "combatOnly") && !sceneCombat[0]?.started) {
             if (AAdebug) { console.warn("Active Auras not active when not in combat") }
-            return;w
+            return;
         }
         if (sceneID !== canvas.id) return ui.notifications.warn("An update was called on a non viewed scene, auras will be updated when you return to that scene")
 
         let map = new Map();
-        let updateTokens = canvas.tokens.placeables
+        let updateTokens = canvas.tokens.placeables;
         let auraTokenId;
 
         if (movedToken !== undefined) {
             if (AAhelpers.IsAuraToken(movedToken.id, sceneID)) {
-                auraTokenId = movedToken.id
+                auraTokenId = movedToken.id;
             }
             else if (getProperty(movedToken, "flags.token-attacher")) {
                 if (AAdebug) console.log("ActiveAuras: token attacher movement")
@@ -39,21 +39,19 @@ class ActiveAuras {
                 updateTokens = [canvas.tokens.get(movedToken.id)];
             }
         }
-        map = ActiveAuras.UpdateAllTokens(map, updateTokens, auraTokenId)
+        map = ActiveAuras.UpdateAllTokens(map, updateTokens, auraTokenId);
         if (AAdebug) {
-            perfEnd = performance.now()
-            console.log(`Active Auras Find Auras took ${perfEnd - perfStart} ms, FPS:${Math.round(canvas.app.ticker.FPS)}`)
+            perfEnd = performance.now();
+            console.log(`Active Auras Find Auras took ${perfEnd - perfStart} ms, FPS:${Math.round(canvas.app.ticker.FPS)}`);
         }
 
         for (const mapEffect of map) {
-            const MapKey = mapEffect[0]
-            map.set(MapKey, { add: mapEffect[1].add, token: mapEffect[1].token, effect: mapEffect[1].effect.data })
+            const MapKey = mapEffect[0];
+            map.set(MapKey, { add: mapEffect[1].add, token: mapEffect[1].token, effect: mapEffect[1].effect.data });
         }
         if (AAdebug) console.log(map)
 
-
-
-        map.forEach(compareMap)
+        map.forEach(compareMap);
 
         /**
          * 
@@ -72,15 +70,15 @@ class ActiveAuras {
                     for (let e = 0; e < m[1].effect.changes.length; e++) {
                         if (typeof (parseInt(m[1].effect.changes[e].value)) !== "number") continue;
                         const oldEffectValue = parseInt(value.effect.changes[e].value);
-                        const newEffectValue = parseInt(m[1].effect.changes[e].value)
+                        const newEffectValue = parseInt(m[1].effect.changes[e].value);
                         if (oldEffectValue < newEffectValue) {
-                            map1.delete(key)
+                            map1.delete(key);
                         }
                     }
                 }
 
                 else if ((m[1].effect.label === value.effect.label) && (m[1].add === true || value.add === true) && (m[1].token.id === value.token.id)) {
-                    if (value.add === false) map.delete(key)
+                    if (value.add === false) map.delete(key);
                 }
             }
 
@@ -88,15 +86,15 @@ class ActiveAuras {
 
         for (const update of map) {
             if (update[1].add) {
-                await ActiveAuras.CreateActiveEffect(update[1].token.id, update[1].effect)
+                await ActiveAuras.CreateActiveEffect(update[1].token.id, update[1].effect);
             }
             else {
-                await ActiveAuras.RemoveActiveEffects(update[1].token.id, update[1].effect.origin)
+                await ActiveAuras.RemoveActiveEffects(update[1].token.id, update[1].effect.origin);
             }
         }
         if (AAdebug) {
-            perfEnd = performance.now()
-            console.log(`Active Auras Main Function took ${perfEnd - perfStart} ms, FPS:${Math.round(canvas.app.ticker.FPS)}`)
+            perfEnd = performance.now();
+            console.log(`Active Auras Main Function took ${perfEnd - perfStart} ms, FPS:${Math.round(canvas.app.ticker.FPS)}`);
         }
     }
 
@@ -108,9 +106,9 @@ class ActiveAuras {
          */
     static UpdateAllTokens(map, tokens, tokenId) {
         for (const canvasToken of tokens) {
-            ActiveAuras.UpdateToken(map, canvasToken, tokenId)
+            ActiveAuras.UpdateToken(map, canvasToken, tokenId);
         }
-        return map
+        return map;
     }
 
     /**
@@ -122,32 +120,32 @@ class ActiveAuras {
     static UpdateToken(map, canvasToken, tokenId) {
         if (canvasToken.document.flags['multilevel-tokens']) return;
         if (canvasToken.actor === null) return;
-        if (canvasToken.actor.type == "vehicle") return
+        if (canvasToken.actor.type == "vehicle") return;
         let tokenAlignment;
         if (game.system.id === "dnd5e" || game.system.id === "sw5e") {
             try {
                 tokenAlignment = canvasToken.actor?.system.details.alignment.toLowerCase();
             } catch (error) {
-                console.error([`ActiveAuras: the token has an unreadable alignment`, canvasToken])
+                console.error([`ActiveAuras: the token has an unreadable alignment`, canvasToken]);
             }
         }
         const MapKey = canvasToken.scene.id;
-        let MapObject = AuraMap.get(MapKey)
+        let MapObject = AuraMap.get(MapKey);
         let checkEffects = MapObject.effects;
         //Check for other types of X aura if the aura token is moved
         if (tokenId && canvasToken.id !== tokenId) {
-            checkEffects = checkEffects.filter(i => i.entityId === tokenId)
-            let duplicateEffect = []
+            checkEffects = checkEffects.filter(i => i.entityId === tokenId);
+            let duplicateEffect = [];
             checkEffects.forEach(e => duplicateEffect = (MapObject.effects.filter(i => (i.data?.label === e.data?.label) && i.entityId !== tokenId)));
-            checkEffects = checkEffects.concat(duplicateEffect)
+            checkEffects = checkEffects.concat(duplicateEffect);
         }
 
         for (const auraEffect of checkEffects) {
-            const auraTargets = auraEffect.data.flags?.ActiveAuras?.aura
+            const auraTargets = auraEffect.data.flags?.ActiveAuras?.aura;
 
             const { radius, height, hostile, wildcard, extra } = auraEffect.data.flags?.ActiveAuras;
             let { type, alignment } = auraEffect.data.flags?.ActiveAuras;
-            const { parentActorLink, parentActorId } = auraEffect
+            const { parentActorLink, parentActorId } = auraEffect;
             type = type !== undefined ? type.toLowerCase() : "";
             alignment = alignment !== undefined ? alignment.toLowerCase() : "";
             if (alignment && !tokenAlignment.includes(alignment) && !tokenAlignment.includes("any")) continue; // cleaned up alignment check and moved here. 
@@ -158,38 +156,38 @@ class ActiveAuras {
             let auraAlignment = auraEffect.data.flags?.ActiveAuras?.alignment !== undefined ? auraEffect.data.flags?.ActiveAuras?.alignment.toLowerCase() : "";
             let hostileTurn = auraEffect.data.flags?.ActiveAuras?.hostile
             */
-            const auraEntityType = auraEffect.entityType
+            const auraEntityType = auraEffect.entityType;
 
             switch (auraEntityType) {
                 //{data: testEffect.data, parentActorLink :testEffect.parent.data.token.actorLink, parentActorId : testEffect.parent._id, tokenId: testToken.id, templateId: template._id, }
                 case "token": {
                     if (parentActorLink) {
-                        const auraTokenArray = game.actors.get(parentActorId).getActiveTokens()
+                        const auraTokenArray = game.actors.get(parentActorId).getActiveTokens();
                         if (auraTokenArray.length > 1) {
-                            auraEntity = auraTokenArray[0]
-                            console.error("AA: Duplicate Linked Tokens detected, defaulting to first token.")
+                            auraEntity = auraTokenArray[0];
+                            console.error("AA: Duplicate Linked Tokens detected, defaulting to first token.");
                         }
-                        else auraEntity = auraTokenArray[0]
+                        else auraEntity = auraTokenArray[0];
                     }
-                    else auraEntity = canvas.tokens.get(auraEffect.entityId)
+                    else auraEntity = canvas.tokens.get(auraEffect.entityId);
 
                     if (auraEntity.id === canvasToken.id) continue;
 
                     if (!AAhelpers.DispositionCheck(auraTargets, auraEntity.document.disposition, canvasToken.document.disposition)) continue;
                     if (type) {
-                        if (!AAhelpers.CheckType(canvasToken, type)) continue
+                        if (!AAhelpers.CheckType(canvasToken, type)) continue;
                     }
                     if (hostile && canvasToken.id !== game.combats.active?.current.tokenId) continue;
 
                     if (game.system.id === "swade") {
-                        if (!AAhelpers.Wildcard(canvasToken, wildcard, extra)) continue
+                        if (!AAhelpers.Wildcard(canvasToken, wildcard, extra)) continue;
                     }
-                    const shape = getAuraShape(auraEntity, radius)
-                    distance = AAmeasure.inAura(canvasToken, auraEntity, game.settings.get("ActiveAuras", "wall-block"), height, radius, shape)
+                    const shape = getAuraShape(auraEntity, radius);
+                    distance = AAmeasure.inAura(canvasToken, auraEntity, game.settings.get("ActiveAuras", "wall-block"), height, radius, shape);
                 }
                     break;
                 case "template": {
-                    auraEntity = canvas.templates.get(auraEffect.entityId)
+                    auraEntity = canvas.templates.get(auraEffect.entityId);
 
                     if (type) {
                         if (!AAhelpers.CheckType(canvasToken, type)) continue
@@ -198,21 +196,21 @@ class ActiveAuras {
                     if (auraEffect.casterDisposition) {
                         if (!AAhelpers.DispositionCheck(auraTargets, auraEffect.casterDisposition, canvasToken.disposition)) continue;
                     }
-                    const shape = getTemplateShape(auraEntity)
-                    let templateDetails = auraEntity
+                    const shape = getTemplateShape(auraEntity);
+                    let templateDetails = auraEntity;
                     //templateDetails.shape = shape
                     distance = AAmeasure.isTokenInside(templateDetails, canvasToken, game.settings.get("ActiveAuras", "wall-block"));
                 }
                     break;
                 case "drawing": {
-                    auraEntity = canvas.drawings.get(auraEffect.entityId)
+                    auraEntity = canvas.drawings.get(auraEffect.entityId);
 
                     if (type) {
-                        if (!AAhelpers.CheckType(canvasToken, type)) continue
+                        if (!AAhelpers.CheckType(canvasToken, type)) continue;
                     }
                     if (hostile && canvasToken.id !== game.combats.active.current.tokenId) return;
                     const shape = getDrawingShape(auraEntity.data)
-                    distance = AAmeasure.inAura(canvasToken, auraEntity, game.settings.get("ActiveAuras", "wall-block"), height, radius, shape)
+                    distance = AAmeasure.inAura(canvasToken, auraEntity, game.settings.get("ActiveAuras", "wall-block"), height, radius, shape);
                 }
                     break;
             }
@@ -222,22 +220,22 @@ class ActiveAuras {
 
             if (distance && !auraEffect.data.flags?.ActiveAuras?.Paused) {
                 if (MapObject) {
-                    MapObject.add = true
+                    MapObject.add = true;
                 }
                 else {
-                    map.set(MapKey, { add: true, token: canvasToken, effect: auraEffect })
+                    map.set(MapKey, { add: true, token: canvasToken, effect: auraEffect });
                 }
             }
             else if (!MapObject?.add && canvasToken.document.actor?.effects.contents.some(e => e.origin === auraEffect.data.origin && e.label === auraEffect.data.label)) {
                 if (MapObject) {
-                    MapObject.add = false
+                    MapObject.add = false;
                 }
                 else {
-                    map.set(MapKey, { add: false, token: canvasToken, effect: auraEffect })
+                    map.set(MapKey, { add: false, token: canvasToken, effect: auraEffect });
                 }
             }
         }
-        return map
+        return map;
     }
 
     /**
@@ -246,9 +244,9 @@ class ActiveAuras {
         * @param {ActiveEffect} effectData - effect data to generate effect
         */
     static async CreateActiveEffect(tokenID, oldEffectData) {
-        const token = canvas.tokens.get(tokenID)
+        const token = canvas.tokens.get(tokenID);
 
-        const duplicateEffect = token.document.actor.effects.contents.find(e => e.origin === oldEffectData.origin && e.label === oldEffectData.label)
+        const duplicateEffect = token.document.actor.effects.contents.find(e => e.origin === oldEffectData.origin && e.label === oldEffectData.label);
         if (getProperty(duplicateEffect, "flags.ActiveAuras.isAura")) return;
         if (duplicateEffect) {
             if (duplicateEffect.origin === oldEffectData.origin) return;
@@ -257,9 +255,9 @@ class ActiveAuras {
         }
         let effectData = duplicate(oldEffectData)
         if (effectData.flags.ActiveAuras.onlyOnce) {
-            const AAID = oldEffectData.origin.replaceAll(".", "")
+            const AAID = oldEffectData.origin.replaceAll(".", "");
             if (token.document.flags.ActiveAuras?.[AAID]) return;
-            else await token.document.setFlag("ActiveAuras", AAID, true)
+            else await token.document.setFlag("ActiveAuras", AAID, true);
         }
         if (effectData.flags.ActiveAuras?.isMacro) {
             for (let [changeIndex, change] of effectData.changes.entries()) {
@@ -267,16 +265,16 @@ class ActiveAuras {
                 if (change.key === "macro.execute" || change.key === "macro.itemMacro") {
 
                     if (typeof newValue === "string") {
-                        newValue = [newValue]
+                        newValue = [newValue];
 
                         newValue = newValue.map(val => {
                             if (typeof val === "string" && val.includes("@@token")) {
-                                let re = /([\s]*@@token)/gms
-                                return val.replaceAll(re, ` @token`)
+                                let re = /([\s]*@@token)/gms;
+                                return val.replaceAll(re, ` @token`);
                             }
                             else if (typeof val === "string" && val.includes("@token")) {
-                                let re = /([\s]*@token)/gms
-                                return val.replaceAll(re, ` ${token.id}`)
+                                let re = /([\s]*@token)/gms;
+                                return val.replaceAll(re, ` ${token.id}`);
                             }
                             return val;
                         });
@@ -290,13 +288,13 @@ class ActiveAuras {
                 }
             }
         }
-        ['ignoreSelf', 'hidden', 'height', 'alignment', 'type', 'aura', 'radius', 'isAura', 'height'].forEach(e => delete effectData.flags.ActiveAuras[e])
+        ['ignoreSelf', 'hidden', 'height', 'alignment', 'type', 'aura', 'radius', 'isAura', 'height'].forEach(e => delete effectData.flags.ActiveAuras[e]);
         if (effectData.flags.ActiveAuras.time !== "None" && effectData.flags.ActiveAuras.time !== undefined && game.modules.get("dae")?.active) {
-            effectData.flags.dae?.specialDuration?.push(effectData.flags.ActiveAuras.time)
+            effectData.flags.dae?.specialDuration?.push(effectData.flags.ActiveAuras.time);
         }
 
         await token.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
-        console.log(game.i18n.format("ACTIVEAURAS.ApplyLog", { effectDataLabel: effectData.label, tokenName: token.name }))
+        console.log(game.i18n.format("ACTIVEAURAS.ApplyLog", { effectDataLabel: effectData.label, tokenName: token.name }));
     }
 
     /**

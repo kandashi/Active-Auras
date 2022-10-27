@@ -55,7 +55,7 @@ Hooks.on("updateCombat", async (combat, changed, options, userId) => {
     let previousCombatant = canvas.tokens.get(combat.previous.tokenId);
     await previousCombatant.document.update({ "flags.ActiveAuras": false });
     if (AAdebug) console.log("updateCombat, main aura");
-    await ActiveAuras.MainAura(combatant.data, "combat update", combatant.scene.id);
+    await ActiveAuras.MainAura(combatant.document, "combat update", combatant.scene.id);
 });
 
 Hooks.on("preDeleteToken", async (token) => {
@@ -75,10 +75,19 @@ Hooks.on("updateToken", async (token, update, _flags, _id) => {
     if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (!AAgm) return;
     if (("y" in update || "x" in update || "elevation" in update)) {
-        let MapObject = AuraMap.get(token.parent.id);
-        if (!MapObject || MapObject?.effects.length < 1) return;
-        if (AAdebug) console.log("movement, main aura");
-        await ActiveAuras.MainAura(token, "movement update", token.parent.id)
+        // we need to wait for the movement to finish due to the animation in v10, listen to refresh hook
+        const moveHookId = Hooks.on("refreshToken", async (rToken) => {
+            if (rToken.id !== token.id
+                || ("x" in update && rToken.x !== update.x)
+                || ("y" in update && rToken.y !== update.y)
+                || ("elevation" in update && rToken.document.elevation !== update.elevation)
+            ) return;
+            Hooks.off("refreshToken", moveHookId);
+            let MapObject = AuraMap.get(token.parent.id);
+            if (!MapObject || MapObject?.effects.length < 1) return;
+            if (AAdebug) console.log("movement, main aura");
+            await ActiveAuras.MainAura(token, "movement update", token.parent.id);
+        })
     }
     else if ("hidden" in update && AAhelpers.IsAuraToken(token.id, token.parent.id)) {
         if (AAdebug) console.log("hidden, collate auras true true");
