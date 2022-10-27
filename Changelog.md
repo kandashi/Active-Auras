@@ -79,3 +79,9 @@ Fixed/updated all compendium items so they contain the macro in an Item Macro, t
 ## 0.4.07
 Fixed for non-circular templates
 Fixes for duplicate DF CE effects as the name would not match the aura-name
+
+## 0.4.20
+
+v10 Support
+Walls will now block again
+Standardize on debounceCollate to help with state oscillation

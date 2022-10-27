@@ -57,14 +57,20 @@ class AAmeasure {
             if (!auraPoly.contains(t.x, t.y)) continue; // quick exit if not in the aura
 
             for (const s of sourceCorners) {
-                const r = new Ray(t, s)
+                const r = new Ray(t, s);
                 if (wallblocking) {
                     let collision;
                     if (game.modules.get("levels")?.active) {
-                        collision = _levels.testCollision({ x: t.x, y: t.y, z: target.document.elevation }, { x: s.x, y: s.y, z: source.document.elevation ?? source.flags?.levels?.elevation }, "collision");
+                        collision = _levels.testCollision(
+                            { x: t.x, y: t.y, z: target.document.elevation },
+                            { x: s.x, y: s.y, z: source.document.elevation ?? source.flags?.levels?.elevation },
+                            "collision"
+                        );
                     }
                     else {
-                        collision = canvas.walls.checkCollision(r);
+                        // collision blocked by sight or movement
+                        collision = canvas.walls.checkCollision(r, {mode: "any", type: "sight" })
+                            || canvas.walls.checkCollision(r, {mode: "any", type: "move" });
                     }
                     if (collision) continue;
                 }
