@@ -85,3 +85,7 @@ Fixes for duplicate DF CE effects as the name would not match the aura-name
 v10 Support
 Walls will now block again
 Standardize on debounceCollate to help with state oscillation
+
+# 0.4.21
+
+New settings to apply/remove aura effects from hidden actors (not invisible). Defaults to true.
