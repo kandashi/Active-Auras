@@ -8,44 +8,50 @@
  */
 async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
     if (!AAgm) return;
-    if (sceneID !== canvas.id) return ui.notifications.warn("Collate Auras called on a non viewed scene, auras will be updated when you return to that scene")
-    if (AAdebug) console.log(source)
+    if (sceneID !== canvas.id) return ui.notifications.warn("Collate Auras called on a non viewed scene, auras will be updated when you return to that scene");
+    if (AAdebug) console.log(source);
     const MapKey = sceneID;
     const MapObject = AuraMap.get(MapKey);
     const effectArray = [];
     for (const t of canvas.tokens.placeables) {
-        const testToken = t.document
+        const testToken = t.document;
         //Skips over null actor tokens
         if (testToken.actor === null || testToken.actor === undefined) continue;
         //Skips over MLT coppied tokens
-        if (testToken.flags["multilevel-tokens"]) continue
-
+        if (testToken.flags["multilevel-tokens"]) continue;
+        // applying auras on dead?
         if (!AAhelpers.HPCheck(testToken) && game.settings.get("ActiveAuras", "dead-aura")) {
-            if (AAdebug) console.log(`Skipping ${testToken.name}, 0hp`)
-            continue
+            if (AAdebug) console.log(`Skipping ${testToken.name}, 0hp`);
+            continue;
         }
+        // applying auras on hidden?
+        if (testToken.hidden && game.settings.get("ActiveAuras", "remove-hidden-auras")) {
+            if (AAdebug) console.log(`Skipping ${testToken.name}, hidden`);
+            continue;
+        }
+        // loop over effects
         for (const testEffect of testToken?.actor?.effects.contents) {
             if (testEffect.flags?.ActiveAuras?.isAura) {
                 if (testEffect.disabled) continue;
-                const newEffect = { data: duplicate(testEffect), parentActorLink: testEffect.parent.prototypeToken.actorLink, parentActorId: testEffect.parent.id, entityType: "token", entityId: testToken.id }
-                const re = /@[\w\.]+/g
-                const rollData = testToken.actor.getRollData()
+                const newEffect = { data: duplicate(testEffect), parentActorLink: testEffect.parent.prototypeToken.actorLink, parentActorId: testEffect.parent.id, entityType: "token", entityId: testToken.id };
+                const re = /@[\w\.]+/g;
+                const rollData = testToken.actor.getRollData();
 
                 for (const change of newEffect.data.changes) {
-                    if (typeof change.value !== "string") continue
-                    let s = change.value
+                    if (typeof change.value !== "string") continue;
+                    let s = change.value;
                     for (const match of s.match(re) || []) {
                         if (s.includes("@@")) {
-                            s = s.replace(match, match.slice(1))
+                            s = s.replace(match, match.slice(1));
                         }
                         else {
-                            s = s.replace(match, getProperty(rollData, match.slice(1)))
+                            s = s.replace(match, getProperty(rollData, match.slice(1)));
                         }
                     }
-                    change.value = s
-                    if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.data.flags.ActiveAuras.isMacro = true
+                    change.value = s;
+                    if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.data.flags.ActiveAuras.isMacro = true;
                 }
-                newEffect.data.disabled = false
+                newEffect.data.disabled = false;
                 const macro = newEffect.data.flags.ActiveAuras.isMacro !== undefined ? newEffect.data.flags.ActiveAuras.isMacro : false;
                 newEffect.data.flags.ActiveAuras.isAura = false;
                 newEffect.data.flags.ActiveAuras.applied = true;
@@ -53,21 +59,20 @@ async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
                 newEffect.data.flags.ActiveAuras.ignoreSelf = false;
                 if (testEffect.flags.ActiveAuras?.hidden && testToken.hidden) newEffect.data.flags.ActiveAuras.Paused = true;
                 else newEffect.data.flags.ActiveAuras.Paused = false;
-                effectArray.push(newEffect)
+                effectArray.push(newEffect);
             }
         }
     }
-    await RetrieveDrawingAuras(effectArray)
-    await RetrieveTemplateAuras(effectArray)
+    await RetrieveDrawingAuras(effectArray);
+    await RetrieveTemplateAuras(effectArray);
     if (MapObject) {
-        MapObject.effects = effectArray
+        MapObject.effects = effectArray;
     }
     else {
-        AuraMap.set(MapKey, { effects: effectArray })
+        AuraMap.set(MapKey, { effects: effectArray });
     }
 
-
-    if (AAdebug) console.log(AuraMap)
+    if (AAdebug) console.log("AuraMap", AuraMap);
 
     if (checkAuras) {
         ActiveAuras.MainAura(undefined, "Collate auras", canvas.id)

@@ -13,7 +13,17 @@ Hooks.once('ready', () => {
 });
 
 let AAgm;
+
+/**
+ * 
+ * @param {String} sceneID Scene to check upon
+ * @param {Boolean} checkAuras Can apply auras
+ * @param {Boolean} removeAuras Can remove auras
+ * @param {String} source For console logging
+ * @returns 
+ */
 const debouncedCollate = debounce((a, b, c, d) => CollateAuras(a, b, c, d), 200);
+
 Hooks.once("socketlib.ready", () => {
     AAsocket = socketlib.registerModule("ActiveAuras");
     AAsocket.register("userCollate", CollateAuras);
@@ -82,7 +92,7 @@ Hooks.on("preDeleteToken", async (token) => {
  * On token movement run MainAura
  */
 Hooks.on("updateToken", async (token, update, _flags, _id) => {
-    if (AAdebug) console.warn("updateTokenHookArgs", {token, update, _flags, _id});
+    if (AAdebug) console.log("updateTokenHookArgs", {token, update, _flags, _id});
     if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (!AAgm) return;
     if (("y" in update || "x" in update || "elevation" in update)) {
@@ -110,9 +120,10 @@ Hooks.on("updateToken", async (token, update, _flags, _id) => {
             movementUpdate();
         }
     }
-    else if ("hidden" in update && AAhelpers.IsAuraToken(token.id, token.parent.id)) {
-        if (AAdebug) console.log("hidden, collate auras true true");
-        debouncedCollate(canvas.scene, true, true, "updateToken");
+    // in v10 invisible is now a thing, so hidden is considered "not on scene"
+    else if (hasProperty(update, "hidden") && (!update.hidden || AAhelpers.IsAuraToken(token.id, token.parent.id))) {
+        if (AAdebug) console.log(`hidden, collate auras ${!update.hidden} ${update.hidden}`);
+        debouncedCollate(canvas.scene.id, !update.hidden, update.hidden, "updateToken, hidden");
     }
     else if (AAhelpers.IsAuraToken(token.id, token.parent.id) && AAhelpers.HPCheck(token)) {
         if (AAdebug) console.log("0hp, collate auras true true");

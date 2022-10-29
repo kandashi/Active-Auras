@@ -31,6 +31,14 @@ Hooks.on('init', () => {
         default: true,
         type: Boolean,
     });
+    game.settings.register("ActiveAuras", "remove-hidden-auras", {
+        name: game.i18n.format("ACTIVEAURAS.removeHiddenAuras"),
+        hint: game.i18n.format("ACTIVEAURAS.removeHiddenAurasHint"),
+        scope: "world",
+        config: true,
+        default: true,
+        type: Boolean,
+    });
     game.settings.register("ActiveAuras", "combatOnly", {
         name: game.i18n.format("ACTIVEAURAS.combatOnly"),
         hint: game.i18n.format("ACTIVEAURAS.combatHint"),

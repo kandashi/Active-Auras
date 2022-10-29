@@ -146,18 +146,19 @@ class AAhelpers {
 
     static ExtractAuraById(entityId, sceneID) {
         if (!AAgm) return;
-        let MapKey = sceneID;
-        let MapObject = AuraMap.get(MapKey);
-        let effectArray = MapObject.effects.filter(e => e.entityId !== entityId);
+        const MapKey = sceneID;
+        const MapObject = AuraMap.get(MapKey);
+        const effectArray = MapObject.effects.filter(e => e.entityId !== entityId);
         AuraMap.set(MapKey, { effects: effectArray });
         AAhelpers.RemoveAppliedAuras(canvas);
     }
 
     static async RemoveAppliedAuras() {
-        let EffectsArray = [];
-        let MapKey = canvas.scene.id;
-        let MapObject = AuraMap.get(MapKey);
-        MapObject.effects.forEach(i => EffectsArray.push(i.data.origin));
+        const MapKey = canvas.scene.id;
+        const MapObject = AuraMap.get(MapKey);
+        const EffectsArray = MapObject.effects.map(i => i.data.origin);
+
+        if (AAdebug) console.warn("RemoveAppliedAuras", { MapKey, MapObject, EffectsArray })
 
         for (let removeToken of canvas.tokens.placeables) {
             if (removeToken?.actor?.effects.size > 0) {
