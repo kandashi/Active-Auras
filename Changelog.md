@@ -89,3 +89,7 @@ Standardize on debounceCollate to help with state oscillation
 # 0.4.21
 
 New settings to apply/remove aura effects from hidden actors (not invisible). Defaults to true.
+
+# 0.4.22
+
+Duplicate macro removed.
