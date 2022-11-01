@@ -85,8 +85,7 @@ class AAmeasure {
 
     static isTokenInside(templateDetails, token, wallsBlockTargeting = false) {
         const grid = canvas?.scene?.grid?.size;
-        if (!grid)
-            return false;
+        if (!grid) return false;
         const templatePos = { x: templateDetails.x, y: templateDetails.y };
         // Check for center of  each square the token uses.
         // e.g. for large tokens all 4 squares
@@ -107,6 +106,8 @@ class AAmeasure {
                         ty = ty + templateDetails.shape.height / 2;
                     }
                     const r = new Ray({ x: tx, y: ty }, { x: currGrid.x + templatePos.x, y: currGrid.y + templatePos.y });
+
+                    console.warn("templateCheck", { templateDetails, token, contains, tx, ty, r })
                     /**if (wallsBlockTargeting && game.modules.get("levels")?.active) {
                         let p1 = {
                             x: currGrid.x + templatePos.x, y: currGrid.y + templatePos.y,
@@ -126,7 +127,9 @@ class AAmeasure {
                         //@ts-ignore
                     }*/
                     
-                    contains = !canvas?.walls?.checkCollision(r);
+                    // collision blocked by sight or movement
+                    contains = !canvas.walls.checkCollision(r, {mode: "any", type: "sight" })
+                        && !canvas.walls.checkCollision(r, {mode: "any", type: "move" });
                     
                 }
                 // Check the distance from origin.
