@@ -84,7 +84,7 @@ Hooks.on("updateToken", async (token, update, _flags, _id) => {
     else if ("hidden" in update && AAhelpers.IsAuraToken(token.id, token.parent.id)) {
         setTimeout(() => {
             if (AAdebug) console.log("hidden, collate auras true true")
-            CollateAuras(canvas.scene, true, true, "updateToken")
+            CollateAuras(canvas.scene.id, true, true, "updateToken")
         }, 20)
     }
     else if (AAhelpers.IsAuraToken(token.id, token.parent.id) && AAhelpers.HPCheck(token)) {
