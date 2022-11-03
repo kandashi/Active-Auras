@@ -40,7 +40,7 @@ async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
                 for (const change of newEffect.data.changes) {
                     if (typeof change.value !== "string") continue;
                     let s = change.value;
-                    for (const match of s.match(re) || []) {
+                    for (let match of s.match(re) || []) {
                         if (s.includes("@@")) {
                             s = s.replace(match, match.slice(1));
                         }
@@ -98,7 +98,7 @@ function RetrieveTemplateAuras(effectArray) {
             const re = /@[\w\.]+/g;
             for (const change of newEffect.data.changes) {
                 if (typeof change.value !== "string") continue;
-                const s = change.value;
+                let s = change.value;
                 for (const match of s.match(re) || []) s = s.replace(match, getProperty(rollData, match.slice(1)));
                 change.value = s;
                 if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.data.flags.ActiveAuras.isMacro = true;
@@ -132,8 +132,8 @@ function RetrieveDrawingAuras(effectArray) {
                 for (let change of newEffect.data.changes) {
                     if (typeof change.value !== "string") continue;
                     const re = /@[\w\.]+/g;
-                    const s = change.value;
-                    for (let match of s.match(re) || []) s = s.replace(match, getProperty(rollData, match.slice(1)));
+                    let s = change.value;
+                    for (const match of s.match(re) || []) s = s.replace(match, getProperty(rollData, match.slice(1)));
                     change.value = s;
                     if (change.key === "macro.execute" || change.key === "macro.itemMacro") newEffect.data.flags.ActiveAuras.isMacro = true;
                 }

@@ -94,3 +94,7 @@ New settings to apply/remove aura effects from hidden actors (not invisible). De
 
 Duplicate macro removed.
 Walls now block on templates again.
+
+# 0.4.23
+
+Some template auras would fail.
