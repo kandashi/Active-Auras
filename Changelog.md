@@ -98,3 +98,7 @@ Walls now block on templates again.
 # 0.4.23
 
 Some template auras would fail.
+
+# 0.4.24
+
+Handle cases of multiple GM's logged in.

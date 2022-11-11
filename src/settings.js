@@ -67,4 +67,10 @@ Hooks.on('init', () => {
         default: false,
         type: Boolean,
     });
+    game.settings.register("ActiveAuras", "ActiveGM", {
+        scope: "world",
+        config: false,
+        default: null,
+        type: String,
+    });
 });

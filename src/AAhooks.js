@@ -34,14 +34,24 @@ Hooks.on("init", () => {
     libWrapper.register("ActiveAuras", "ActiveEffect.prototype._displayScrollingStatus", AAhelpers.scrollingText, "WRAPPER");
 });
 
-Hooks.on("ready", () => {
+Hooks.on("ready", async () => {
+    if (game.settings.get("ActiveAuras", "debug")) AAdebug = true;
     if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
 
-    AAgm = game.user === game.users.find((u) => u.isGM && u.active);
+    // determine if this user is the active gm/first active in current session
+    if (game.user.isGM) {
+        const currentGMUser = game.users.get(game.settings.get("ActiveAuras", "ActiveGM"));
+        if ((currentGMUser && !currentGMUser.active) || !currentGMUser || currentGMUser.id === game.user.id) {
+            await game.settings.set("ActiveAuras", "ActiveGM", game.user.id);
+            AAgm = true;
+        } else {
+            AAgm = false;
+        }
+    } else {
+        AAgm = false;
+    }
+
     CollateAuras(canvas.id, true, false);
-
-    if (game.settings.get("ActiveAuras", "debug")) AAdebug = true
-
 });
 
 Hooks.on("createToken", (token) => {
@@ -106,7 +116,7 @@ Hooks.on("updateToken", async (token, update, _flags, _id) => {
         };
 
         if(_flags.animate === false) {
-            movementUpdate();
+            await movementUpdate();
         } else {
             const moveHookId = Hooks.on("refreshToken", async (rToken) => {
                 if (rToken.id !== token.id
@@ -115,17 +125,15 @@ Hooks.on("updateToken", async (token, update, _flags, _id) => {
                     || ("elevation" in update && rToken.document.elevation !== update.elevation)
                 ) return;
                 Hooks.off("refreshToken", moveHookId);
-                movementUpdate();
+                await movementUpdate();
             })
-            movementUpdate();
+            // await movementUpdate();
         }
-    }
-    // in v10 invisible is now a thing, so hidden is considered "not on scene"
-    else if (hasProperty(update, "hidden") && (!update.hidden || AAhelpers.IsAuraToken(token.id, token.parent.id))) {
+    } else if (hasProperty(update, "hidden") && (!update.hidden || AAhelpers.IsAuraToken(token.id, token.parent.id))) {
+        // in v10 invisible is now a thing, so hidden is considered "not on scene"
         if (AAdebug) console.log(`hidden, collate auras ${!update.hidden} ${update.hidden}`);
         debouncedCollate(canvas.scene.id, !update.hidden, update.hidden, "updateToken, hidden");
-    }
-    else if (AAhelpers.IsAuraToken(token.id, token.parent.id) && AAhelpers.HPCheck(token)) {
+    } else if (AAhelpers.IsAuraToken(token.id, token.parent.id) && AAhelpers.HPCheck(token)) {
         if (AAdebug) console.log("0hp, collate auras true true");
         debouncedCollate(canvas.scene.id, true, true, "updateToken, dead");
     }
