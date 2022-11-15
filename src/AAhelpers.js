@@ -9,7 +9,7 @@ class AAhelpers {
         {
             const scopes = SetupConfiguration.getPackageScopes();
             if (!scopes.includes(scope)) throw new Error(`Invalid scope`);
-            return getProperty(entity.data.flags, scope);
+            return getProperty(entity.flags, scope);
         }
     }
 
@@ -26,18 +26,18 @@ class AAhelpers {
         for (let effect of MapObject.effects) {
             if (effect.entityId === tokenID) return true;
         }
-        return false
+        return false;
     }
 
     static DispositionCheck(auraTargets, auraDis, tokenDis) {
         switch (auraTargets) {
             case "Allies": {
-                if (auraDis !== tokenDis) return false
-                else return true
+                if (auraDis !== tokenDis) return false;
+                else return true;
             }
             case "Enemy": {
-                if (auraDis === tokenDis) return false
-                else return true
+                if (auraDis === tokenDis) return false;
+                else return true;
             }
             case "All": return true;
         }
@@ -45,124 +45,130 @@ class AAhelpers {
 
     static CheckType(canvasToken, type) {
         switch (game.system.id) {
-            case ("dnd5e"): ;
-            case ("sw5e"): return AAhelpers.typeCheck5e(canvasToken, type)
-            case ("swade"): return AAhelpers.typeCheckSWADE(canvasToken, type);
+            case ("dnd5e"):
+            case ("sw5e"):
+                return AAhelpers.typeCheck5e(canvasToken, type);
+            case ("swade"):
+                return AAhelpers.typeCheckSWADE(canvasToken, type);
         }
     }
     static typeCheck5e(canvasToken, type) {
         let tokenType;
-        switch (canvasToken.actor.data.type) {
+        switch (canvasToken.actor.type) {
             case "npc": {
                 try {
-                    tokenType = [canvasToken.actor?.data.data.details.type.value, canvasToken.actor?.data.data.details.type.custom];
+                    tokenType = [canvasToken.actor?.system.details.type.value, canvasToken.actor?.system.details.type.custom];
                 } catch (error) {
-                    console.error([`ActiveAuras: the token has an unreadable type`, canvasToken])
+                    console.error([`ActiveAuras: the token has an unreadable type`, canvasToken]);
                 }
             }
                 break;
             case "character": {
                 try {
-                    if (game.system.data.name === "sw5e") {
-                        tokenType = canvasToken.actor?.data.data.details.species.toLowerCase();
+                    if (game.system.id === "sw5e") {
+                        tokenType = canvasToken.actor?.system.details.species.toLowerCase();
                     }
-                    else tokenType = [canvasToken.actor?.data.data.details.race.toLowerCase().replace("-", " ").split(" ")];
+                    else tokenType = [canvasToken.actor?.system.details.race.toLowerCase().replace("-", " ").split(" ")];
                 } catch (error) {
-                    console.error([`ActiveAuras: the token has an unreadable type`, canvasToken])
+                    console.error([`ActiveAuras: the token has an unreadable type`, canvasToken]);
                 }
             }
                 break;
             case "vehicle": return;
         };
         let humanoidRaces;
-        if (game.system.data.name === "sw5e") {
+        if (game.system.id === "sw5e") {
             humanoidRaces = ["abyssin", "aingtii", "aleena", "anzellan", "aqualish", "arcona", "ardennian", "arkanian", "balosar", "barabel", "baragwin", "besalisk", "bith", "bothan", "cathar", "cerean", "chadrafan", "chagrian", "chevin", "chironian", "chiss", "clawdite", "codruji", "colicoid", "dashade", "defel", "devoronian", "draethos", "dug", "duros", "echani", "eshkha", "ewok", "falleen", "felucian", "fleshraider", "gamorrean", "gand", "geonosian", "givin", "gotal", "gran", "gungan", "halfhuman", "harch", "herglic", "ho’din", "human", "hutt", "iktotchi", "ithorian", "jawa", "kage", "kaleesh", "kaminoan", "karkarodon", "keldor", "killik", "klatooinian", "kubaz", "kushiban", "kyuzo", "lannik", "lasat", "lurmen", "miraluka", "mirialan", "moncalamari", "mustafarian", "muun", "nautolan", "neimoidian", "noghri", "ortolan", "patrolian", "pau’an", "pa’lowick", "pyke", "quarren", "rakata", "rattataki", "rishii", "rodian", "ryn", "selkath", "shistavanen", "sithpureblood", "squib", "ssiruu", "sullustan", "talz", "tarasin", "thisspiasian", "togorian", "togruta", "toydarian", "trandoshan", "tusken", "twi'lek", "ugnaught", "umbaran", "verpine", "voss", "vurk", "weequay", "wookie", "yevetha", "zabrak", "zeltron", "zygerrian"];
         }
         else humanoidRaces = ["human", "orc", "elf", "tiefling", "gnome", "aaracokra", "dragonborn", "dwarf", "halfling", "leonin", "satyr", "genasi", "goliath", "aasimar", "bugbear", "firbolg", "goblin", "lizardfolk", "tabxi", "triton", "yuan-ti", "tortle", "changling", "kalashtar", "shifter", "warforged", "gith", "centaur", "loxodon", "minotaur", "simic hybrid", "vedalken", "verdan", "locathah", "grung"];
 
-        if (tokenType.includes(type)) return true
+        if (tokenType.includes(type)) return true;
 
         for (let x of tokenType) {
             if (humanoidRaces.includes(x)) {
-                tokenType = "humanoid"
+                tokenType = "humanoid";
                 continue;
             }
         }
         if (tokenType === type || tokenType === "any") return true;
-        return false
+        return false;
     }
 
     static typeCheckSWADE(canvasToken, type) {
         let tokenType;
-        switch (canvasToken.actor.data.type) {
+        switch (canvasToken.actor.type) {
             case "npc": {
                 try {
-                    tokenType = canvasToken.actor?.data.data.details.species.name.toLowerCase();
+                    tokenType = canvasToken.actor?.system.details.species.name.toLowerCase();
                 } catch (error) {
-                    console.error([`ActiveAuras: the token has an unreadable type`, canvasToken])
+                    console.error([`ActiveAuras: the token has an unreadable type`, canvasToken]);
                 }
             }
                 break;
             case "character": {
                 try {
-                    tokenType = canvasToken.actor?.data.data.details.species.name.toLowerCase();
+                    tokenType = canvasToken.actor?.system.details.species.name.toLowerCase();
                 } catch (error) {
-                    console.error([`ActiveAuras: the token has an unreadable type`, canvasToken])
+                    console.error([`ActiveAuras: the token has an unreadable type`, canvasToken]);
                 }
             }
                 break;
             case "vehicle": return;
         }
-        return tokenType === type
+        return tokenType === type;
     }
 
     static Wildcard(canvasToken, wildcard, extra) {
-        if (game.system.id !== "swade") return true
-        let Wild = canvasToken.actor.isWildcard
-        if (Wild && wildcard) return true
-        else if (!Wild && extra) return true
-        else return false
+        if (game.system.id !== "swade") return true;
+        let Wild = canvasToken.actor.isWildcard;
+        if (Wild && wildcard) return true;
+        else if (!Wild && extra) return true;
+        else return false;
     }
 
     static HPCheck(entity) {
-        let actor = entity.actor
-        if(entity.collectionName === "actors") actor = entity
+        let actor = entity.actor;
+        if(entity.collectionName === "actors") actor = entity;
         switch (game.system.id) {
             case "dnd5e": ;
             case "sw5e": {
-                if (getProperty(actor, "data.data.attributes.hp.max") === 0) return true
-                if (getProperty(actor, "data.data.attributes.hp.value") <= 0) return false
-                else return true
+                if (getProperty(actor, "system.attributes.hp.max") === 0) return true;
+                if (getProperty(actor, "system.attributes.hp.value") <= 0) return false;
+                else return true;
             }
             case "swade": {
-                let { max, value, ignored } = actor.data.data.wounds
-                if (value - ignored >= max) return false
-                else return true
+                let { max, value, ignored } = actor.system.wounds;
+                if (value - ignored >= max) return false;
+                else return true;
             }
         }
     }
 
     static ExtractAuraById(entityId, sceneID) {
         if (!AAgm) return;
-        let MapKey = sceneID;
-        let MapObject = AuraMap.get(MapKey);
-        let effectArray = MapObject.effects.filter(e => e.entityId !== entityId);
-        AuraMap.set(MapKey, { effects: effectArray })
-        AAhelpers.RemoveAppliedAuras(canvas)
+        const MapKey = sceneID;
+        const MapObject = AuraMap.get(MapKey);
+        const effectArray = MapObject.effects.filter(e => e.entityId !== entityId);
+        AuraMap.set(MapKey, { effects: effectArray });
+        AAhelpers.RemoveAppliedAuras(canvas);
     }
 
     static async RemoveAppliedAuras() {
-        let EffectsArray = [];
-        let MapKey = canvas.scene.id
-        let MapObject = AuraMap.get(MapKey)
-        MapObject.effects.forEach(i => EffectsArray.push(i.data.origin))
+        const MapKey = canvas.scene.id;
+        const MapObject = AuraMap.get(MapKey);
+        const EffectsArray = MapObject.effects.map(i => i.data.origin);
+
+        if (AAdebug) console.warn("RemoveAppliedAuras", { MapKey, MapObject, EffectsArray })
 
         for (let removeToken of canvas.tokens.placeables) {
             if (removeToken?.actor?.effects.size > 0) {
                 for (let testEffect of removeToken.actor.effects) {
-                    if (!EffectsArray.includes(testEffect.data.origin) && testEffect.data?.flags?.ActiveAuras?.applied) {
-                        await removeToken.actor.deleteEmbeddedDocuments("ActiveEffect", [testEffect.id])
-                        console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: testEffect.data.label, tokenName: removeToken.name }))
+                    if (!EffectsArray.includes(testEffect.origin) && testEffect?.flags?.ActiveAuras?.applied) {
+                        try {
+                            await removeToken.actor.deleteEmbeddedDocuments("ActiveEffect", [testEffect.id]);
+                        } finally {
+                            console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: testEffect.data.label, tokenName: removeToken.name }));
+                        }
                     }
                 }
             }
@@ -171,17 +177,20 @@ class AAhelpers {
     static async RemoveAllAppliedAuras() {
         for (let removeToken of canvas.tokens.placeables) {
             if (removeToken?.actor?.effects.size > 0) {
-                let effects = removeToken.actor.effects.reduce((a, v) => { if (v.data?.flags?.ActiveAuras?.applied) return a.concat(v.id) }, [])
-                await removeToken.actor.deleteEmbeddedDocuments("ActiveEffect", effects)
-                console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { tokenName: removeToken.name }))
+                let effects = removeToken.actor.effects.reduce((a, v) => { if (v?.flags?.ActiveAuras?.applied) return a.concat(v.id) }, []);
+                try {
+                    await removeToken.actor.deleteEmbeddedDocuments("ActiveEffect", effects);
+                } finally {
+                    console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { tokenName: removeToken.name }));
+                }
             }
         }
 
     }
 
     static UserCollateAuras(sceneID, checkAuras, removeAuras, source) {
-        let AAGM = game.users.find((u) => u.isGM && u.active)
-        AAsocket.executeAsUser("userCollate", AAGM.id, sceneID, checkAuras, removeAuras, source)
+        let AAGM = game.users.find((u) => u.isGM && u.active);
+        AAsocket.executeAsUser("userCollate", AAGM.id, sceneID, checkAuras, removeAuras, source);
     }
 
     /**
@@ -189,11 +198,11 @@ class AAhelpers {
      */
 
     static applyWrapper(wrapped, ...args) {
-        let actor = args[0]
-        let change = args[1]
-        if (change.effect.data.flags?.ActiveAuras?.ignoreSelf) {
-            console.log(game.i18n.format("ACTIVEAURAS.IgnoreSelfLog", { effectDataLabel: change.effect.data.label, changeKey: change.key, actorName: actor.name }));
-            args[1] = {}
+        let actor = args[0];
+        let change = args[1];
+        if (change.effect.flags?.ActiveAuras?.ignoreSelf) {
+            console.log(game.i18n.format("ACTIVEAURAS.IgnoreSelfLog", { effectDataLabel: change.effect.label, changeKey: change.key, actorName: actor.name }));
+            args[1] = {};
             return wrapped(...args);
         }
         return wrapped(...args)
@@ -201,7 +210,7 @@ class AAhelpers {
 
     static scrollingText(wrapped, ...args) {
         if (game.settings.get("ActiveAuras", "scrollingAura")) {
-          if (this.data.flags["ActiveAuras"]?.applied) {
+          if (this.flags["ActiveAuras"]?.applied) {
             Object.defineProperty(this, "isSuppressed", {
               get: () => {
                 if (new Error('').stack.includes("ActiveEffect5e._displayScrollingStatus")){
@@ -220,8 +229,8 @@ class AAhelpers {
 
     static async applyTemplate(args) {
 
-        let duration
-        const convertedDuration = globalThis.DAE.convertDuration(args[0].itemData.data.duration, true);
+        let duration;
+        const convertedDuration = globalThis.DAE.convertDuration(args[0].itemData.system.duration, true);
         if (convertedDuration?.type === "seconds") {
             duration = { seconds: convertedDuration.seconds, startTime: game.time.worldTime };
         }
@@ -233,26 +242,35 @@ class AAhelpers {
                 startTurn: game.combat?.turn
             };
         }
-        let template = canvas.templates.get(args[0].templateId)
-        let disposition = args[0].actor.token.disposition
-        let effects = args[0].item.effects
-        let templateEffectData = []
+        let template = canvas.templates.get(args[0].templateId);
+        let disposition = args[0].actor.token?.disposition ?? args[0].actor.prototypeToken?.disposition;
+        let effects = args[0].item.effects;
+        let templateEffectData = [];
         for (let effect of effects) {
-            let data = { data: duplicate(effect), parentActorId: false, parentActorLink: false, entityType: "template", entityId: template.id, casterDisposition: disposition, castLevel: args[0].spellLevel }
-            if (effect.flags["ActiveAuras"].displayTemp) { data.data.duration = duration }
-            data.data.origin = `Actor.${args[0].actor._id}.Item.${args[0].item._id}`
-            templateEffectData.push(data)
+            let data = {
+                data: duplicate(effect),
+                parentActorId: false,
+                parentActorLink: false,
+                entityType: "template",
+                entityId: template.id,
+                casterDisposition: disposition,
+                castLevel: args[0].spellLevel
+            };
+            if (effect.flags["ActiveAuras"].displayTemp) data.data.duration = duration;
+            data.data.origin = `Actor.${args[0].actor._id}.Item.${args[0].item._id}`;
+            templateEffectData.push(data);
         }
-        await template.document.setFlag("ActiveAuras", "IsAura", templateEffectData)
-        AAhelpers.UserCollateAuras(canvas.scene.id, true, false, "spellCast")
-        return { haltEffectsApplication: true }
+        if (AAdebug) console.log("Applying template effect", templateEffectData);
+        await template.document.setFlag("ActiveAuras", "IsAura", templateEffectData);
+        AAhelpers.UserCollateAuras(canvas.scene.id, true, false, "spellCast");
+        return { haltEffectsApplication: true };
 
     }
 
     static async removeAurasOnToken(token){
-        if(!token.data.actorLink) return
-        let auras = token.actor.effects.filter(i => i.data.flags?.["ActiveAuras"]?.applied).map(i => i.id)
-        if(!auras) return
-        await token.actor.deleteEmbeddedDocuments("ActiveEffect", auras)
+        if(!token.actorLink) return;
+        let auras = token.actor.effects.filter(i => i.flags?.["ActiveAuras"]?.applied).map(i => i.id);
+        if(!auras) return;
+        await token.actor.deleteEmbeddedDocuments("ActiveEffect", auras);
     }
 }

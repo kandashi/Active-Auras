@@ -4,7 +4,7 @@
  * Hooks onto effect sheet to add aura configuration
  */
 Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
-    const flags = sheet.object.data.flags ?? {};
+    const flags = sheet.object.flags ?? {};
     const FormIsAura = game.i18n.format("ACTIVEAURAS.FORM_IsAura");
     const FormIgnoreSelf = game.i18n.format("ACTIVEAURAS.FORM_IgnoreSelf");
     const FormHidden = game.i18n.format("ACTIVEAURAS.FORM_Hidden");

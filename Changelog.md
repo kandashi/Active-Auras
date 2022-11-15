@@ -79,3 +79,26 @@ Fixed/updated all compendium items so they contain the macro in an Item Macro, t
 ## 0.4.07
 Fixed for non-circular templates
 Fixes for duplicate DF CE effects as the name would not match the aura-name
+
+## 0.4.20
+
+v10 Support
+Walls will now block again
+Standardize on debounceCollate to help with state oscillation
+
+# 0.4.21
+
+New settings to apply/remove aura effects from hidden actors (not invisible). Defaults to true.
+
+# 0.4.22
+
+Duplicate macro removed.
+Walls now block on templates again.
+
+# 0.4.23
+
+Some template auras would fail.
+
+# 0.4.24
+
+Handle cases of multiple GM's logged in.
