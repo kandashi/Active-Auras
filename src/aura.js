@@ -13,9 +13,11 @@ class ActiveAuras {
     static async MainAura(movedToken, source, sceneID) {
         let perfStart;
         let perfEnd;
-        if (AAdebug) { perfStart = performance.now() }
+        if (AAdebug) { 
+            perfStart = performance.now();
+            console.log("MainAura Params", { movedToken, source, sceneID});
+        }
         if (typeof movedToken?.documentName !== "string") movedToken = movedToken?.document ?? undefined;
-        if (AAdebug) { console.log(source) }
         if (!AAgm) return;
         const sceneCombat = game.combats.filter(c => c.scene?.id === sceneID);
         if (game.settings.get("ActiveAuras", "combatOnly") && !sceneCombat[0]?.started) {
@@ -49,7 +51,7 @@ class ActiveAuras {
             const MapKey = mapEffect[0];
             map.set(MapKey, { add: mapEffect[1].add, token: mapEffect[1].token, effect: mapEffect[1].effect.data });
         }
-        if (AAdebug) console.log(map)
+        if (AAdebug) console.log("Active Aura Effect map", map);
 
         map.forEach(compareMap);
 
@@ -106,6 +108,7 @@ class ActiveAuras {
          */
     static UpdateAllTokens(map, tokens, tokenId) {
         for (const canvasToken of tokens) {
+            // if (AAdebug) console.log("Updating canvas token", {canvasToken, tokenId});
             ActiveAuras.UpdateToken(map, canvasToken, tokenId);
         }
         return map;
@@ -140,12 +143,13 @@ class ActiveAuras {
             checkEffects = checkEffects.concat(duplicateEffect);
         }
 
+        // if (AAdebug) console.log("ActiveAura UpdateToken Map details", { MapKey, MapObject, checkEffects, tokenAlignment})
+
         for (const auraEffect of checkEffects) {
             const auraTargets = auraEffect.data.flags?.ActiveAuras?.aura;
 
             const { radius, height, hostile, wildcard, extra } = auraEffect.data.flags?.ActiveAuras;
             let { type, alignment } = auraEffect.data.flags?.ActiveAuras;
-            const { parentActorLink, parentActorId } = auraEffect;
             type = type !== undefined ? type.toLowerCase() : "";
             alignment = alignment !== undefined ? alignment.toLowerCase() : "";
             if (alignment && !tokenAlignment.includes(alignment) && !tokenAlignment.includes("any")) continue; // cleaned up alignment check and moved here. 
@@ -156,13 +160,12 @@ class ActiveAuras {
             let auraAlignment = auraEffect.data.flags?.ActiveAuras?.alignment !== undefined ? auraEffect.data.flags?.ActiveAuras?.alignment.toLowerCase() : "";
             let hostileTurn = auraEffect.data.flags?.ActiveAuras?.hostile
             */
-            const auraEntityType = auraEffect.entityType;
 
-            switch (auraEntityType) {
+            switch (auraEffect.entityType) {
                 //{data: testEffect.data, parentActorLink :testEffect.parent.data.token.actorLink, parentActorId : testEffect.parent._id, tokenId: testToken.id, templateId: template._id, }
                 case "token": {
-                    if (parentActorLink) {
-                        const auraTokenArray = game.actors.get(parentActorId).getActiveTokens();
+                    if (auraEffect.parentActorLink) {
+                        const auraTokenArray = game.actors.get(auraEffect.parentActorId).getActiveTokens();
                         if (auraTokenArray.length > 1) {
                             auraEntity = auraTokenArray[0];
                             console.error("AA: Duplicate Linked Tokens detected, defaulting to first token.");
