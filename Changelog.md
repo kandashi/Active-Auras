@@ -102,3 +102,11 @@ Some template auras would fail.
 # 0.4.24
 
 Handle cases of multiple GM's logged in.
+
+# 0.5.0
+
+Official v10 Release
+
+# 0.5.1
+
+Would not work in SWADE due to a 5e assumption in the template shape detection algorithm.

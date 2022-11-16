@@ -21,7 +21,7 @@ async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
         if (testToken.flags["multilevel-tokens"]) continue;
         // applying auras on dead?
         if (!AAhelpers.HPCheck(testToken) && game.settings.get("ActiveAuras", "dead-aura")) {
-            if (AAdebug) console.log(`Skipping ${testToken.name}, 0hp`);
+            if (AAdebug) console.log(`Skipping ${testToken.name}, "DEAD/0hp"`);
             continue;
         }
         // applying auras on hidden?

@@ -128,18 +128,18 @@ class AAhelpers {
 
     static HPCheck(entity) {
         let actor = entity.actor;
-        if(entity.collectionName === "actors") actor = entity;
+        if (entity.collectionName === "actors") actor = entity;
         switch (game.system.id) {
             case "dnd5e": ;
             case "sw5e": {
-                if (getProperty(actor, "system.attributes.hp.max") === 0) return true;
+                if (getProperty(actor, "system.attributes.hp.max") === 0) return true; // dead
                 if (getProperty(actor, "system.attributes.hp.value") <= 0) return false;
-                else return true;
+                else return true; // dead
             }
             case "swade": {
                 let { max, value, ignored } = actor.system.wounds;
                 if (value - ignored >= max) return false;
-                else return true;
+                else return true; // dead
             }
         }
     }
