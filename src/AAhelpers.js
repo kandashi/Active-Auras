@@ -209,21 +209,13 @@ class AAhelpers {
     }
 
     static scrollingText(wrapped, ...args) {
+        // if supressing aura effect notifications and an aura; dont continue
         if (game.settings.get("ActiveAuras", "scrollingAura")) {
           if (this.flags["ActiveAuras"]?.applied) {
-            Object.defineProperty(this, "isSuppressed", {
-              get: () => {
-                if (new Error('').stack.includes("ActiveEffect5e._displayScrollingStatus")){
-                    return true;
-                }
-                return this._isSuppressed;
-              },
-              set: (v) => {
-                 this._isSuppressed = v;
-              },
-            });
+            return;
           }
         }
+        // otherwise continue notificaiton chain
         return wrapped(...args);
     }
 
