@@ -31,7 +31,7 @@ Hooks.once("socketlib.ready", () => {
 
 Hooks.on("init", () => {
     libWrapper.register("ActiveAuras", "ActiveEffect.prototype.apply", AAhelpers.applyWrapper, "MIXED");
-    libWrapper.register("ActiveAuras", "ActiveEffect.prototype._displayScrollingStatus", AAhelpers.scrollingText, "WRAPPER");
+    libWrapper.register("ActiveAuras", "ActiveEffect.prototype._displayScrollingStatus", AAhelpers.scrollingText, "MIXED");
 });
 
 Hooks.on("ready", async () => {
@@ -214,7 +214,7 @@ Hooks.on("deleteMeasuredTemplate", (doc) => {
     if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     //if (!getProperty(data, "flags.ActiveAuras")) return;
     AAhelpers.ExtractAuraById(doc.id, doc.parent.id);
-    //ActiveAuras.CollateAuras(scene._id, false, true, "template deletion")
+    //CollateAuras(scene._id, false, true, "template deletion")
 });
 
 Hooks.on("deleteCombat", (combat) => {
