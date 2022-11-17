@@ -47,8 +47,8 @@ Hooks.on('init', () => {
         default: false,
         type: Boolean,
         onChange: () => {
-            if (game.settings.get("ActiveAuras", "combatOnly") === false) ActiveAuras.CollateAuras(canvas.id, true, true, "settings change")
-            else ActiveAuras.RemoveAllAppliedAuras()
+            if (game.settings.get("ActiveAuras", "combatOnly") === false) CollateAuras(canvas.id, true, true, "settings change")
+            else AAhelpers.RemoveAllAppliedAuras()
         }
     })
     game.settings.register("ActiveAuras", "scrollingAura", {
