@@ -150,7 +150,8 @@ class AAhelpers {
         const MapObject = AuraMap.get(MapKey);
         const effectArray = MapObject.effects.filter(e => e.entityId !== entityId);
         AuraMap.set(MapKey, { effects: effectArray });
-        AAhelpers.RemoveAppliedAuras(canvas);
+        if (AAdebug) console.warn("ExtractAuraById", { AuraMap });
+        // AAhelpers.RemoveAppliedAuras();
     }
 
     static async RemoveAppliedAuras() {
