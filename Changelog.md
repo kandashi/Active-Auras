@@ -115,3 +115,7 @@ Would not work in SWADE due to a 5e assumption in the template shape detection a
 
 Resolves #252 Error when disabling "Auras in combat"
 Resolves #251 Error when disabling an AE and "Disable scrolling text for auras" is enabled
+
+# 0.5.3
+
+Correct a missing deprecated data reference.
