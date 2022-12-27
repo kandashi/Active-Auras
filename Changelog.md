@@ -121,3 +121,4 @@ Resolves #251 Error when disabling an AE and "Disable scrolling text for auras" 
 Correct a missing deprecated data reference.
 Try and prevent the double effect deletion.
 HP Check could misfire effect application due to bad HP logic.
+Auras in 5e will support the `isSuppressed` flag, and triggered by attunement and equipped status if it's an item. (@DarkByteZero)
