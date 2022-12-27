@@ -89,6 +89,7 @@ function RetrieveTemplateAuras(effectArray) {
     for (const template of auraTemplates) {
         for (const testEffect of template.document.flags?.ActiveAuras?.IsAura) {
             if (testEffect.disabled) continue;
+            if (testEffect.isSuppressed) continue; // effect is supressed for example because it is unequipped
             const newEffect = duplicate(testEffect);
             const parts = testEffect.data.origin.split(".")
             const [entityName, entityId, embeddedName, embeddedId] = parts;
@@ -124,6 +125,7 @@ function RetrieveDrawingAuras(effectArray) {
     for (const drawing of auraDrawings) {
         for (const testEffect of drawing.document.flags?.ActiveAuras?.IsAura) {
             if (testEffect.disabled) continue;
+            if (testEffect.isSuppressed) continue; // effect is supressed
             const newEffect = { data: duplicate(testEffect), parentActorId: false, parentActorLink: false, entityType: "drawing", entityId: drawing.id, };
             const parts = testEffect.origin.split(".");
             const [entityName, entityId, embeddedName, embeddedId] = parts;
