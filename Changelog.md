@@ -119,3 +119,5 @@ Resolves #251 Error when disabling an AE and "Disable scrolling text for auras" 
 # 0.5.3
 
 Correct a missing deprecated data reference.
+Try and prevent the double effect deletion.
+HP Check could misfire effect application due to bad HP logic.

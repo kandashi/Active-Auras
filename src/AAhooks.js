@@ -51,7 +51,7 @@ Hooks.on("ready", async () => {
         AAgm = false;
     }
 
-    CollateAuras(canvas.id, true, false);
+    CollateAuras(canvas.id, true, false, "readyHook");
 });
 
 Hooks.on("createToken", (token) => {
@@ -102,12 +102,13 @@ Hooks.on("preDeleteToken", async (token) => {
  * On token movement run MainAura
  */
 Hooks.on("updateToken", async (token, update, _flags, _id) => {
-    if (AAdebug) console.log("updateTokenHookArgs", {token, update, _flags, _id});
+    if (AAdebug) console.log("updateTokenHookArgs", { token: duplicate(token), update, _flags, _id });
     if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (!AAgm) return;
     if (("y" in update || "x" in update || "elevation" in update)) {
         // we need to wait for the movement to finish due to the animation in v10, listen to refresh hook
 
+        if (AAdebug) console.log("creatingAAUpdateTokenHook", { token: duplicate(token), update, _flags, _id });
         async function movementUpdate() {
             let MapObject = AuraMap.get(token.parent.id);
             if (!MapObject || MapObject?.effects.length < 1) return;
@@ -135,7 +136,7 @@ Hooks.on("updateToken", async (token, update, _flags, _id) => {
         debouncedCollate(canvas.scene.id, !update.hidden, update.hidden, "updateToken, hidden");
     } else if (AAhelpers.IsAuraToken(token.id, token.parent.id) && AAhelpers.HPCheck(token)) {
         if (AAdebug) console.log("0hp, collate auras true true");
-        debouncedCollate(canvas.scene.id, true, true, "updateToken, dead");
+        debouncedCollate(canvas.scene.id, false, true, "updateToken, dead");
     }
 });
 
@@ -154,13 +155,13 @@ Hooks.on("updateActiveEffect", (effect, _update) => {
 /**
  * On removal of active effect from linked actor, if aura remove from canvas.tokens
  */
-Hooks.on("deleteActiveEffect", (effect) => {
+Hooks.on("deleteActiveEffect", (effect, options) => {
     if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (!AAgm) return;
     let applyStatus = effect.flags?.ActiveAuras?.applied;
     let auraStatus = effect.flags?.ActiveAuras?.isAura;
     if (!applyStatus && auraStatus) {
-        if (AAdebug) console.log("deleteAE, collate auras true false");
+        if (AAdebug) console.log("deleteActiveEffect, collate auras true false", { effect, update: options });
         debouncedCollate(canvas.scene.id, false, true, "deleteActiveEffect");
     }
 });
@@ -172,7 +173,7 @@ Hooks.on("createActiveEffect", (effect) => {
     if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (!AAgm) return;
     if (!effect.flags?.ActiveAuras?.applied && effect.flags?.ActiveAuras?.isAura) {
-        if (AAdebug) console.log("deleteAE, collate auras true false");
+        if (AAdebug) console.log("createActiveEffect, collate auras true false", {effect});
         debouncedCollate(canvas.scene.id, true, false, "createActiveEffect");
     }
 });
@@ -187,9 +188,10 @@ Hooks.on("canvasReady", (canvas) => {
 Hooks.on("preUpdateActor", (actor, update) => {
     if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (AAhelpers.HPCheck(actor)) {
+        if (AAdebug) console.log("Actor dead, checking for tokens and auras", { actor, update });
         const activeTokens = actor.getActiveTokens();
         if (activeTokens.length > 0 && AAhelpers.IsAuraToken(activeTokens[0].id, canvas.id)) {
-            if (AAdebug) console.log("0hp, collate auras true true")
+            if (AAdebug) console.log("preUpdate0hp, collate auras true true");
             Hooks.once("updateActor", (a, b) => {
                 if (!AAgm) return;
                 debouncedCollate(canvas.scene.id, true, true, "updateActor, dead");

@@ -133,7 +133,7 @@ class AAhelpers {
             case "dnd5e": ;
             case "sw5e": {
                 if (getProperty(actor, "system.attributes.hp.max") === 0) return true; // dead
-                if (getProperty(actor, "system.attributes.hp.value") <= 0) return false;
+                if (getProperty(actor, "system.attributes.hp.value") > 0) return false; //alive!
                 else return true; // dead
             }
             case "swade": {

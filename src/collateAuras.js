@@ -20,7 +20,7 @@ async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
         //Skips over MLT coppied tokens
         if (testToken.flags["multilevel-tokens"]) continue;
         // applying auras on dead?
-        if (!AAhelpers.HPCheck(testToken) && game.settings.get("ActiveAuras", "dead-aura")) {
+        if (AAhelpers.HPCheck(testToken) && game.settings.get("ActiveAuras", "dead-aura")) {
             if (AAdebug) console.log(`Skipping ${testToken.name}, "DEAD/0hp"`);
             continue;
         }
