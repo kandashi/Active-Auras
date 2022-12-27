@@ -33,6 +33,7 @@ async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
         for (const testEffect of testToken?.actor?.effects.contents) {
             if (testEffect.flags?.ActiveAuras?.isAura) {
                 if (testEffect.disabled) continue;
+                if (testEffect.isSuppressed) continue; // effect is supressed for example because it is unequipped
                 const newEffect = { data: duplicate(testEffect), parentActorLink: testEffect.parent.prototypeToken.actorLink, parentActorId: testEffect.parent.id, entityType: "token", entityId: testToken.id };
                 const re = /@[\w\.]+/g;
                 const rollData = testToken.actor.getRollData();
