@@ -142,6 +142,31 @@ Hooks.on("updateToken", async (token, update, _flags, _id) => {
 
 
 /**
+ * On item Change for example equipped state change
+ */
+Hooks.on("updateItem", (item, update, _flags, _id) => {
+    if (AAdebug) console.log("updateItemHookArgs", {item, update, _flags, _id});
+    if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
+    if (!AAgm) return;
+    // check if item has active Effect with ActiveAura
+    if (!item.effects.map(i => i.flags?.ActiveAuras?.isAura).includes(true)) { return }
+
+    // isSuppressed Checks for dnd5e
+    // dnd5e makes an effect isSuppressed when equipped or attunement status changes
+
+
+    if (hasProperty(update, "system.equipped")) {
+        if (AAdebug) console.log(`equipped, collate auras true true`);
+        debouncedCollate(canvas.scene.id, true, true, "updateItem, equipped");
+    } else if (hasProperty(update, "system.attunement")) {
+        if (AAdebug) console.log(`attunement, collate auras true true`);
+        debouncedCollate(canvas.scene.id, true, true, "updateItem, attunement");
+    }
+
+});
+
+
+/**
  */
 Hooks.on("updateActiveEffect", (effect, _update) => {
     if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
