@@ -78,7 +78,8 @@ async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
         ActiveAuras.MainAura(undefined, "Collate auras", canvas.id)
     }
     if (removeAuras) {
-        AAhelpers.RemoveAppliedAuras(canvas)
+        if (AAdebug) console.warn("CollateAuras delete", { AuraMap });
+        AAhelpers.RemoveAppliedAuras();
     }
 }
 

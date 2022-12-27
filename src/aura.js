@@ -309,7 +309,10 @@ class ActiveAuras {
         for (const tokenEffects of token.actor.effects) {
             if (tokenEffects.origin === effectOrigin && tokenEffects.flags?.ActiveAuras?.applied === true) {
                 try {
+                    if (AAdebug) console.warn("RemoveActiveEffects", { token, tokenEffects });
                     await token.actor.deleteEmbeddedDocuments("ActiveEffect", [tokenEffects.id]);
+                } catch (err) {
+                    console.error("ERROR CAUGHT in RemoveActiveEffects", err);
                 } finally {
                     console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: effectOrigin, tokenName: token.name }));
                 }

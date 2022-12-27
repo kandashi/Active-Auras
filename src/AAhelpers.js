@@ -150,7 +150,8 @@ class AAhelpers {
         const MapObject = AuraMap.get(MapKey);
         const effectArray = MapObject.effects.filter(e => e.entityId !== entityId);
         AuraMap.set(MapKey, { effects: effectArray });
-        AAhelpers.RemoveAppliedAuras(canvas);
+        if (AAdebug) console.warn("ExtractAuraById", { AuraMap });
+        // AAhelpers.RemoveAppliedAuras();
     }
 
     static async RemoveAppliedAuras() {
@@ -165,21 +166,28 @@ class AAhelpers {
                 for (let testEffect of removeToken.actor.effects) {
                     if (!EffectsArray.includes(testEffect.origin) && testEffect?.flags?.ActiveAuras?.applied) {
                         try {
+                            if (AAdebug) console.warn("RemoveAppliedAuras", { removeToken, testEffect });
                             await removeToken.actor.deleteEmbeddedDocuments("ActiveEffect", [testEffect.id]);
+                        } catch (err) {
+                            console.error("ERROR CAUGHT in RemoveAppliedAuras", err);
                         } finally {
-                            console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: testEffect.data.label, tokenName: removeToken.name }));
+                            console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: testEffect.label, tokenName: removeToken.name }));
                         }
                     }
                 }
             }
         }
     }
+
     static async RemoveAllAppliedAuras() {
         for (let removeToken of canvas.tokens.placeables) {
             if (removeToken?.actor?.effects.size > 0) {
                 let effects = removeToken.actor.effects.reduce((a, v) => { if (v?.flags?.ActiveAuras?.applied) return a.concat(v.id) }, []);
                 try {
+                    if (AAdebug) console.warn("RemoveAllAppliedAuras", { removeToken, effects });
                     await removeToken.actor.deleteEmbeddedDocuments("ActiveEffect", effects);
+                } catch (err) {
+                    console.error("ERROR CAUGHT in RemoveAllAppliedAuras", err);
                 } finally {
                     console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { tokenName: removeToken.name }));
                 }
@@ -263,6 +271,13 @@ class AAhelpers {
         if(!token.actorLink) return;
         let auras = token.actor.effects.filter(i => i.flags?.["ActiveAuras"]?.applied).map(i => i.id);
         if(!auras) return;
-        await token.actor.deleteEmbeddedDocuments("ActiveEffect", auras);
+        try {
+            if (AAdebug) console.warn("removeAurasOnToken", { token, auras });
+            await token.actor.deleteEmbeddedDocuments("ActiveEffect", auras);
+        } catch (err) {
+            console.error("ERROR CAUGHT in removeAurasOnToken", err);
+        } finally {
+            console.log(game.i18n.format("ACTIVEAURAS.RemoveLog", { tokenName: token.name }));
+        }
     }
 }
