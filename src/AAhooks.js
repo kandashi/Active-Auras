@@ -183,10 +183,12 @@ Hooks.on("updateActiveEffect", (effect, _update) => {
 Hooks.on("deleteActiveEffect", (effect, options) => {
     if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
     if (!AAgm) return;
-    let applyStatus = effect.flags?.ActiveAuras?.applied;
-    let auraStatus = effect.flags?.ActiveAuras?.isAura;
-    if (!applyStatus && auraStatus) {
-        if (AAdebug) console.log("deleteActiveEffect, collate auras true false", { effect, update: options });
+    const applyStatus = effect.flags?.ActiveAuras?.applied;
+    const auraStatus = effect.flags?.ActiveAuras?.isAura;
+    const timeUpExpiry = options["expiry-reason"]?.startsWith("times-up:");
+
+    if (!applyStatus && auraStatus && !timeUpExpiry) {
+        if (AAdebug) console.log("deleteActiveEffect, collate auras true false", { effect, options });
         debouncedCollate(canvas.scene.id, false, true, "deleteActiveEffect");
     }
 });
