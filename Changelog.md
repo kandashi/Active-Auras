@@ -126,3 +126,7 @@ Auras in 5e will support the `isSuppressed` flag, and triggered by attunement an
 # 0.5.4
 
 Don't trigger effect removal when times-up expires an effect as it cleans up for us.
+
+# 0.5.5
+
+Going to 0 hp will now remove effects such as Paladin Auras once again.

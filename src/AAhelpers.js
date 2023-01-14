@@ -144,6 +144,26 @@ class AAhelpers {
         }
     }
 
+    static EventHPCheck(event) {
+        // if this is not a hp/wound check then assune not dead
+        if (!hasProperty(event, "system.wounds") && !getProperty(event, "system.attributes.hp")) {
+            return false;
+        }
+        switch (game.system.id) {
+            case "dnd5e": ;
+            case "sw5e": {
+                if (getProperty(event, "system.attributes.hp.max") === 0) return true; // dead
+                if (getProperty(event, "system.attributes.hp.value") > 0) return false; //alive!
+                else return true; // dead
+            }
+            case "swade": {
+                let { max, value, ignored } = event.system.wounds;
+                if (value - ignored >= max) return false;
+                else return true; // dead
+            }
+        }
+    }
+
     static ExtractAuraById(entityId, sceneID) {
         if (!AAgm) return;
         const MapKey = sceneID;

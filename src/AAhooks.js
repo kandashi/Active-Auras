@@ -214,7 +214,7 @@ Hooks.on("canvasReady", (canvas) => {
 
 Hooks.on("preUpdateActor", (actor, update) => {
     if (canvas.scene === null) { if (AAdebug) { console.log("Active Auras disabled due to no canvas") } return }
-    if (AAhelpers.HPCheck(actor)) {
+    if (AAhelpers.HPCheck(actor) || AAhelpers.EventHPCheck(update)) {
         if (AAdebug) console.log("Actor dead, checking for tokens and auras", { actor, update });
         const activeTokens = actor.getActiveTokens();
         if (activeTokens.length > 0 && AAhelpers.IsAuraToken(activeTokens[0].id, canvas.id)) {
