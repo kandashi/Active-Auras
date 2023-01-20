@@ -74,7 +74,9 @@ class AAhelpers {
                 }
             }
                 break;
-            case "vehicle": return;
+            case "group":
+            case "vehicle":
+                return;
         };
         let humanoidRaces;
         if (game.system.id === "sw5e") {
@@ -162,6 +164,38 @@ class AAhelpers {
                 else return true; // dead
             }
         }
+    }
+
+    static GetRollData({ actor, item, deterministic=false }={}) {
+        if ( !actor ) return null;
+        const actorRollData = actor.getRollData({ deterministic });
+        const rollData = {
+            ...actorRollData,
+            item: item ? item.toObject().system : undefined,
+        };
+    
+        // Include an ability score modifier if one exists
+        const abl = item?.abilityMod;
+        if ( abl && ("abilities" in rollData) ) {
+            const ability = rollData.abilities[abl];
+            if ( !ability ) {
+            console.warn(`Item ${actor.name} in Actor ${actor.name} has an invalid item ability modifier of ${abl} defined`);
+            }
+            rollData.mod = ability?.mod ?? 0;
+        }
+        return rollData;
+    }
+
+    static EvaluateRollString({ rollString, token, item, deterministic=false}={}) {
+        console.warn("evaluate", {
+            rollString, token, item, deterministic
+        })
+        if (Number.isInteger(Number.parseInt(`${rollString}`.trim()))) return rollString;
+
+        const actor = token.actor ?? token.parent;
+
+        const rollData =  AAhelpers.GetRollData({ actor, item, deterministic });
+        return Roll.replaceFormulaData(rollString, rollData);
     }
 
     static ExtractAuraById(entityId, sceneID) {

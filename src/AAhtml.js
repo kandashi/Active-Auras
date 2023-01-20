@@ -51,7 +51,7 @@ Hooks.on("renderActiveEffectConfig", async (sheet, html) => {
             <div id="specifics">
                 <div class="form-group">
                     <label>${FormRadius}</label>
-                    <input id="radius" name="flags.${AA_MODULE_NAME}.radius" type="number" min="0" step="any" value="${flags[AA_MODULE_NAME]?.radius}" placeholder="${FormRadiusPrompt}"></input>
+                    <input id="radius" name="flags.${AA_MODULE_NAME}.radius" type="text" min="0" step="any" value="${flags[AA_MODULE_NAME]?.radius}" placeholder="${FormRadiusPrompt}"></input>
                 </div>            
                 <div class="form-group">
                     <label>${FormCheckAlignment}:</label>

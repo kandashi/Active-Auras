@@ -123,11 +123,11 @@ class ActiveAuras {
     static UpdateToken(map, canvasToken, tokenId) {
         if (canvasToken.document.flags['multilevel-tokens']) return;
         if (canvasToken.actor === null) return;
-        if (canvasToken.actor.type == "vehicle") return;
+        if (canvasToken.actor.type == "vehicle" || canvasToken.actor.type == "group") return;
         let tokenAlignment;
         if (game.system.id === "dnd5e" || game.system.id === "sw5e") {
             try {
-                tokenAlignment = canvasToken.actor?.system.details.alignment.toLowerCase();
+                tokenAlignment = canvasToken.actor?.system?.details?.alignment?.toLowerCase();
             } catch (error) {
                 console.error([`ActiveAuras: the token has an unreadable alignment`, canvasToken]);
             }
@@ -150,8 +150,8 @@ class ActiveAuras {
 
             const { radius, height, hostile, wildcard, extra } = auraEffect.data.flags?.ActiveAuras;
             let { type, alignment } = auraEffect.data.flags?.ActiveAuras;
-            type = type !== undefined ? type.toLowerCase() : "";
-            alignment = alignment !== undefined ? alignment.toLowerCase() : "";
+            type = type?.toLowerCase() ?? "";
+            alignment = alignment?.toLowerCase() ?? "";
             if (alignment && !tokenAlignment.includes(alignment) && !tokenAlignment.includes("any")) continue; // cleaned up alignment check and moved here. 
 
             let auraEntity, distance;
@@ -185,8 +185,9 @@ class ActiveAuras {
                     if (game.system.id === "swade") {
                         if (!AAhelpers.Wildcard(canvasToken, wildcard, extra)) continue;
                     }
-                    const shape = getAuraShape(auraEntity, radius);
-                    distance = AAmeasure.inAura(canvasToken, auraEntity, game.settings.get("ActiveAuras", "wall-block"), height, radius, shape);
+                    const tokenRadius = AAhelpers.EvaluateRollString({ rollString: radius, token: auraEntity });
+                    const shape = getAuraShape(auraEntity, tokenRadius);
+                    distance = AAmeasure.inAura(canvasToken, auraEntity, game.settings.get("ActiveAuras", "wall-block"), height, tokenRadius, shape);
                 }
                     break;
                 case "template": {
