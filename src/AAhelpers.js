@@ -216,9 +216,6 @@ class AAhelpers {
     }
 
     static EvaluateRollString({ rollString, token, item, deterministic=false}={}) {
-        console.warn("evaluate", {
-            rollString, token, item, deterministic
-        })
         if (Number.isInteger(Number.parseInt(`${rollString}`.trim()))) return rollString;
 
         const actor = token.actor ?? token.parent;
