@@ -130,3 +130,9 @@ Don't trigger effect removal when times-up expires an effect as it cleans up for
 # 0.5.5
 
 Going to 0 hp will now remove effects such as Paladin Auras once again.
+
+# 0.5.6
+
+Will now evaluate the radius as a rollterm, so you can use things like ` @scale.paladin.aura-of-protection` in the radius as well as numbers.
+Auras would fail with new 5e Group actors due to lack of alignment.
+
