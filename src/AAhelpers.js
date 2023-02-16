@@ -49,7 +49,9 @@ class AAhelpers {
             case ("sw5e"):
                 return AAhelpers.typeCheck5e(canvasToken, type);
             case ("swade"):
-                return AAhelpers.typeCheckSWADE(canvasToken, type);
+                return AAhelpers.typeCheckSWADE(canvasToken, type);                
+            case ("dnd4e"):
+                return AAhelpers.typeCheck4e(canvasToken, type);
         }
     }
     static typeCheck5e(canvasToken, type) {
@@ -118,6 +120,33 @@ class AAhelpers {
             case "vehicle": return;
         }
         return tokenType === type;
+    }
+
+    static typeCheck4e(canvasToken, type) {
+        let tokenType;
+        switch (canvasToken.actor.type) {
+            case "NPC": {
+                try {
+                    tokenType = [canvasToken.actor?.system.details.type, canvasToken.actor?.system.details.other, canvasToken.actor?.system.details.origin];
+                } catch (error) {
+                    console.error([`ActiveAuras: the token has an unreadable type`, canvasToken]);
+                }
+            }
+                break;
+            case "Player Character": {
+                try {
+                    tokenType = ["humanoid"]; //Will update this later after adding detailed info to PCs
+                } catch (error) {
+                    console.error([`ActiveAuras: the token has an unreadable type`, canvasToken]);
+                }
+            }
+                break;
+            case "group":
+            case "vehicle":
+                return;
+        };
+        if (tokenType.includes(type)) return true;
+        return false;
     }
 
     static Wildcard(canvasToken, wildcard, extra) {
