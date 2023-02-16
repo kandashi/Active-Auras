@@ -46,12 +46,12 @@ class AAhelpers {
     static CheckType(canvasToken, type) {
         switch (game.system.id) {
             case ("dnd5e"):
-            case ("dnd4e"):
-                return AAhelpers.typeCheck4e(canvasToken, type);
             case ("sw5e"):
                 return AAhelpers.typeCheck5e(canvasToken, type);
             case ("swade"):
-                return AAhelpers.typeCheckSWADE(canvasToken, type);
+                return AAhelpers.typeCheckSWADE(canvasToken, type);                
+            case ("dnd4e"):
+                return AAhelpers.typeCheck4e(canvasToken, type);
         }
     }
     static typeCheck5e(canvasToken, type) {
