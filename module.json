@@ -2,13 +2,18 @@
   "id": "ActiveAuras",
   "title": "Active-Auras",
   "description": "Active-Auras",
-  "authors": [{
-    "name": "Kandashi"
-  }],
+  "authors": [
+    {
+      "name": "Kandashi"
+    },
+    {
+      "name": "MrPrimate"
+    }
+  ],
   "url": "https://github.com/kandashi/Active-Auras",
   "bugs": "https://github.com/kandashi/Active-Auras/issues",
   "flags": {},
-  "version": "0.5.6",
+  "version": "0.5.7",
   "compatibility": {
     "minimum": 10,
     "verified": 10
