@@ -2,6 +2,7 @@
   "id": "ActiveAuras",
   "title": "Active-Auras",
   "description": "Active-Auras",
+  "license": "MIT License",
   "authors": [
     {
       "name": "Kandashi"
@@ -13,21 +14,12 @@
   "url": "https://github.com/kandashi/Active-Auras",
   "bugs": "https://github.com/kandashi/Active-Auras/issues",
   "flags": {},
-  "version": "0.5.7",
+  "version": "0.6.0",
   "compatibility": {
     "minimum": 10,
     "verified": 10
   },
-  "scripts": [
-    "src/aura.js",
-    "src/AAhelpers.js",
-    "src/AAhooks.js",
-    "src/AAhtml.js",
-    "src/collateAuras.js",
-    "src/measureDistances.js",
-    "src/settings.js",
-    "src/templateDetection.js"
-  ],
+  "esmodules": ["src/index.mjs"],
   "languages": [
     {
       "lang": "en",
