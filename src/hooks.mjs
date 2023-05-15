@@ -1,23 +1,31 @@
-
 import CONSTANTS from "./constants.mjs";
-import { AAHelpers } from "./lib/AAHelpers.mjs";
-import { canvasReadyHook, createActiveEffectHook, createCombatantHook, createTokenHook, createWallHook, deleteActiveEffectHook, deleteCombatHook, deleteCombatantHook, deleteMeasuredTemplateHook, deleteWallHook, preDeleteTokenHook, preUpdateActorHook, updateActiveEffectHook, updateCombatHook, updateItemHook, updateMeasuredTemplateHook, updateWallHook } from "./lib/AAHooks.mjs";
-import { AAMeasure } from "./lib/AAMeasure.mjs";
-import { ActiveAuras } from "./lib/ActiveAuras.mjs";
-import { CollateAuras } from "./lib/CollateAuras.mjs";
 import Logger from "./lib/Logger.mjs";
 import { settings } from "./settings.mjs";
+import { AAHelpers } from "./lib/AAHelpers.mjs";
+import { AAMeasure } from "./lib/AAMeasure.mjs";
+import { CollateAuras } from "./lib/CollateAuras.mjs";
+import {
+  canvasReadyHook,
+  createActiveEffectHook,
+  createCombatantHook,
+  createTokenHook,
+  createWallHook,
+  deleteActiveEffectHook,
+  deleteCombatHook,
+  deleteCombatantHook,
+  deleteMeasuredTemplateHook,
+  deleteWallHook,
+  preDeleteTokenHook,
+  preUpdateActorHook,
+  updateActiveEffectHook,
+  updateCombatHook,
+  updateItemHook,
+  updateMeasuredTemplateHook,
+  updateTokenHook,
+  updateWallHook,
+} from "./lib/AAHooks.mjs";
 
 
-/**
- *
- * @param {String} sceneID Scene to check upon
- * @param {Boolean} checkAuras Can apply auras
- * @param {Boolean} removeAuras Can remove auras
- * @param {String} source For console logging
- * @returns
- */
-const debouncedCollate = debounce((a, b, c, d) => CollateAuras(a, b, c, d), 200);
 
 export function initHooks() {
   settings();
@@ -64,13 +72,12 @@ export async function readyHooks() {
     CONFIG.AA.GM = false;
   }
 
-
   CollateAuras(canvas.id, true, false, "readyHook");
 
   if (CONFIG.AA.GM) {
     Hooks.on("createToken", createTokenHook);
     // On token movement run MainAura
-    Hooks.on("updateToken", createTokenHook);
+    Hooks.on("updateToken", updateTokenHook);
 
     Hooks.on("preDeleteTokenHook", preDeleteTokenHook);
 
@@ -82,7 +89,7 @@ export async function readyHooks() {
     // On removal of active effect from linked actor, if aura remove from canvas.tokens
     Hooks.on("deleteActiveEffect", deleteActiveEffectHook);
     // On creation of active effect on linked actor, run MainAura
-    Hooks.on("createActiveEffect", createActiveEffectHook)
+    Hooks.on("createActiveEffect", createActiveEffectHook);
 
     Hooks.on("canvasReady", canvasReadyHook);
 
@@ -91,7 +98,6 @@ export async function readyHooks() {
 
     Hooks.on("deleteCombatant", deleteCombatantHook);
     Hooks.on("createCombatant", createCombatantHook);
-
   }
 
   Hooks.on("createWall", createWallHook);
