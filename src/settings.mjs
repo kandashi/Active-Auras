@@ -1,3 +1,4 @@
+import { socketLibReadyHooks } from "./hooks.mjs";
 import { AAHelpers } from "./lib/AAHelpers.mjs";
 import { CollateAuras } from "./lib/CollateAuras.mjs";
 
@@ -5,7 +6,6 @@ export function settings() {
 
   setProperty(CONFIG, "debug.AA", false);
   setProperty(CONFIG, "AA.GM", false);
-  setProperty(CONFIG, "AA.Socket", null);
   setProperty(CONFIG, "AA.Map", new Map());
 
   game.settings.register("ActiveAuras", "measurement", {

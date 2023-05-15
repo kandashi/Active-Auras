@@ -20,9 +20,7 @@ export class ActiveAuras {
     if (!CONFIG.AA.GM) return;
     const sceneCombat = game.combats.filter((c) => c.scene?.id === sceneID);
     if (game.settings.get("ActiveAuras", "combatOnly") && !sceneCombat[0]?.started) {
-      if (CONFIG.debug.AA) {
-        Logger.warn("Active Auras not active when not in combat");
-      }
+      Logger.debug("Active Auras not active when not in combat");
       return;
     }
     if (sceneID !== canvas.id) {
@@ -52,8 +50,7 @@ export class ActiveAuras {
     }
 
     for (const mapEffect of map) {
-      const MapKey = mapEffect[0];
-      map.set(MapKey, { add: mapEffect[1].add, token: mapEffect[1].token, effect: mapEffect[1].effect.data });
+      map.set(mapEffect[0], { add: mapEffect[1].add, token: mapEffect[1].token, effect: mapEffect[1].effect.data });
     }
     Logger.debug("Active Aura Effect map", map);
 
