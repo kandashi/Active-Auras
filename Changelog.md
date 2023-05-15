@@ -144,3 +144,4 @@ Spikegrowth example macro fixed.
 # NEXT
 
 Improve wound detection in SWADE.
+IN some cases, an aura effect would be reapplied even after the aura was gone#271

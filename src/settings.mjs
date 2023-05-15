@@ -1,4 +1,3 @@
-import { socketLibReadyHooks } from "./hooks.mjs";
 import { AAHelpers } from "./lib/AAHelpers.mjs";
 import { CollateAuras } from "./lib/CollateAuras.mjs";
 

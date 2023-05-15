@@ -10,12 +10,9 @@ export class ActiveAuras {
    * Locate all auras on the canvas, create map of tokens to update, update tokens
    */
   static async MainAura(movedToken, source, sceneID) {
-    let perfStart;
-    let perfEnd;
-    if (CONFIG.debug.AA) {
-      perfStart = performance.now();
-      Logger.debug("MainAura Params", { movedToken, source, sceneID });
-    }
+    Logger.debug("MainAura Params", { movedToken, source, sceneID });
+    const perfStart = CONFIG.debug.AA ? performance.now() : undefined;
+
     if (typeof movedToken?.documentName !== "string") movedToken = movedToken?.document ?? undefined;
     if (!CONFIG.AA.GM) return;
     const sceneCombat = game.combats.filter((c) => c.scene?.id === sceneID);
@@ -30,41 +27,36 @@ export class ActiveAuras {
       return;
     }
 
-    let map = new Map();
     let updateTokens = canvas.tokens.placeables;
     let auraTokenId;
 
     if (movedToken !== undefined) {
       if (AAHelpers.IsAuraToken(movedToken.id, sceneID)) {
         auraTokenId = movedToken.id;
-      } else if (getProperty(movedToken, "flags.token-attacher")) {
+      }
+      else if (getProperty(movedToken, "flags.token-attacher")) {
         Logger.debug("ActiveAuras: token attacher movement");
-      } else {
+      }
+      else {
         updateTokens = [canvas.tokens.get(movedToken.id)];
       }
     }
-    map = ActiveAuras.UpdateAllTokens(map, updateTokens, auraTokenId);
+
+    const effectMap = ActiveAuras.UpdateAllTokens(new Map(), updateTokens, auraTokenId);
+
     if (CONFIG.debug.AA) {
-      perfEnd = performance.now();
-      Logger.debug(`Active Auras Find Auras took ${perfEnd - perfStart} ms, FPS:${Math.round(canvas.app.ticker.FPS)}`);
+      Logger.info(`Active Auras Find Auras took ${performance.now() - perfStart} ms, FPS:${Math.round(canvas.app.ticker.FPS)}`);
     }
 
-    for (const mapEffect of map) {
-      map.set(mapEffect[0], { add: mapEffect[1].add, token: mapEffect[1].token, effect: mapEffect[1].effect.data });
+    for (const mapEffect of effectMap) {
+      effectMap.set(mapEffect[0], { add: mapEffect[1].add, token: mapEffect[1].token, effect: mapEffect[1].effect.data });
     }
-    Logger.debug("Active Aura Effect map", map);
+    Logger.debug("Active Aura Effect map", effectMap);
 
-    map.forEach(compareMap);
-
-    /**
-     *
-     * @param {map value} value
-     * @param {map key} key
-     * @param {map object} map1
-     * Loop over the map to remove any "add.false" entries where a "add.true" is present, prevents odd ordering from removing auras when in range of 2 or more of the same aura
-     * Where 2 of the same type of aura are present, choose the higher of the 2 values to update too
-     */
-    function compareMap(value, key, map1) {
+    // Loop over the map to remove any "add.false" entries where a "add.true" is present,
+    // prevents odd ordering from removing auras when in range of 2 or more of the same aura
+    // Where 2 of the same type of aura are present, choose the higher of the 2 values to update too
+    effectMap.forEach((value, key, map1) => {
       const iterator1 = map1[Symbol.iterator]();
       for (const m of iterator1) {
         if (m[0] === key) continue;
@@ -83,12 +75,12 @@ export class ActiveAuras {
           && (m[1].add === true || value.add === true)
           && m[1].token.id === value.token.id
         ) {
-          if (value.add === false) map.delete(key);
+          if (value.add === false) effectMap.delete(key);
         }
       }
-    }
+    });
 
-    for (const update of map) {
+    for (const update of effectMap) {
       if (update[1].add) {
         await ActiveAuras.CreateActiveEffect(update[1].token.id, update[1].effect);
       } else {
@@ -96,25 +88,10 @@ export class ActiveAuras {
       }
     }
     if (CONFIG.debug.AA) {
-      perfEnd = performance.now();
       Logger.debug(
-        `Active Auras Main Function took ${perfEnd - perfStart} ms, FPS:${Math.round(canvas.app.ticker.FPS)}`
+        `Active Auras Main Function took ${performance.now() - perfStart} ms, FPS:${Math.round(canvas.app.ticker.FPS)}`
       );
     }
-  }
-
-  /**
-   * Loop over canvas tokens for individual tests
-   * @param {Map} map - empty map to populate
-   * @param {Array} auraEffectArray - array of auras to test against
-   * @param {Token} tokens - array of tokens to test against
-   */
-  static UpdateAllTokens(map, tokens, tokenId) {
-    for (const canvasToken of tokens) {
-      // if (CONFIG.debug.AA) console.log("Updating canvas token", {canvasToken, tokenId});
-      ActiveAuras.UpdateToken(map, canvasToken, tokenId);
-    }
-    return map;
   }
 
   /**
@@ -272,6 +249,20 @@ export class ActiveAuras {
           map.set(MapKey, { add: false, token: canvasToken, effect: auraEffect });
         }
       }
+    }
+    return map;
+  }
+
+  /**
+   * Loop over canvas tokens for individual tests
+   * @param {Map} map - empty map to populate
+   * @param {Array} auraEffectArray - array of auras to test against
+   * @param {Token} tokens - array of tokens to test against
+   */
+  static UpdateAllTokens(map, tokens, tokenId) {
+    for (const canvasToken of tokens) {
+      // if (CONFIG.debug.AA) console.log("Updating canvas token", {canvasToken, tokenId});
+      ActiveAuras.UpdateToken(map, canvasToken, tokenId);
     }
     return map;
   }

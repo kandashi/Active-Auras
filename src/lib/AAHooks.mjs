@@ -151,10 +151,12 @@ export function deleteActiveEffectHook(effect, options) {
   const auraStatus = effect.flags?.ActiveAuras?.isAura;
   const timeUpExpiry = options["expiry-reason"]?.startsWith("times-up:");
 
-  console.warn("delete!", { effect, options, applyStatus, auraStatus, timeUpExpiry });
   if (!applyStatus && auraStatus && !timeUpExpiry) {
     Logger.debug("deleteActiveEffect, collate auras true false", { effect, options });
     debouncedCollate(canvas.scene.id, false, true, "deleteActiveEffect");
+  } else if (auraStatus) {
+    const sceneEffect = CONFIG.AA.Map.get(canvas.scene._id)?.effects.find((e) => e.data._id === effect.id);
+    if (sceneEffect) AAHelpers.ExtractAuraById(sceneEffect.entityId, canvas.scene._id);
   }
 }
 
