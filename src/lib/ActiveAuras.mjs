@@ -294,7 +294,7 @@ export class ActiveAuras {
       // eslint-disable-next-line no-unused-vars
       for (let [changeIndex, change] of effectData.changes.entries()) {
         let newValue = change.value;
-        if (change.key === "macro.execute" || change.key === "macro.itemMacro") {
+        if (change.key.startsWith("macro.")) {
           if (typeof newValue === "string") {
             newValue = [newValue];
 

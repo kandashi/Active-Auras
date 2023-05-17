@@ -141,7 +141,7 @@ Auras would fail with new 5e Group actors due to lack of alignment.
 Better support for 4e.
 Spikegrowth example macro fixed.
 
-# NEXT
+# 0.6.0
 
 - Moved to a ES Module, no longer provided as world scripts.
 - Improve wound detection in SWADE.

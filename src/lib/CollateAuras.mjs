@@ -5,7 +5,7 @@ import Logger from "./Logger.mjs";
 
 function generateTargetEffect(token, effect) {
   if (effect.disabled) return;
-  if (effect.isSuppressed) return; // effect is supressed for example because it is unequipped
+  if (effect.isSuppressed) return; // effect is suppressed for example because it is unequipped
   const newEffect = {
     data: duplicate(effect),
     parentActorLink: effect.parent.prototypeToken.actorLink,
@@ -27,8 +27,7 @@ function generateTargetEffect(token, effect) {
       }
     }
     change.value = s;
-    if (change.key === "macro.execute" || change.key === "macro.itemMacro")
-      newEffect.data.flags.ActiveAuras.isMacro = true;
+    if (change.key.startsWith("macro.")) newEffect.data.flags.ActiveAuras.isMacro = true;
   }
   newEffect.data.disabled = false;
   const macro = newEffect.data.flags.ActiveAuras.isMacro !== undefined
@@ -121,8 +120,7 @@ function RetrieveTemplateAuras(effectArray) {
         let s = change.value;
         for (const match of s.match(re) || []) s = s.replace(match, getProperty(rollData, match.slice(1)));
         change.value = s;
-        if (change.key === "macro.execute" || change.key === "macro.itemMacro")
-          newEffect.data.flags.ActiveAuras.isMacro = true;
+        if (change.key.startsWith("macro.")) newEffect.data.flags.ActiveAuras.isMacro = true;
       }
       newEffect.disabled = false;
       const macro = newEffect.data.flags.ActiveAuras.isMacro !== undefined
@@ -165,8 +163,7 @@ function RetrieveDrawingAuras(effectArray) {
           let s = change.value;
           for (const match of s.match(re) || []) s = s.replace(match, getProperty(rollData, match.slice(1)));
           change.value = s;
-          if (change.key === "macro.execute" || change.key === "macro.itemMacro")
-            newEffect.data.flags.ActiveAuras.isMacro = true;
+          if (change.key.startsWith("macro.")) newEffect.data.flags.ActiveAuras.isMacro = true;
         }
       }
       newEffect.disabled = false;
