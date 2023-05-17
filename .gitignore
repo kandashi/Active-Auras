@@ -1,0 +1,6 @@
+node_modules/
+.vscode/
+/dist/
+yarn-error.log
+/sync*.sh
+package-lock.json

@@ -1,0 +1,13 @@
+{
+  "name": "Active-Auras",
+  "license": "MIT",
+  "scripts": {
+    "lint": "npx eslint ./",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "eslint": "^8.10.0",
+    "eslint-config-prettier": "^8.4.0",
+    "prettier": "2.0.5"
+  }
+}

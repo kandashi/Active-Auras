@@ -15,7 +15,7 @@
 
 ## 0.2.00
 Lots of updates for templates and drawings
-- Any template effect can now call a AA macro (included in the compendium) in the Midi QoL OnUse field to apply any active effects to the template rather than the targeted tokens. 
+- Any template effect can now call a AA macro (included in the compendium) in the Midi QoL OnUse field to apply any active effects to the template rather than the targeted tokens.
     - This template will then act as its own source of an aura, any tokens that move inside the template will have the arua applied to them (not radius from the placement)
     - For setting up auras like this, simply put any non-0 value inside the aura radius and call the "AA ApplyEffectsToTemplate" macro in Midi QoL OnUse
 - Auras can now be added to drawings through macros and will apply via the same logic as templates
@@ -37,7 +37,7 @@ Added create/delete combatant hooks to allow adding and removing aura actors fro
 [BUGS] Currently Macro-Repeat function from TimesUp/DAE is broken with auras
 
 ## 0.2.07
-Clean up combatant checks 
+Clean up combatant checks
 Clear up parsing of @ values within effect data
 Added multiple Aura effect spells into the compendium pack
 
@@ -53,14 +53,14 @@ Fix for Spirit Guardians spell, will need replacing and the macro importing
 ## 0.2.11
 Fix for non-viewed scene errors on combat advancement
 Cleaned up the range computation to make things faster
-Updated spells : Spirit Guardians, Black Tentacles, Cloudkill, Incendiary Cloud, Insect Plague, Moonbeam, Sleet Storm, 
+Updated spells : Spirit Guardians, Black Tentacles, Cloudkill, Incendiary Cloud, Insect Plague, Moonbeam, Sleet Storm,
 Any of these spells will still work with the old versions, but the new ones will remove the effect if the token is forcefully removed from the aura not on their turn
 
 ## 0.3.0
 0.8.6 release
 
 ## 0.3.01
-Added LibWrapper dependency 
+Added LibWrapper dependency
 
 ## 0.3.02
 added SWADE support
@@ -140,3 +140,10 @@ Auras would fail with new 5e Group actors due to lack of alignment.
 
 Better support for 4e.
 Spikegrowth example macro fixed.
+
+# 0.6.0
+
+- Moved to a ES Module, no longer provided as world scripts.
+- Improve wound detection in SWADE.
+- In some cases, an aura effect would be reapplied even after the aura was gone#271
+- Transferred Effects aren't removed if the source token is deleted #269
