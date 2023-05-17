@@ -52,7 +52,7 @@ export async function updateCombatHook(combat, changed, options, userId) {
   await ActiveAuras.MainAura(combatant.document, "combat update", combatant.scene.id);
 }
 
-export function preDeleteTokenHook(token) {
+export async function preDeleteTokenHook(token) {
   if (canvas.scene === null) {
     Logger.debug("Active Auras disabled due to no canvas");
     return;
@@ -61,7 +61,8 @@ export function preDeleteTokenHook(token) {
     Logger.debug("preDelete, collate auras false true");
     AAHelpers.ExtractAuraById(token.id, token.parent.id);
   }
-  AAHelpers.removeAurasOnToken(token);
+  await AAHelpers.removeAurasOnToken(token);
+  debouncedCollate(canvas.scene.id, false, true, "deleteActiveEffect");
 }
 
 /**

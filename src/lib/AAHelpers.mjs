@@ -370,7 +370,7 @@ export class AAHelpers {
 
   static async removeAurasOnToken(token) {
     if (!token.actorLink) return;
-    let auras = token.actor.effects.filter((i) => i.flags?.["ActiveAuras"]?.applied).map((i) => i.id);
+    const auras = token.actor.effects.filter((i) => hasProperty(i, "flags.ActiveAuras.applied")).map((i) => i.id);
     if (!auras) return;
     try {
       Logger.debug("removeAurasOnToken", { token, auras });

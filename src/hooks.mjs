@@ -76,26 +76,16 @@ export async function readyHooks() {
 
   if (CONFIG.AA.GM) {
     Hooks.on("createToken", createTokenHook);
-    // On token movement run MainAura
-    Hooks.on("updateToken", updateTokenHook);
-
-    Hooks.on("preDeleteTokenHook", preDeleteTokenHook);
-
+    Hooks.on("updateToken", updateTokenHook); // On token movement run MainAura
+    Hooks.on("preDeleteToken", preDeleteTokenHook);
     Hooks.on("preUpdateActor", preUpdateActorHook);
-
-    // On item Change for example equipped state change
-    Hooks.on("updateItem", updateItemHook);
+    Hooks.on("updateItem", updateItemHook); // On item Change for example equipped state change
     Hooks.on("updateActiveEffect", updateActiveEffectHook);
-    // On removal of active effect from linked actor, if aura remove from canvas.tokens
-    Hooks.on("deleteActiveEffect", deleteActiveEffectHook);
-    // On creation of active effect on linked actor, run MainAura
-    Hooks.on("createActiveEffect", createActiveEffectHook);
-
+    Hooks.on("deleteActiveEffect", deleteActiveEffectHook); // if aura remove from canvas.tokens
+    Hooks.on("createActiveEffect", createActiveEffectHook); // On creation of active effect on linked actor, run MainAura
     Hooks.on("canvasReady", canvasReadyHook);
-
     Hooks.on("updateCombat", updateCombatHook);
     Hooks.on("deleteCombat", deleteCombatHook);
-
     Hooks.on("deleteCombatant", deleteCombatantHook);
     Hooks.on("createCombatant", createCombatantHook);
   }
@@ -103,7 +93,6 @@ export async function readyHooks() {
   Hooks.on("createWall", createWallHook);
   Hooks.on("updateWall", updateWallHook);
   Hooks.on("deleteWall", deleteWallHook);
-
   Hooks.on("updateMeasuredTemplate", updateMeasuredTemplateHook);
   Hooks.on("deleteMeasuredTemplate", deleteMeasuredTemplateHook);
 }

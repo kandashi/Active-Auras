@@ -146,3 +146,4 @@ Spikegrowth example macro fixed.
 - Moved to a ES Module, no longer provided as world scripts.
 - Improve wound detection in SWADE.
 - In some cases, an aura effect would be reapplied even after the aura was gone#271
+- Transferred Effects aren't removed if the source token is deleted #269
