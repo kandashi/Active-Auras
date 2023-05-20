@@ -303,7 +303,8 @@ export class AAHelpers {
     //   args: duplicate(args),
     //   ignoreSelf: getProperty(change, "effect.flags.ActiveAuras.ignoreSelf"),
     // })
-    if (getProperty(change, "effect.flags.ActiveAuras.ignoreSelf") === true) {
+    const AAFlags = getProperty(change, "effect.flags.ActiveAuras");
+    if (AAFlags?.isAura === true && AAFlags?.ignoreSelf === true) {
       Logger.info(
         game.i18n.format("ACTIVEAURAS.IgnoreSelfLog", {
           effectDataLabel: change.effect.label,

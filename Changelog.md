@@ -147,3 +147,7 @@ Spikegrowth example macro fixed.
 - Improve wound detection in SWADE.
 - In some cases, an aura effect would be reapplied even after the aura was gone#271
 - Transferred Effects aren't removed if the source token is deleted #269
+
+# 0.6.1
+
+- Effects which had previously been marked as active auras and had ignore self checked, but were no longer marked as active effects would cause the effect to not be applied to the actor.
