@@ -156,3 +156,7 @@ Spikegrowth example macro fixed.
 
 - When applying effects via a template and targetting larger numbers of creatures, due to some timing issues, midi could decide that the effect had expired and remove the effect. Certain auras will now await more, which might increase some auras processing time.
 - ActiveAuras was not exported through the legacy window mode.
+
+# 0.6.3
+
+- Correct Pack/Compendium names for v11.

@@ -56,7 +56,7 @@
     {
       "name": "Active Auras Auras",
       "label": "Active Auras Auras",
-      "path": "packs/AuraItems",
+      "path": "packs/AuraItems.db",
       "type": "Item",
       "module": "ActiveAuras",
       "private": false,
@@ -65,7 +65,7 @@
     {
       "name": "Active Auras Zone Actors",
       "label": "Active Auras Zone Actors",
-      "path": "packs/ZoneActors",
+      "path": "packs/ZoneActors.db",
       "type": "Actor",
       "system": "dnd5e",
       "module": "ActiveAuras",
@@ -74,7 +74,7 @@
     {
       "name": "Active Auras Macros",
       "label": "Active Auras Macros",
-      "path": "packs/macros",
+      "path": "packs/Macros.db",
       "type": "Macro",
       "module": "ActiveAuras",
       "private": false
