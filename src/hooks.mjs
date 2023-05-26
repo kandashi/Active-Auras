@@ -24,6 +24,7 @@ import {
   updateTokenHook,
   updateWallHook,
 } from "./lib/AAHooks.mjs";
+import { ActiveAuras } from "./lib/ActiveAuras.mjs";
 
 
 
@@ -43,6 +44,7 @@ function configureApi() {
   const API = {
     AAHelpers,
     AAMeasure,
+    ActiveAuras,
   };
   game.modules.get(CONSTANTS.MODULE_NAME).api = API;
 }

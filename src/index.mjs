@@ -2,6 +2,7 @@ import { extendEffectsForm } from "./app/aurasTab.mjs";
 import { initHooks, readyHooks, socketLibReadyHooks } from "./hooks.mjs";
 import { AAHelpers } from "./lib/AAHelpers.mjs";
 import { AAMeasure } from "./lib/AAMeasure.mjs";
+import { ActiveAuras } from "./lib/ActiveAuras.mjs";
 
 
 Hooks.on("init", initHooks);
@@ -13,3 +14,4 @@ window.AAHelpers = AAHelpers;
 window.AAhelpers = AAHelpers;
 window.AAMeasure = AAMeasure;
 window.AAmeasure = AAMeasure;
+window.ActiveAuras = ActiveAuras;
