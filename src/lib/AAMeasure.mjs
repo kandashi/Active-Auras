@@ -92,7 +92,7 @@ export class AAMeasure {
     const grid = canvas?.scene?.grid?.size;
     if (!grid) return false;
     const templatePos = { x: templateDetails.x, y: templateDetails.y };
-    // Check for center of  each square the token uses.
+    // Check for center of each square the token uses.
     // e.g. for large tokens all 4 squares
     const startX = token.document.width >= 1 ? 0.5 : token.document.width / 2;
     const startY = token.document.height >= 1 ? 0.5 : token.document.height / 2;

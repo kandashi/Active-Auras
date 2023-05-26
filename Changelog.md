@@ -151,3 +151,8 @@ Spikegrowth example macro fixed.
 # 0.6.1
 
 - Effects which had previously been marked as active auras and had ignore self checked, but were no longer marked as active effects would cause the effect to not be applied to the actor.
+
+# 0.6.2
+
+- When applying effects via a template and targetting larger numbers of creatures, due to some timing issues, midi could decide that the effect had expired and remove the effect. Certain auras will now await more, which might increase some auras processing time.
+- ActiveAuras was not exported through the legacy window mode.

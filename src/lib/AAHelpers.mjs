@@ -287,9 +287,9 @@ export class AAHelpers {
     }
   }
 
-  static UserCollateAuras(sceneID, checkAuras, removeAuras, source) {
+  static async UserCollateAuras(sceneID, checkAuras, removeAuras, source) {
     CONFIG.AA.GM = game.users.find((u) => u.isGM && u.active);
-    CONFIG.AA.Socket.executeAsUser("userCollate", CONFIG.AA.GM.id, sceneID, checkAuras, removeAuras, source);
+    await CONFIG.AA.Socket.executeAsUser("userCollate", CONFIG.AA.GM.id, sceneID, checkAuras, removeAuras, source);
   }
 
   /**
@@ -365,7 +365,7 @@ export class AAHelpers {
     }
     Logger.debug("Applying template effect", templateEffectData);
     await template.document.setFlag("ActiveAuras", "IsAura", templateEffectData);
-    AAHelpers.UserCollateAuras(canvas.scene.id, true, false, "spellCast");
+    await AAHelpers.UserCollateAuras(canvas.scene.id, true, false, "templateApply");
     return { haltEffectsApplication: true };
   }
 

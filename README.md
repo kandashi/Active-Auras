@@ -4,7 +4,7 @@
 - Auras will only work in combat unless the setting is turned off in the module settings
 - Auras will only work on the Active Scene
 
-Active Auras will propagate Active Effects that are labeled as auras onto nearby tokens. 
+Active Auras will propagate Active Effects that are labeled as auras onto nearby tokens.
 The distance and targeting of the aura are both configurable.
 Any ```@``` fields from DAE will be correctly parsed before being applied to the effected token.
 Macros from DAE will fire once when applied and once when removed (work is being done for damage over time effects)
@@ -16,7 +16,7 @@ The "Apply while inactive" option allows for effects to propagate to other token
 - We set the radius as 10 (measure in ft)
 ![Active Auras setup](https://github.com/kandashi/Active-Auras/blob/main/Images/Aura%20of%20protection.PNG)
 
-- We then move to Effect tab and add the relevant field. Make sure to use `+` in the field. 
+- We then move to Effect tab and add the relevant field. Make sure to use `+` in the field.
 ![Active Auras setup 2](https://github.com/kandashi/Active-Auras/blob/main/Images/Aura%20of%20protection%202.PNG)
 
 -Finally we can see the effect has been transfered over to a nearly allied PC, and the `@` field has been converted to the correct value
@@ -31,15 +31,15 @@ The "Apply while inactive" option allows for effects to propagate to other token
 ![Active Aura Test](https://github.com/kandashi/Active-Auras/blob/main/Images/ActiveAuras%20test2.gif)
 
 ## DAE Macro Executes
-- Using `@token` as a macro argument will now refer to the token the aura is applied to, you can use this in any DAE auras as normal 
+- Using `@token` as a macro argument will now refer to the token the aura is applied to, you can use this in any DAE auras as normal
 
 
 ## Compatability
-- Works with DAE as far as I know
+- Works with DAE
 - Multi Level Token should work fine, clones actors are ignored for purposes of calculating auras
 
 ## Templates and drawings
-- Any template effect can now call a AA macro (included in the compendium) in the Midi QoL OnUse field to apply any active effects to the template rather than the targeted tokens. 
+- Any template effect can now call a AA macro (included in the compendium) in the Midi QoL OnUse field to apply any active effects to the template rather than the targeted tokens.
     - This template will then act as its own source of an aura, any tokens that move inside the template will have the aura applied to them (not radius from the placement)
     - For setting up auras like this, simply call the "AA ApplyEffectsToTemplate" macro in Midi QoL OnUse, any effects in the item will be applied to the aura
 - Auras can now be added to drawings through macros and will apply via the same logic as templates

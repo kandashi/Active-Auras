@@ -58,7 +58,7 @@ export async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
     );
     return;
   }
-  Logger.debug(source);
+  Logger.debug(`CollateAuras called for ${source}`);
   const effectArray = [];
 
   for (const t of canvas.tokens.placeables) {
@@ -92,12 +92,13 @@ export async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
   Logger.debug("CONFIG.AA.Map", CONFIG.AA.Map);
 
   if (checkAuras) {
-    ActiveAuras.MainAura(undefined, "Collate auras", canvas.id);
+    await ActiveAuras.MainAura(undefined, "Collate auras", canvas.id);
   }
   if (removeAuras) {
     Logger.debug("CollateAuras delete", { map: CONFIG.AA.Map });
-    AAHelpers.RemoveAppliedAuras();
+    await AAHelpers.RemoveAppliedAuras();
   }
+  Logger.debug(`CollateAuras finished for ${source}`);
 }
 
 function RetrieveTemplateAuras(effectArray) {
