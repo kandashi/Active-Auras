@@ -165,3 +165,7 @@ Spikegrowth example macro fixed.
 
 - Update packs for v11
 - Version bump for v11 support
+
+# 0.7.1
+
+- Fix disabled scrolling text in v11

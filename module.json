@@ -14,7 +14,7 @@
   "url": "https://github.com/kandashi/Active-Auras",
   "bugs": "https://github.com/kandashi/Active-Auras/issues",
   "flags": {},
-  "version": "0.7.0",
+  "version": "0.7.1",
   "compatibility": {
     "minimum": 10,
     "verified": 11
