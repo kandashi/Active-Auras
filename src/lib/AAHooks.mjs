@@ -279,3 +279,19 @@ export function deleteMeasuredTemplateHook(doc){
   AAHelpers.ExtractAuraById(doc.id, doc.parent.id);
   //CollateAuras(scene._id, false, true, "template deletion")
 }
+
+export function preCreateActiveEffectHook(effect, _update, options) {
+  if (game.settings.get("ActiveAuras", "scrollingAura")) {
+    if (getProperty(effect, "flags.ActiveAuras.applied") === true) {
+      options.animate = false;
+    }
+  }
+}
+
+export function preDeleteActiveEffectHook(effect, options) {
+  if (game.settings.get("ActiveAuras", "scrollingAura")) {
+    if (getProperty(effect, "flags.ActiveAuras.applied") === true) {
+      options.animate = false;
+    }
+  }
+}

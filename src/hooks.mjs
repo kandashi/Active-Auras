@@ -15,6 +15,8 @@ import {
   deleteCombatantHook,
   deleteMeasuredTemplateHook,
   deleteWallHook,
+  preCreateActiveEffectHook,
+  preDeleteActiveEffectHook,
   preDeleteTokenHook,
   preUpdateActorHook,
   updateActiveEffectHook,
@@ -32,12 +34,16 @@ export function initHooks() {
   settings();
 
   libWrapper.register("ActiveAuras", "ActiveEffect.prototype.apply", AAHelpers.applyWrapper, "MIXED");
-  libWrapper.register(
-    "ActiveAuras",
-    "ActiveEffect.prototype._displayScrollingStatus",
-    AAHelpers.scrollingText,
-    "MIXED"
-  );
+
+  if (isNewerVersion(11, game.version)) {
+    libWrapper.register(
+      "ActiveAuras",
+      "ActiveEffect.prototype._displayScrollingStatus",
+      AAHelpers.scrollingText,
+      "MIXED"
+    );
+  }
+
 }
 
 function configureApi() {
@@ -90,6 +96,12 @@ export async function readyHooks() {
     Hooks.on("deleteCombat", deleteCombatHook);
     Hooks.on("deleteCombatant", deleteCombatantHook);
     Hooks.on("createCombatant", createCombatantHook);
+
+    // pre update hooks for scrolling text
+    if (isNewerVersion(game.version, 11)) {
+      Hooks.on("preCreateActiveEffect", preCreateActiveEffectHook);
+      Hooks.on("preDeleteActiveEffect", preDeleteActiveEffectHook);
+    }
   }
 
   Hooks.on("createWall", createWallHook);
