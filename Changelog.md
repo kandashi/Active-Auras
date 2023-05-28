@@ -160,3 +160,8 @@ Spikegrowth example macro fixed.
 # 0.6.3
 
 - Correct Pack/Compendium names for v11.
+
+# 0.7.0
+
+- Update packs for v11
+- Version bump for v11 support
