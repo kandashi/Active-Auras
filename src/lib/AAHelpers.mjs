@@ -254,7 +254,7 @@ export class AAHelpers {
             } finally {
               Logger.info(
                 game.i18n.format("ACTIVEAURAS.RemoveLog", {
-                  effectDataLabel: testEffect.label,
+                  effectDataLabel: (testEffect.name ?? testEffect.label),
                   tokenName: removeToken.name,
                 })
               );
@@ -307,7 +307,7 @@ export class AAHelpers {
     if (AAFlags?.isAura === true && AAFlags?.ignoreSelf === true) {
       Logger.info(
         game.i18n.format("ACTIVEAURAS.IgnoreSelfLog", {
-          effectDataLabel: change.effect.label,
+          effectDataLabel: (change.effect.name ?? change.effect.label),
           changeKey: change.key,
           actorName: actor.name,
         })

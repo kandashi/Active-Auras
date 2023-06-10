@@ -169,3 +169,7 @@ Spikegrowth example macro fixed.
 # 0.7.1
 
 - Fix disabled scrolling text in v11
+
+# 0.7.2
+
+- Fox some issues with entering/exiting auras on v11.

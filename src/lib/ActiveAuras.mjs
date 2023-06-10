@@ -61,7 +61,9 @@ export class ActiveAuras {
       for (const m of iterator1) {
         if (m[0] === key) continue;
 
-        if (m[1].effect.label === value.effect.label && m[1].add === true && value.add === true) {
+        if ((m[1].effect.name ?? m[1].effect.label) === (value.effect.name ?? value.effect.label)
+          && m[1].add === true && value.add === true
+        ) {
           for (let e = 0; e < m[1].effect.changes.length; e++) {
             if (typeof parseInt(m[1].effect.changes[e].value) !== "number") continue;
             const oldEffectValue = parseInt(value.effect.changes[e].value);
@@ -71,7 +73,7 @@ export class ActiveAuras {
             }
           }
         } else if (
-          m[1].effect.label === value.effect.label
+          (m[1].effect.name ?? m[1].effect.label) === (value.effect.name ?? value.effect.label)
           && (m[1].add === true || value.add === true)
           && m[1].token.id === value.token.id
         ) {
@@ -121,7 +123,10 @@ export class ActiveAuras {
       let duplicateEffect = [];
       checkEffects.forEach(
         (e) =>
-          (duplicateEffect = MapObject.effects.filter((i) => i.data?.label === e.data?.label && i.entityId !== tokenId))
+          (duplicateEffect = MapObject.effects.filter((i) =>
+            (i.data?.name ?? i.data?.label) === (e.data?.name ?? e.data?.label)
+            && i.entityId !== tokenId)
+          )
       );
       checkEffects = checkEffects.concat(duplicateEffect);
     }
@@ -228,7 +233,7 @@ export class ActiveAuras {
           }
           break;
       }
-      const MapKey = auraEffect.data.origin + "-" + canvasToken.id + "-" + auraEntity.id + "-" + auraEffect.data.label;
+      const MapKey = auraEffect.data.origin + "-" + canvasToken.id + "-" + auraEntity.id + "-" + (auraEffect.data.name ?? auraEffect.data.label);
       MapObject = map.get(MapKey);
 
       if (distance && !auraEffect.data.flags?.ActiveAuras?.Paused) {
@@ -240,7 +245,7 @@ export class ActiveAuras {
       } else if (
         !MapObject?.add
         && canvasToken.document.actor?.effects.contents.some(
-          (e) => e.origin === auraEffect.data.origin && e.label === auraEffect.data.label
+          (e) => e.origin === auraEffect.data.origin && (e.name ?? e.label) === (auraEffect.data.name ?? auraEffect.data.label)
         )
       ) {
         if (MapObject) {
@@ -276,7 +281,7 @@ export class ActiveAuras {
     const token = canvas.tokens.get(tokenID);
 
     const duplicateEffect = token.document.actor.effects.contents.find(
-      (e) => e.origin === oldEffectData.origin && e.label === oldEffectData.label
+      (e) => e.origin === oldEffectData.origin && (e.name ?? e.label) === (oldEffectData.name ?? oldEffectData.label)
     );
     if (getProperty(duplicateEffect, "flags.ActiveAuras.isAura")) return;
     if (duplicateEffect) {
@@ -329,7 +334,7 @@ export class ActiveAuras {
     }
 
     await token.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
-    Logger.debug(game.i18n.format("ACTIVEAURAS.ApplyLog", { effectDataLabel: effectData.label, tokenName: token.name }));
+    Logger.debug(game.i18n.format("ACTIVEAURAS.ApplyLog", { effectDataLabel: (effectData.name ?? effectData.label), tokenName: token.name }));
   }
 
   /**
