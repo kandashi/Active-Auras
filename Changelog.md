@@ -172,4 +172,8 @@ Spikegrowth example macro fixed.
 
 # 0.7.2
 
-- Fox some issues with entering/exiting auras on v11.
+- Fix some issues with entering/exiting auras on v11.
+
+# 0.7.3
+
+- If wall blocking was enabled AA would throw deprecated warning messages. Also, auras would be applied inconsistently.

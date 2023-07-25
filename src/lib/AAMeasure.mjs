@@ -8,6 +8,16 @@ import { AAHelpers } from "./AAHelpers.mjs";
 import Logger from "./Logger.mjs";
 
 export class AAMeasure {
+
+  // collision blocked by sight or movement
+  static checkCollision(ray) {
+    return isNewerVersion(11, game.version)
+      ? canvas.walls.checkCollision(ray, { mode: "any", type: "sight" })
+        && canvas.walls.checkCollision(ray, { mode: "any", type: "move" })
+      : CONFIG.Canvas.polygonBackends["sight"].testCollision(ray.A, ray.B, { mode: "any", type: "sight" })
+        && CONFIG.Canvas.polygonBackends["move"].testCollision(ray.A, ray.B, { mode: "any", type: "move" });
+  }
+
   static inAura(target, source, wallBlocking = false, auraHeight, radius, shape) {
     const gs = canvas.dimensions.size;
     const g2 = gs / 2;
@@ -74,8 +84,7 @@ export class AAMeasure {
             );
           } else {
             // collision blocked by sight or movement
-            collision = canvas.walls.checkCollision(r, { mode: "any", type: "sight" })
-              || canvas.walls.checkCollision(r, { mode: "any", type: "move" });
+            collision = AAMeasure.checkCollision(r);
           }
           if (collision) continue;
         }
@@ -116,8 +125,7 @@ export class AAMeasure {
           Logger.debug("templateCheck", { templateDetails, token, contains, tx, ty, r });
 
           // collision blocked by sight or movement
-          contains = !canvas.walls.checkCollision(r, { mode: "any", type: "sight" })
-            && !canvas.walls.checkCollision(r, { mode: "any", type: "move" });
+          contains = AAMeasure.checkCollision(r);
         }
         // Check the distance from origin.
         if (contains) return true;
