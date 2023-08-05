@@ -124,8 +124,8 @@ export class AAMeasure {
 
           Logger.debug("templateCheck", { templateDetails, token, contains, tx, ty, r });
 
-          // collision blocked by sight or movement
-          contains = AAMeasure.checkCollision(r);
+          // check to see if blocked by template
+          contains = !AAMeasure.checkCollision(r);
         }
         // Check the distance from origin.
         if (contains) return true;
