@@ -346,8 +346,10 @@ export class ActiveAuras {
     for (const tokenEffects of token.actor.effects) {
       if (tokenEffects.origin === effectOrigin && tokenEffects.flags?.ActiveAuras?.applied === true) {
         try {
-          Logger.debug("RemoveActiveEffects", { token, tokenEffects });
-          await token.actor.deleteEmbeddedDocuments("ActiveEffect", [tokenEffects.id]);
+          if (token.actor.getEmbeddedDocument("ActiveEffect", tokenEffects.id)) {
+            Logger.debug("RemoveActiveEffects", { token, tokenEffects });
+            await token.actor.deleteEmbeddedDocuments("ActiveEffect", [tokenEffects.id]);
+          }
         } catch (err) {
           Logger.error("ERROR CAUGHT in RemoveActiveEffects", err);
         } finally {

@@ -1,6 +1,7 @@
 # 0.7.4
 - Changelog reveresed.
 - Template auras would not apply template correctly if Wall Blocking was enabled.
+- Updates to remove changes of duplicate auras been applied, or errors if moving tokens very quickly.
 
 # 0.7.3
 - If wall blocking was enabled AA would throw deprecated warning messages. Also, auras would be applied inconsistently.

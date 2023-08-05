@@ -76,25 +76,42 @@ export async function updateTokenHook(token, update, _flags, _id) {
   }
 
   if ("y" in update || "x" in update || "elevation" in update) {
+    const updateRef = `${token._id}-${update.x ?? 0}-${update.y ?? 0}-${update.elevation ?? 0}`;
+    // if we are tracking this movement position as already awaiting an update then don't process it
+    if (hasProperty(CONFIG.AA, `refreshMarkers.${updateRef}`)) {
+      Logger.debug(`awaiting token update completion, refreshMarkers.${updateRef}`, { token, update, _flags, _id });
+      return;
+    }
+
     // we need to wait for the movement to finish due to the animation in v10, listen to refresh hook
     Logger.debug("creatingAAUpdateTokenHook", { token: duplicate(token), update, _flags, _id });
 
-    if (_flags.animate === false) {
-      await ActiveAuras.movementUpdate(token);
-    } else {
-      const moveHookId = Hooks.on("refreshToken", async (rToken) => {
-        if (
-          rToken.id !== token.id
-          || ("x" in update && rToken.x !== update.x)
-          || ("y" in update && rToken.y !== update.y)
-          || ("elevation" in update && rToken.document.elevation !== update.elevation)
-        )
-          return;
-        Hooks.off("refreshToken", moveHookId);
-        await ActiveAuras.movementUpdate(token);
+    const timeoutId = setTimeout(() => {
+      // set a timeout for token movement completion
+      Logger.debug("move timeout delete", {
+        token,
+        _flags,
       });
-      // await movementUpdate();
-    }
+      delete CONFIG.AA.refreshMarkers[updateRef];
+    }, 2000);
+
+    setProperty(CONFIG.AA, `refreshMarkers.${updateRef}`, timeoutId);
+    const moveHookId = Hooks.on("refreshToken", async (rToken, details) => {
+      if (
+        rToken.id !== token.id
+        || ("x" in update && rToken.x !== update.x)
+        || ("y" in update && rToken.y !== update.y)
+        || ("elevation" in update && rToken.document.elevation !== update.elevation)
+      ) {
+        if (details.refreshState && !details.refreshPosition) Hooks.off("refreshToken", moveHookId);
+        return;
+      }
+      Hooks.off("refreshToken", moveHookId);
+      await ActiveAuras.movementUpdate(token);
+      // remove token update
+      clearTimeout(timeoutId);
+      delete CONFIG.AA.refreshMarkers[updateRef];
+    });
   } else if (hasProperty(update, "hidden") && (!update.hidden || AAHelpers.IsAuraToken(token.id, token.parent.id))) {
     // in v10 invisible is now a thing, so hidden is considered "not on scene"
     Logger.debug(`hidden, collate auras ${!update.hidden} ${update.hidden}`);
