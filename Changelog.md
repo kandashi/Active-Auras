@@ -1,3 +1,6 @@
+# 0.7.5
+- Wall check logic fixed back to sight or movement (had been changed to sight and movement).
+
 # 0.7.4
 - Changelog reveresed.
 - Template auras would not apply template correctly if Wall Blocking was enabled.
