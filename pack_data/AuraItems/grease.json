@@ -1,0 +1,184 @@
+{
+  "name": "Grease",
+  "type": "spell",
+  "img": "icons/magic/air/fog-gas-smoke-orange.webp",
+  "effects": [
+    {
+      "_id": "56HHrYL8EiufxQmp",
+      "flags": {
+        "dae": {
+          "stackable": "none",
+          "macroRepeat": "endEveryTurn",
+          "transfer": false,
+          "specialDuration": []
+        },
+        "ActiveAuras": {
+          "isAura": true,
+          "ignoreSelf": false,
+          "hidden": false,
+          "height": false,
+          "alignment": "",
+          "type": "",
+          "aura": "All",
+          "radius": null,
+          "save": "",
+          "savedc": null,
+          "hostile": false,
+          "onlyOnce": false,
+          "time": "None",
+          "displayTemp": true
+        },
+        "core": {
+          "statusId": ""
+        }
+      },
+      "changes": [
+        {
+          "key": "flags.midi-qol.OverTime",
+          "mode": 0,
+          "value": "turn=start, saveAbility=dex, saveDC=@attributes.spelldc, rollType=save, label=Fall prone on fail",
+          "priority": 20
+        }
+      ],
+      "disabled": false,
+      "duration": {
+        "startTime": null,
+        "seconds": null,
+        "combat": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "icon": "icons/magic/air/fog-gas-smoke-orange.webp",
+      "label": "Grease",
+      "origin": "Actor.LClwU7mAyShYLmFU.OwnedItem.c75EoQVhgTvlVbq1",
+      "tint": null,
+      "transfer": false
+    }
+  ],
+  "flags": {
+    "midi-qol": {
+      "onUseMacroName": "[preActiveEffects]ItemMacro",
+      "effectActivation": false
+    },
+    "itemacro": {
+      "macro": {
+        "data": {
+          "_id": null,
+          "name": "Grease",
+          "type": "script",
+          "author": "jkdToQqzFl0mFXls",
+          "img": "icons/svg/dice-target.svg",
+          "scope": "global",
+          "command": "if(args[0].tag === \"OnUse\"){\nAAhelpers.applyTemplate(args)\n\n}",
+          "folder": null,
+          "sort": 0,
+          "permission": {
+            "default": 0
+          },
+          "flags": {}
+        }
+      }
+    },
+    "midiProperties": {
+      "nodam": false,
+      "fulldam": false,
+      "halfdam": false,
+      "rollOther": false,
+      "critOther": false,
+      "magicdam": false,
+      "magiceffect": false,
+      "concentration": false,
+      "toggleEffect": false
+    }
+  },
+  "system": {
+    "description": {
+      "value": "<p>Slick grease covers the ground in a 10-foot square centered on a point within range and turns it into difficult terrain for the duration.</p><p>When the grease appears, each creature standing in its area must succeed on a Dexterity saving throw or fall prone. A creature that enters the area or ends its turn there must also succeed on a Dexterity saving throw or fall prone.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": "PHB pg. 246",
+    "activation": {
+      "type": "action",
+      "cost": 1,
+      "condition": ""
+    },
+    "duration": {
+      "value": "1",
+      "units": "minute"
+    },
+    "target": {
+      "value": 10,
+      "width": null,
+      "units": "ft",
+      "type": "square"
+    },
+    "range": {
+      "value": 60,
+      "long": 0,
+      "units": "ft"
+    },
+    "uses": {
+      "value": 0,
+      "max": "",
+      "per": "",
+      "recovery": ""
+    },
+    "consume": {
+      "type": "",
+      "target": "",
+      "amount": null
+    },
+    "ability": "",
+    "actionType": "save",
+    "attackBonus": "",
+    "chatFlavor": "",
+    "critical": {
+      "threshold": null,
+      "damage": ""
+    },
+    "damage": {
+      "parts": [],
+      "versatile": ""
+    },
+    "formula": "",
+    "save": {
+      "ability": "dex",
+      "dc": 20,
+      "scaling": "spell"
+    },
+    "level": 1,
+    "school": "con",
+    "components": {
+      "vocal": true,
+      "somatic": true,
+      "material": true,
+      "ritual": false,
+      "concentration": false
+    },
+    "materials": {
+      "value": "A bit of pork rind or butter",
+      "consumed": false,
+      "cost": 0,
+      "supply": 0
+    },
+    "preparation": {
+      "mode": "prepared",
+      "prepared": false
+    },
+    "scaling": {
+      "mode": "none",
+      "formula": ""
+    }
+  },
+  "_stats": {
+    "systemId": "dnd5e",
+    "systemVersion": "2.1.5",
+    "coreVersion": "10.291",
+    "createdTime": 1662274929957,
+    "modifiedTime": 1685209182957,
+    "lastModifiedBy": "WXjnI1KTF6OM7esR"
+  }
+}

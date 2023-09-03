@@ -121,12 +121,11 @@ export class ActiveAuras {
     if (tokenId && canvasToken.id !== tokenId) {
       checkEffects = checkEffects.filter((i) => i.entityId === tokenId);
       let duplicateEffect = [];
-      checkEffects.forEach(
-        (e) =>
-          (duplicateEffect = MapObject.effects.filter((i) =>
-            (i.data?.name ?? i.data?.label) === (e.data?.name ?? e.data?.label)
-            && i.entityId !== tokenId)
-          )
+      checkEffects.forEach((e) =>
+        (duplicateEffect = MapObject.effects.filter((i) =>
+          (i.data?.name ?? i.data?.label) === (e.data?.name ?? e.data?.label)
+          && i.entityId !== tokenId)
+        )
       );
       checkEffects = checkEffects.concat(duplicateEffect);
     }
@@ -148,6 +147,11 @@ export class ActiveAuras {
             let auraAlignment = auraEffect.data.flags?.ActiveAuras?.alignment !== undefined ? auraEffect.data.flags?.ActiveAuras?.alignment.toLowerCase() : "";
             let hostileTurn = auraEffect.data.flags?.ActiveAuras?.hostile
             */
+
+      const rename = getProperty(auraEffect.data, "flags.ActiveAuras.nameOverride");
+      const effectName = (rename && rename.trim() !=="")
+        ? rename
+        : auraEffect.data.name ?? auraEffect.data.label;
 
       switch (auraEffect.entityType) {
         //{data: testEffect.data, parentActorLink :testEffect.parent.data.token.actorLink, parentActorId : testEffect.parent._id, tokenId: testToken.id, templateId: template._id, }
@@ -233,7 +237,7 @@ export class ActiveAuras {
           }
           break;
       }
-      const MapKey = auraEffect.data.origin + "-" + canvasToken.id + "-" + auraEntity.id + "-" + (auraEffect.data.name ?? auraEffect.data.label);
+      const MapKey = auraEffect.data.origin + "-" + canvasToken.id + "-" + auraEntity.id + "-" + effectName;
       MapObject = map.get(MapKey);
 
       if (distance && !auraEffect.data.flags?.ActiveAuras?.Paused) {
@@ -245,7 +249,7 @@ export class ActiveAuras {
       } else if (
         !MapObject?.add
         && canvasToken.document.actor?.effects.contents.some(
-          (e) => e.origin === auraEffect.data.origin && (e.name ?? e.label) === (auraEffect.data.name ?? auraEffect.data.label)
+          (e) => e.origin === auraEffect.data.origin && (e.name ?? e.label) === effectName
         )
       ) {
         if (MapObject) {
@@ -280,8 +284,14 @@ export class ActiveAuras {
   static async CreateActiveEffect(tokenID, oldEffectData) {
     const token = canvas.tokens.get(tokenID);
 
-    const duplicateEffect = token.document.actor.effects.contents.find(
-      (e) => e.origin === oldEffectData.origin && (e.name ?? e.label) === (oldEffectData.name ?? oldEffectData.label)
+    const rename = getProperty(oldEffectData, "flags.ActiveAuras.nameOverride");
+    const effectName = (rename && rename.trim() !=="")
+      ? rename
+      : oldEffectData.name ?? oldEffectData.label;
+
+    const duplicateEffect = token.document.actor.effects.contents.find((e) =>
+      e.origin === oldEffectData.origin
+      && (e.name ?? e.label) === effectName
     );
     if (getProperty(duplicateEffect, "flags.ActiveAuras.isAura")) return;
     if (duplicateEffect) {
@@ -290,6 +300,9 @@ export class ActiveAuras {
       else await ActiveAuras.RemoveActiveEffects(tokenID, oldEffectData.origin);
     }
     let effectData = duplicate(oldEffectData);
+    if (effectData.name) effectData.name = effectName;
+    else effectData.label = effectName;
+
     if (effectData.flags.ActiveAuras.onlyOnce) {
       const AAID = oldEffectData.origin.replaceAll(".", "");
       if (token.document.flags.ActiveAuras?.[AAID]) return;

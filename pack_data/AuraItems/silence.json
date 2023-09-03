@@ -1,0 +1,185 @@
+{
+  "name": "Silence",
+  "type": "spell",
+  "img": "icons/magic/symbols/runes-triangle-magenta.webp",
+  "effects": [
+    {
+      "_id": "4gFVHoupB272LFGm",
+      "flags": {
+        "dae": {
+          "stackable": "none",
+          "macroRepeat": "none",
+          "transfer": false,
+          "specialDuration": [],
+          "durationExpression": ""
+        },
+        "ActiveAuras": {
+          "isAura": true,
+          "ignoreSelf": false,
+          "hidden": false,
+          "height": false,
+          "alignment": "",
+          "type": "",
+          "aura": "All",
+          "radius": null,
+          "save": "",
+          "savedc": null,
+          "hostile": false,
+          "onlyOnce": false,
+          "time": "None",
+          "displayTemp": true
+        },
+        "core": {
+          "statusId": ""
+        }
+      },
+      "changes": [
+        {
+          "key": "",
+          "mode": 0,
+          "value": "Convenient Effect: Blinded",
+          "priority": 20
+        }
+      ],
+      "disabled": false,
+      "duration": {
+        "startTime": null,
+        "seconds": null,
+        "combat": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "icon": "icons/magic/symbols/runes-triangle-magenta.webp",
+      "label": "Silence",
+      "tint": null,
+      "transfer": false,
+      "origin": null
+    }
+  ],
+  "flags": {
+    "midi-qol": {
+      "onUseMacroName": "[preActiveEffects]ItemMacro",
+      "effectActivation": false
+    },
+    "itemacro": {
+      "macro": {
+        "data": {
+          "_id": null,
+          "name": "Silence",
+          "type": "script",
+          "author": "jkdToQqzFl0mFXls",
+          "img": "icons/svg/dice-target.svg",
+          "scope": "global",
+          "command": "if(args[0].tag === \"OnUse\"){\nAAhelpers.applyTemplate(args) }",
+          "folder": null,
+          "sort": 0,
+          "permission": {
+            "default": 0
+          },
+          "flags": {}
+        }
+      }
+    },
+    "midiProperties": {
+      "nodam": false,
+      "fulldam": false,
+      "halfdam": false,
+      "rollOther": false,
+      "critOther": false,
+      "magicdam": false,
+      "magiceffect": false,
+      "concentration": false,
+      "toggleEffect": false
+    }
+  },
+  "system": {
+    "description": {
+      "value": "<p>For the Duration, no sound can be created within or pass through a 20-foot-radius s⁠phere centered on a point you choose within range. Any creature or object entirely inside the s⁠phere is immune to thunder damage, and creatures are Deafened while entirely inside it. Casting a Spell that includes a verbal component is impossible there.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": "PHB pg. 275",
+    "activation": {
+      "type": "action",
+      "cost": 1,
+      "condition": ""
+    },
+    "duration": {
+      "value": "10",
+      "units": "minute"
+    },
+    "target": {
+      "value": 20,
+      "width": null,
+      "units": "ft",
+      "type": "sphere"
+    },
+    "range": {
+      "value": 120,
+      "long": 0,
+      "units": "ft"
+    },
+    "uses": {
+      "value": 0,
+      "max": "",
+      "per": "",
+      "recovery": ""
+    },
+    "consume": {
+      "type": "",
+      "target": "",
+      "amount": null
+    },
+    "ability": "",
+    "actionType": "util",
+    "attackBonus": "",
+    "chatFlavor": "",
+    "critical": {
+      "threshold": null,
+      "damage": ""
+    },
+    "damage": {
+      "parts": [],
+      "versatile": ""
+    },
+    "formula": "",
+    "save": {
+      "ability": "",
+      "dc": null,
+      "scaling": "spell"
+    },
+    "level": 2,
+    "school": "ill",
+    "components": {
+      "vocal": true,
+      "somatic": true,
+      "material": false,
+      "ritual": true,
+      "concentration": true
+    },
+    "materials": {
+      "value": "",
+      "consumed": false,
+      "cost": 0,
+      "supply": 0
+    },
+    "preparation": {
+      "mode": "prepared",
+      "prepared": false
+    },
+    "scaling": {
+      "mode": "none",
+      "formula": ""
+    }
+  },
+  "_stats": {
+    "systemId": "dnd5e",
+    "systemVersion": "2.1.5",
+    "coreVersion": "10.291",
+    "createdTime": 1662274929974,
+    "modifiedTime": 1685209182969,
+    "lastModifiedBy": "WXjnI1KTF6OM7esR"
+  }
+}

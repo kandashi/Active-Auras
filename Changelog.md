@@ -1,3 +1,6 @@
+# 0.7.6
+- Auras now have a rename/name override field, allow the effect placed by the aura to get a new name!
+
 # 0.7.5
 - Wall check logic fixed back to sight or movement (had been changed to sight and movement).
 

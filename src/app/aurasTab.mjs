@@ -25,12 +25,14 @@ export async function extendEffectsForm(sheet, html) {
   const ActivateOnce = game.i18n.format("ACTIVEAURAS.FORM_ActivateOnce");
   const Wildcard = game.i18n.format("ACTIVEAURAS.FORM_Wildcard");
   const Extra = game.i18n.format("ACTIVEAURAS.FORM_Extra");
+  const FormNameOverride = game.i18n.format("ACTIVEAURAS.FORM_NameOverride");
 
 
   const tab = `<a class="item" data-tab="ActiveAuras"><i class="fas fa-broadcast-tower"></i> ${AuraTab}</a>`;
   const type = flags[CONSTANTS.MODULE_NAME]?.type ? flags[CONSTANTS.MODULE_NAME]?.type : "";
   const alignment = flags[CONSTANTS.MODULE_NAME]?.alignment ? flags[CONSTANTS.MODULE_NAME]?.alignment : "";
   const radius = flags[CONSTANTS.MODULE_NAME]?.radius ?? "";
+  const nameOverride = flags[CONSTANTS.MODULE_NAME]?.nameOverride ?? "";
 
   let contents = `
     <div class="tab" data-tab="ActiveAuras">
@@ -48,6 +50,10 @@ export async function extendEffectsForm(sheet, html) {
                 </select>
             </div>
         <div id="specifics">
+            <div class="form-group">
+                <label>${FormNameOverride}</label>
+                <input id="type" name="flags.${CONSTANTS.MODULE_NAME}.nameOverride" type="text" value="${nameOverride}" placeholder=""></input>
+            </div>
             <div class="form-group">
                 <label>${FormRadius}</label>
                 <input id="radius" name="flags.${CONSTANTS.MODULE_NAME}.radius" type="text" min="0" step="any" value="${radius}" placeholder="${FormRadiusPrompt}"></input>

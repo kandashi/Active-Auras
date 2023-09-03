@@ -1,0 +1,127 @@
+{
+  "name": "Aura of Courage",
+  "type": "feat",
+  "img": "icons/magic/light/explosion-beam-impact-silhouette.webp",
+  "effects": [
+    {
+      "_id": "jqyEv4x6Yz5NcW9F",
+      "flags": {
+        "ActiveAuras": {
+          "isAura": true,
+          "inactive": false,
+          "hidden": false,
+          "aura": "Allies",
+          "radius": 10
+        },
+        "dae": {
+          "stackable": false,
+          "specialDuration": "None",
+          "transfer": true
+        }
+      },
+      "changes": [
+        {
+          "key": "system.traits.ci.value",
+          "value": "frightened",
+          "mode": 2,
+          "priority": 20
+        }
+      ],
+      "disabled": false,
+      "duration": {
+        "startTime": null,
+        "seconds": null,
+        "combat": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "icon": "icons/magic/light/explosion-beam-impact-silhouette.webp",
+      "label": "Aura of Courage",
+      "tint": null,
+      "transfer": true,
+      "origin": null
+    }
+  ],
+  "flags": {
+    "dae": {
+      "activeEquipped": false,
+      "alwaysActive": true
+    }
+  },
+  "system": {
+    "description": {
+      "value": "<p>Starting at 10th level, you and friendly creatures within 10 feet of you can't be frightened while you are conscious.</p><p>At 18th level, the range of this aura increases to 30 feet.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": "PHB pg. 85",
+    "activation": {
+      "type": "",
+      "cost": 0,
+      "condition": ""
+    },
+    "duration": {
+      "value": "",
+      "units": ""
+    },
+    "target": {
+      "value": null,
+      "width": null,
+      "units": "",
+      "type": "self"
+    },
+    "range": {
+      "value": 10,
+      "long": 30,
+      "units": "ft"
+    },
+    "uses": {
+      "value": 0,
+      "max": "",
+      "per": "",
+      "recovery": ""
+    },
+    "consume": {
+      "type": "",
+      "target": null,
+      "amount": null
+    },
+    "ability": "",
+    "actionType": "",
+    "attackBonus": "",
+    "chatFlavor": "",
+    "critical": {
+      "threshold": null,
+      "damage": ""
+    },
+    "damage": {
+      "parts": [],
+      "versatile": ""
+    },
+    "formula": "",
+    "save": {
+      "ability": "",
+      "dc": null,
+      "scaling": "spell"
+    },
+    "type": {
+      "value": "",
+      "subtype": ""
+    },
+    "requirements": "Paladin 10",
+    "recharge": {
+      "value": null,
+      "charged": false
+    }
+  },
+  "_stats": {
+    "systemId": "dnd5e",
+    "systemVersion": "2.1.5",
+    "coreVersion": "10.291",
+    "createdTime": 1662274929977,
+    "modifiedTime": 1685209182970,
+    "lastModifiedBy": "WXjnI1KTF6OM7esR"
+  }
+}

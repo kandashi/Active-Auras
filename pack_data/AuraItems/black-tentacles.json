@@ -1,0 +1,185 @@
+{
+  "name": "Black Tentacles",
+  "type": "spell",
+  "img": "icons/magic/nature/vines-thorned-curled-glow-teal-purple.webp",
+  "effects": [
+    {
+      "_id": "ovktWr3CsAFw82Nd",
+      "flags": {
+        "dae": {
+          "stackable": "none",
+          "macroRepeat": "startEveryTurn",
+          "transfer": false,
+          "specialDuration": []
+        },
+        "ActiveAuras": {
+          "isAura": true,
+          "ignoreSelf": false,
+          "hidden": false,
+          "height": false,
+          "alignment": "",
+          "type": "",
+          "aura": "All",
+          "radius": null,
+          "save": "",
+          "savedc": null,
+          "hostile": true,
+          "onlyOnce": true,
+          "time": "None",
+          "displayTemp": false
+        },
+        "core": {
+          "statusId": ""
+        }
+      },
+      "changes": [
+        {
+          "key": "flags.midi-qol.OverTime",
+          "mode": 0,
+          "value": "turn=start, saveAbility=con, saveDC=@attributes.spelldc, saveDamage=noDamage, rollType=save, saveMagic=true, damageBeforeSave=false, damageRoll=3d6, damageType=bludgeoning",
+          "priority": 20
+        }
+      ],
+      "disabled": false,
+      "duration": {
+        "startTime": null,
+        "seconds": null,
+        "combat": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "icon": "icons/magic/nature/vines-thorned-curled-glow-teal-purple.webp",
+      "label": "Black Tentacles",
+      "tint": null,
+      "transfer": false,
+      "origin": null
+    }
+  ],
+  "flags": {
+    "midi-qol": {
+      "onUseMacroName": "[preActiveEffects]ItemMacro",
+      "effectActivation": false,
+      "forceCEOn": false
+    },
+    "itemacro": {
+      "macro": {
+        "data": {
+          "_id": null,
+          "name": "Black Tentacles",
+          "type": "script",
+          "author": "jkdToQqzFl0mFXls",
+          "img": "icons/svg/dice-target.svg",
+          "scope": "global",
+          "command": "if(args[0].tag === \"OnUse\"){AAhelpers.applyTemplate(args)\n}",
+          "folder": null,
+          "sort": 0,
+          "permission": {
+            "default": 0
+          },
+          "flags": {}
+        }
+      }
+    },
+    "midiProperties": {
+      "nodam": false,
+      "fulldam": false,
+      "halfdam": false,
+      "rollOther": false,
+      "critOther": false,
+      "magicdam": false,
+      "magiceffect": false,
+      "concentration": false,
+      "toggleEffect": false
+    }
+  },
+  "system": {
+    "description": {
+      "value": "<p>Squirming, ebony tentacles fill a 20-foot square on ground that you can see within range. For the Duration, these tentacles turn the ground in the area into difficult terrain.</p>\n<p>When a creature enters the affected area for the first time on a turn or starts its turn there, the creature must succeed on a Dexterity saving throw or take 3d6 bludgeoning damage and be @Compendium[dnd5e.rules.QRKWz3p6v9Rl1Tzh]{Restrained} by the tentacles until the spell ends. A creature that starts its turn in the area and is already @Compendium[dnd5e.rules.QRKWz3p6v9Rl1Tzh]{Restrained} by the tentacles takes 3d6 bludgeoning damage.</p>\n<p>A creature @Compendium[dnd5e.rules.QRKWz3p6v9Rl1Tzh]{Restrained} by the tentacles can use its action to make a Strength or D⁠exterity check (its choice) against your spell save DC. On a success, it frees itself.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": "",
+    "activation": {
+      "type": "action",
+      "cost": 1,
+      "condition": ""
+    },
+    "duration": {
+      "value": "1",
+      "units": "minute"
+    },
+    "target": {
+      "value": 20,
+      "width": null,
+      "units": "ft",
+      "type": "square"
+    },
+    "range": {
+      "value": 90,
+      "long": 0,
+      "units": "ft"
+    },
+    "uses": {
+      "value": 0,
+      "max": "",
+      "per": "",
+      "recovery": ""
+    },
+    "consume": {
+      "type": "",
+      "target": "",
+      "amount": null
+    },
+    "ability": "",
+    "actionType": "save",
+    "attackBonus": "",
+    "chatFlavor": "",
+    "critical": {
+      "threshold": null,
+      "damage": ""
+    },
+    "damage": {
+      "parts": [],
+      "versatile": ""
+    },
+    "formula": "",
+    "save": {
+      "ability": "",
+      "dc": null,
+      "scaling": "spell"
+    },
+    "level": 4,
+    "school": "con",
+    "components": {
+      "vocal": true,
+      "somatic": true,
+      "material": true,
+      "ritual": false,
+      "concentration": true
+    },
+    "materials": {
+      "value": "A piece of tentacle from a giant octopus or a giant squid",
+      "consumed": false,
+      "cost": 0,
+      "supply": 0
+    },
+    "preparation": {
+      "mode": "prepared",
+      "prepared": false
+    },
+    "scaling": {
+      "mode": "none",
+      "formula": ""
+    }
+  },
+  "_stats": {
+    "systemId": "dnd5e",
+    "systemVersion": "2.1.5",
+    "coreVersion": "10.291",
+    "createdTime": 1662274929942,
+    "modifiedTime": 1685209182950,
+    "lastModifiedBy": "WXjnI1KTF6OM7esR"
+  }
+}

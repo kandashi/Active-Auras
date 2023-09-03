@@ -1,0 +1,23 @@
+{
+  "name": "AA DoT",
+  "type": "script",
+  "flags": {
+    "furnace": { "runAsGM": false }
+  },
+  "scope": "global",
+  "command": "if(args[0] === \"on\") {\nlet damageRoll = new Roll(`${args[1]}`).roll().toMessage({flavor: `${args[2]}`})\n}",
+  "author": "E4BVikjIkVl2lL2j",
+  "img": "icons/svg/dice-target.svg",
+  "_id": "TWJ7K9Rw384oXFxV",
+  "ownership": { "default": 0, "E4BVikjIkVl2lL2j": 3 },
+  "folder": null,
+  "sort": 0,
+  "_stats": {
+    "systemId": "dnd5e",
+    "systemVersion": "2.0.1",
+    "coreVersion": "10.283",
+    "createdTime": 1662274930162,
+    "modifiedTime": 1662274930162,
+    "lastModifiedBy": "GrX6tFOozYFBnDHq"
+  }
+}

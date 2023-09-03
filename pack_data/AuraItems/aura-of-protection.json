@@ -1,0 +1,144 @@
+{
+  "name": "Aura of Protection",
+  "type": "feat",
+  "img": "icons/magic/air/wind-tornado-wall-blue.webp",
+  "effects": [
+    {
+      "_id": "YA6d5MuIdX6Bkc8O",
+      "flags": {
+        "ActiveAuras": {
+          "aura": "Allies",
+          "radius": 10,
+          "isAura": true,
+          "inactive": false,
+          "hidden": false,
+          "ignoreSelf": false,
+          "height": false,
+          "alignment": "",
+          "type": "",
+          "save": "",
+          "savedc": null,
+          "hostile": false,
+          "onlyOnce": false,
+          "time": "None",
+          "displayTemp": false
+        },
+        "dae": {
+          "stackable": "none",
+          "specialDuration": [
+            "None"
+          ],
+          "transfer": true,
+          "macroRepeat": "none",
+          "durationExpression": ""
+        },
+        "core": {
+          "statusId": ""
+        }
+      },
+      "changes": [
+        {
+          "key": "system.bonuses.abilities.save",
+          "mode": 2,
+          "value": "+@abilities.cha.mod",
+          "priority": 20
+        }
+      ],
+      "disabled": false,
+      "duration": {
+        "startTime": null,
+        "seconds": null,
+        "combat": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "icon": "icons/magic/air/wind-tornado-wall-blue.webp",
+      "label": "Aura of Protection",
+      "origin": "Item.8csQOq23Ht2m47Zg",
+      "tint": null,
+      "transfer": true
+    }
+  ],
+  "flags": {
+    "dae": {
+      "activeEquipped": false,
+      "alwaysActive": true
+    }
+  },
+  "system": {
+    "description": {
+      "value": "<p>Starting at 6th level, whenever you or a friendly creature within 10 feet of you must make a saving throw, the creature gains a bonus to the saving throw equal to your Charisma modifier (with a minimum bonus of +1). You must be conscious to grant this bonus.</p><p> At 18th level, the range of this aura increases to 30 feet.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": "PHB pg. 85",
+    "activation": {
+      "type": "",
+      "cost": 0,
+      "condition": ""
+    },
+    "duration": {
+      "value": "",
+      "units": ""
+    },
+    "target": {
+      "value": null,
+      "width": null,
+      "units": "",
+      "type": "self"
+    },
+    "range": {
+      "value": 10,
+      "long": 30,
+      "units": "ft"
+    },
+    "uses": {
+      "value": 0,
+      "max": "",
+      "per": "",
+      "recovery": ""
+    },
+    "consume": {
+      "type": "",
+      "target": null,
+      "amount": null
+    },
+    "ability": "",
+    "actionType": "",
+    "attackBonus": "",
+    "chatFlavor": "",
+    "critical": {
+      "threshold": null,
+      "damage": ""
+    },
+    "damage": {
+      "parts": [],
+      "versatile": ""
+    },
+    "formula": "",
+    "save": {
+      "ability": "",
+      "dc": null,
+      "scaling": "spell"
+    },
+    "type": {
+      "value": "",
+      "subtype": ""
+    },
+    "requirements": "Paladin 6",
+    "recharge": {
+      "value": null,
+      "charged": false
+    }
+  },
+  "_stats": {
+    "systemId": "dnd5e",
+    "systemVersion": "2.1.5",
+    "coreVersion": "10.291",
+    "createdTime": 1662274929979,
+    "modifiedTime": 1685209182971,
+    "lastModifiedBy": "WXjnI1KTF6OM7esR"
+  }
+}

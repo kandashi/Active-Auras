@@ -1,0 +1,25 @@
+{
+  "_id": "UwyXiTHK3Q518uLm",
+  "name": "AA Apply Effect to Template",
+  "type": "script",
+  "author": "E4BVikjIkVl2lL2j",
+  "img": "icons/svg/dice-target.svg",
+  "scope": "global",
+  "command": "//On use macro to apply an item's active effects to the placed template instead of applying through the normal midi QoL workflow \n// requires midi qol, advanced macros and Active Auras \nAAhelpers.applyTemplate(<midi arguments here>)",
+  "folder": null,
+  "sort": 0,
+  "flags": {
+    "furnace": { "runAsGM": false },
+    "combat-utility-belt": { "macroTrigger": "" },
+    "advanced-macros": { "runAsGM": false }
+  },
+  "ownership": { "default": 0, "E4BVikjIkVl2lL2j": 3 },
+  "_stats": {
+    "systemId": "dnd5e",
+    "systemVersion": "2.0.1",
+    "coreVersion": "10.283",
+    "createdTime": 1662274930163,
+    "modifiedTime": 1662274930163,
+    "lastModifiedBy": "GrX6tFOozYFBnDHq"
+  }
+}

@@ -93,7 +93,7 @@ export async function updateTokenHook(token, update, _flags, _id) {
         _flags,
       });
       delete CONFIG.AA.refreshMarkers[updateRef];
-    }, 2000);
+    }, 6000);
 
     setProperty(CONFIG.AA, `refreshMarkers.${updateRef}`, timeoutId);
     const moveHookId = Hooks.on("refreshToken", async (rToken, details) => {
@@ -123,7 +123,7 @@ export async function updateTokenHook(token, update, _flags, _id) {
 }
 
 export function updateItemHook(item, update, _flags, _id) {
-  Logger.debug("updateItemHookArgs", { item, update, _flags, _id });
+  // Logger.debug("updateItemHookArgs", { item, update, _flags, _id });
   if (canvas.scene === null) {
     Logger.debug("Active Auras disabled due to no canvas");
     return;

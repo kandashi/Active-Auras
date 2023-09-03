@@ -1,0 +1,182 @@
+{
+  "name": "Spike Growth",
+  "type": "spell",
+  "img": "icons/magic/nature/vines-thorned-curled-glow-green.webp",
+  "effects": [
+    {
+      "_id": "f1Ab0wnqRPfoEsf1",
+      "flags": {
+        "dae": {
+          "stackable": false,
+          "macroRepeat": "none",
+          "transfer": false,
+          "specialDuration": [
+            "isDamaged"
+          ]
+        },
+        "ActiveAuras": {
+          "isAura": true,
+          "ignoreSelf": false,
+          "hidden": false,
+          "height": false,
+          "alignment": "",
+          "type": "",
+          "aura": "All",
+          "radius": null,
+          "save": "",
+          "savedc": null,
+          "hostile": true,
+          "onlyOnce": false,
+          "time": "isDamaged"
+        }
+      },
+      "changes": [
+        {
+          "key": "macro.itemMacro",
+          "mode": 0,
+          "value": "",
+          "priority": 20
+        }
+      ],
+      "disabled": false,
+      "duration": {
+        "startTime": null,
+        "seconds": null,
+        "combat": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "icon": "icons/magic/nature/vines-thorned-curled-glow-green.webp",
+      "label": "Spike Growth",
+      "origin": "Actor.LClwU7mAyShYLmFU.OwnedItem.nkArQrnBQu4uN92X",
+      "tint": null,
+      "transfer": false
+    }
+  ],
+  "flags": {
+    "midi-qol": {
+      "onUseMacroName": "[preActiveEffects]ItemMacro",
+      "effectActivation": false
+    },
+    "itemacro": {
+      "macro": {
+        "data": {
+          "_id": null,
+          "name": "Spike Growth",
+          "type": "script",
+          "author": "jkdToQqzFl0mFXls",
+          "img": "icons/svg/dice-target.svg",
+          "scope": "global",
+          "command": "if(args[0].tag === \"OnUse\"){\nAAhelpers.applyTemplate(args) }\nif (args[0] === \"on\" || args[0] === \"each\") {\n    const lastArg = args[args.length - 1];\n    let tactor;\n    if (lastArg.tokenId) tactor = canvas.tokens.get(lastArg.tokenId).actor;\n    else tactor = game.actors.get(lastArg.actorId);\n    const target = canvas.tokens.get(lastArg.tokenId)\n    let damageRoll = await new Roll(`2d4[piercing]`).evaluate()\n    damageRoll.toMessage({ flavor: \"Spike Growth Damage\" })\n    let targets = new Set();\n    let saves = new Set();\n    targets.add(target);\n    saves.add(target);\n    await MidiQOL.applyTokenDamage([{ damage: damageRoll.total, type: \"piercing\" }], damageRoll.total, targets, null, saves);\n    let effect = tactor.effects.find(i => i.data.label === \"Spike Growth\")\n    await effect.delete()\n}",
+          "folder": null,
+          "sort": 0,
+          "permission": {
+            "default": 0
+          },
+          "flags": {}
+        }
+      }
+    },
+    "midiProperties": {
+      "nodam": false,
+      "fulldam": false,
+      "halfdam": false,
+      "rollOther": false,
+      "critOther": false,
+      "magicdam": false,
+      "magiceffect": false,
+      "concentration": false,
+      "toggleEffect": false
+    }
+  },
+  "system": {
+    "description": {
+      "value": "<p>The ground in a 20-foot radius centered on a point within range twists and sprouts hard spikes and thorns. The area becomes difficult terrain for the Duration. When a creature moves into or within the area, it takes 2d4 piercing damage for every 5 feet it travels.</p><p>The transformation of the ground is camouflaged to look natural. Any creature that can’t see the area at the time the spell is cast must make a Wisdom (Perception) check against your spell save DC to recognize the terrain as hazardous before entering it.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": "PHB pg. 277",
+    "activation": {
+      "type": "action",
+      "cost": 1,
+      "condition": ""
+    },
+    "duration": {
+      "value": "10",
+      "units": "minute"
+    },
+    "target": {
+      "value": 20,
+      "width": null,
+      "units": "ft",
+      "type": "radius"
+    },
+    "range": {
+      "value": 150,
+      "long": 0,
+      "units": "ft"
+    },
+    "uses": {
+      "value": 0,
+      "max": "",
+      "per": "",
+      "recovery": ""
+    },
+    "consume": {
+      "type": "",
+      "target": "",
+      "amount": null
+    },
+    "ability": "",
+    "actionType": "other",
+    "attackBonus": "",
+    "chatFlavor": "",
+    "critical": {
+      "threshold": null,
+      "damage": ""
+    },
+    "damage": {
+      "parts": [],
+      "versatile": ""
+    },
+    "formula": "",
+    "save": {
+      "ability": "",
+      "dc": null,
+      "scaling": "spell"
+    },
+    "level": 2,
+    "school": "trs",
+    "components": {
+      "vocal": true,
+      "somatic": true,
+      "material": true,
+      "ritual": false,
+      "concentration": true
+    },
+    "materials": {
+      "value": "Seven sharp thorns or seven small twigs, each sharpened to a point",
+      "consumed": false,
+      "cost": 0,
+      "supply": 0
+    },
+    "preparation": {
+      "mode": "prepared",
+      "prepared": false
+    },
+    "scaling": {
+      "mode": "none",
+      "formula": ""
+    }
+  },
+  "_stats": {
+    "systemId": "dnd5e",
+    "systemVersion": "2.1.5",
+    "coreVersion": "10.291",
+    "createdTime": 1662274929962,
+    "modifiedTime": 1685209182959,
+    "lastModifiedBy": "WXjnI1KTF6OM7esR"
+  }
+}
