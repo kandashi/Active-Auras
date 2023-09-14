@@ -5,7 +5,13 @@ export class AAHelpers {
 
   static evaluateCustomCheck(token, check) {
     try {
-      const result = Boolean(eval(check.trim()));
+      // eslint-disable-next-line no-unused-vars
+      const actor = token.actor;
+      // eslint-disable-next-line no-unused-vars
+      const system = token.actor?.system;
+      // eslint-disable-next-line no-unused-vars
+      const rollData = token.actor?.getRollData();
+      const result = Boolean(eval(check));
       return result;
     } catch (e) {
       Logger.warn(`Custom check failed: ${check}`, e);
