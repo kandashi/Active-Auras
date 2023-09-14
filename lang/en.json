@@ -16,7 +16,11 @@
     "ACTIVEAURAS.scrollingAuraHint" : "Removes the Active Effect scrolling text for any applied aura",
 
     "ACTIVEAURAS.walltoptions_name": "Walls Block Auras",
-    "ACTIVEAURAS.walltoptions_hint":"Interveneing walls will block aura effects",
+    "ACTIVEAURAS.walltoptions_hint":"Intervening walls will block aura effects",
+    "ACTIVEAURAS.FORM_WallsBlock": "Walls Block this Aura?",
+    "ACTIVEAURAS.FORM_SystemWallsBlock": "Use module default",
+    "ACTIVEAURAS.FORM_WallsDoBlock": "Yes",
+    "ACTIVEAURAS.FORM_WallsDontBlock": "No",
 
     "ACTIVEAURAS.FORM_IsAura" : "Effect is Aura",
     "ACTIVEAURAS.FORM_IgnoreSelf": "Ignore self",
@@ -51,3 +55,4 @@
     "ACTIVEAURAS.IgnoreSelfLog":"ActiveAuras | Ignoring '{effectDataLabel}' change {changeKey} to {actorName}",
     "ACTIVEAURAS.SaveNotify": "${tokenName} passes the save against ${oldEffectDataLabel}"
 }
+
