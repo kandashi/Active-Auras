@@ -138,12 +138,11 @@ export class ActiveAuras {
       const { radius, height, hostile, wildcard, extra } = (auraEffect.data.flags?.ActiveAuras ?? {});
       let { type, alignment, customCheck, wallsBlock } = (auraEffect.data.flags?.ActiveAuras ?? {});
       alignment = alignment?.toLowerCase() ?? "";
-      customCheck = customCheck?.toLowerCase() ?? "";
+      customCheck = customCheck?.trim() ?? "";
       type = type?.toLowerCase() ?? "";
       wallsBlock = wallsBlock?.toLowerCase() ?? "system";
 
       if (alignment && !tokenAlignment.includes(alignment) && !tokenAlignment.includes("any")) continue;
-      if (customCheck && !AAHelpers.evaluateCustomCheck(canvasToken, customCheck)) continue;
       if (wallsBlock !== "system") {
         wallsBlock = wallsBlock === "true";
       } else {
@@ -239,6 +238,7 @@ export class ActiveAuras {
       MapObject = map.get(MapKey);
 
       if (distance && !auraEffect.data.flags?.ActiveAuras?.Paused) {
+        if (customCheck && !AAHelpers.evaluateCustomCheck(canvasToken, customCheck)) continue;
         if (MapObject) {
           MapObject.add = true;
         } else {
