@@ -136,17 +136,14 @@ export class ActiveAuras {
       const auraTargets = auraEffect.data.flags?.ActiveAuras?.aura;
 
       const { radius, height, hostile, wildcard, extra } = (auraEffect.data.flags?.ActiveAuras ?? {});
-      let { type, alignment } = (auraEffect.data.flags?.ActiveAuras ?? {});
+      let { type, alignment, customCheck } = (auraEffect.data.flags?.ActiveAuras ?? {});
       type = type?.toLowerCase() ?? "";
       alignment = alignment?.toLowerCase() ?? "";
+      customCheck = customCheck?.toLowerCase() ?? "";
       if (alignment && !tokenAlignment.includes(alignment) && !tokenAlignment.includes("any")) continue;
+      if (customCheck && !AAHelpers.evaluateCustomCheck(canvasToken, customCheck)) continue;
 
       let auraEntity, distance;
-      /*
-            let auraType = auraEffect.data.flags?.ActiveAuras?.type !== undefined ? auraEffect.data.flags?.ActiveAuras?.type.toLowerCase() : "";
-            let auraAlignment = auraEffect.data.flags?.ActiveAuras?.alignment !== undefined ? auraEffect.data.flags?.ActiveAuras?.alignment.toLowerCase() : "";
-            let hostileTurn = auraEffect.data.flags?.ActiveAuras?.hostile
-            */
 
       const rename = getProperty(auraEffect.data, "flags.ActiveAuras.nameOverride");
       const effectName = (rename && rename.trim() !=="")
@@ -175,14 +172,10 @@ export class ActiveAuras {
               )
             )
               continue;
-            if (type) {
-              if (!AAHelpers.CheckType(canvasToken, type)) continue;
-            }
+            if (type) if (!AAHelpers.CheckType(canvasToken, type)) continue;
             if (hostile && canvasToken.id !== game.combats.active?.current.tokenId) continue;
+            if (game.system.id === "swade" && !AAHelpers.Wildcard(canvasToken, wildcard, extra)) continue;
 
-            if (game.system.id === "swade") {
-              if (!AAHelpers.Wildcard(canvasToken, wildcard, extra)) continue;
-            }
             const tokenRadius = AAHelpers.EvaluateRollString({ rollString: radius, token: auraEntity });
             const shape = AATemplates.getAuraShape(auraEntity, tokenRadius);
             distance = AAMeasure.inAura(
@@ -199,9 +192,7 @@ export class ActiveAuras {
           {
             auraEntity = canvas.templates.get(auraEffect.entityId);
 
-            if (type) {
-              if (!AAHelpers.CheckType(canvasToken, type)) continue;
-            }
+            if (type) if (!AAHelpers.CheckType(canvasToken, type)) continue;
             if (hostile && canvasToken.id !== game.combats.active.current.tokenId) return;
             if (auraEffect.casterDisposition) {
               if (!AAHelpers.DispositionCheck(auraTargets, auraEffect.casterDisposition, canvasToken.disposition))

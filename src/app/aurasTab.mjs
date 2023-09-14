@@ -26,11 +26,12 @@ export async function extendEffectsForm(sheet, html) {
   const Wildcard = game.i18n.format("ACTIVEAURAS.FORM_Wildcard");
   const Extra = game.i18n.format("ACTIVEAURAS.FORM_Extra");
   const FormNameOverride = game.i18n.format("ACTIVEAURAS.FORM_NameOverride");
-
+  const FormCustomConditionPrompt = game.i18n.format("ACTIVEAURAS.FORM_CustomCondition");
 
   const tab = `<a class="item" data-tab="ActiveAuras"><i class="fas fa-broadcast-tower"></i> ${AuraTab}</a>`;
-  const type = flags[CONSTANTS.MODULE_NAME]?.type ? flags[CONSTANTS.MODULE_NAME]?.type : "";
-  const alignment = flags[CONSTANTS.MODULE_NAME]?.alignment ? flags[CONSTANTS.MODULE_NAME]?.alignment : "";
+  const type = flags[CONSTANTS.MODULE_NAME]?.type ?? "";
+  const customCheck = flags[CONSTANTS.MODULE_NAME]?.customCheck.replace("\\\"", "\"") ?? "";
+  const alignment = flags[CONSTANTS.MODULE_NAME]?.alignment ?? "";
   const radius = flags[CONSTANTS.MODULE_NAME]?.radius ?? "";
   const nameOverride = flags[CONSTANTS.MODULE_NAME]?.nameOverride ?? "";
 
@@ -70,6 +71,10 @@ export async function extendEffectsForm(sheet, html) {
             <div class="form-group">
                 <label>${FormCheckType}</label>
                 <input id="type" name="flags.${CONSTANTS.MODULE_NAME}.type" type="text" value="${type}" placeholder="${FormTypePrompt}"></input>
+            </div>
+            <div class="form-group">
+              <label>Custom Check</label>
+              <input id="type" name="flags.${CONSTANTS.MODULE_NAME}.customCheck" type="text" value="${customCheck}" placeholder="${FormCustomConditionPrompt}"></input>
             </div>
             <div class="form-group">
                 <label>${FormIgnoreSelf}?</label>

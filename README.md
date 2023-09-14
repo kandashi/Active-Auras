@@ -48,6 +48,9 @@ The "Apply while inactive" option allows for effects to propagate to other token
     - `drawing.setFlag("ActiveAuras", "IsAura", [effect.data])` where effect is the active effect to apply
     - There is a bundled macro to select an active effect from a pre-made actor available in the compendium, which has several "zone effect" style auras setup
 
+## Custom evaluation conditions
+
+e.g. `['goblinoid'].includes(token.actor?.system.details?.type?.subtype)` to apply only to goblinoid creatures. You can access only `token` from within this evaluation, which will refer to the token data the aura is evaluating to see if it should transfer the aura effect to it.
 
 ## Notes
 - Only works with a GM account currently connected

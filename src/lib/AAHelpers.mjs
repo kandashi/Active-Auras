@@ -3,6 +3,16 @@ import Logger from "./Logger.mjs";
 
 export class AAHelpers {
 
+  static evaluateCustomCheck(token, check) {
+    try {
+      const result = Boolean(eval(check.trim()));
+      return result;
+    } catch (e) {
+      Logger.warn(`Custom check failed: ${check}`, e);
+    }
+    return false;
+  }
+
   static drawSquare(point) {
     const { x, y } = point;
     const g = new PIXI.Graphics();
