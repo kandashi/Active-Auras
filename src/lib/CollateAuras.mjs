@@ -37,8 +37,11 @@ function generateTargetEffect(token, effect) {
   newEffect.data.flags.ActiveAuras.applied = true;
   newEffect.data.flags.ActiveAuras.isMacro = macro;
   newEffect.data.flags.ActiveAuras.ignoreSelf = false;
-  if (effect.flags.ActiveAuras?.hidden && token.hidden) newEffect.data.flags.ActiveAuras.Paused = true;
-  else newEffect.data.flags.ActiveAuras.Paused = false;
+  if (effect.flags.ActiveAuras?.hidden && token.hidden) {
+    newEffect.data.flags.ActiveAuras.Paused = true;
+  } else {
+    newEffect.data.flags.ActiveAuras.Paused = false;
+  }
   return newEffect;
 }
 
