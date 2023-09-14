@@ -50,7 +50,14 @@ The "Apply while inactive" option allows for effects to propagate to other token
 
 ## Custom evaluation conditions
 
-e.g. `['goblinoid'].includes(token.actor?.system.details?.type?.subtype)` to apply only to goblinoid creatures. You can access only `token` from within this evaluation, which will refer to the token data the aura is evaluating to see if it should transfer the aura effect to it.
+You can provide a custom javascript check to evaluate if the aura should be transfered.
+You can access `token`, `actor`, `system` and `rollData` from within this evaluation, which will refer to the token data, and the actor the aura is evaluating on.
+
+To apply to only goblinoids:
+
+```
+['goblinoid','goblin'].includes(system.details?.type?.subtype ?? system.details?.race.toLowerCase())
+```
 
 ## Notes
 - Only works with a GM account currently connected

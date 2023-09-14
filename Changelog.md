@@ -1,6 +1,6 @@
 # 0.7.7
 
-- Based on a feature by Aedif, you can now specify a custom evaluation condition for the active aura. e.g. `['goblinoid'].includes(token.actor?.system.details?.type?.subtype)` to apply only to goblinoid creatures. You can access only `token` from within this evaluation, which will refer to the token the aura is evaluating to see if it should transfer the aura effect to it.
+- Based on a feature by Aedif, you can now specify a custom evaluation condition for the active aura. See the readme for details.
 - There is a new per aura "Walls Block" setting, that can use the module default or specify a yes/no for the aura.
 
 # 0.7.6
