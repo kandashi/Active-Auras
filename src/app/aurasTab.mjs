@@ -27,6 +27,10 @@ export async function extendEffectsForm(sheet, html) {
   const Extra = game.i18n.format("ACTIVEAURAS.FORM_Extra");
   const FormNameOverride = game.i18n.format("ACTIVEAURAS.FORM_NameOverride");
   const FormCustomConditionPrompt = game.i18n.format("ACTIVEAURAS.FORM_CustomCondition");
+  const WallsBlockPrompt = game.i18n.format("ACTIVEAURAS.FORM_WallsBlock");
+  const FormSystemWallsBlock = game.i18n.format("ACTIVEAURAS.FORM_SystemWallsBlock");
+  const FormWallsBlock = game.i18n.format("ACTIVEAURAS.FORM_WallsDoBlock");
+  const FormWallsDontBlock = game.i18n.format("ACTIVEAURAS.FORM_WallsDontBlock");
 
   const tab = `<a class="item" data-tab="ActiveAuras"><i class="fas fa-broadcast-tower"></i> ${AuraTab}</a>`;
   const type = flags[CONSTANTS.MODULE_NAME]?.type ?? "";
@@ -34,6 +38,7 @@ export async function extendEffectsForm(sheet, html) {
   const alignment = flags[CONSTANTS.MODULE_NAME]?.alignment ?? "";
   const radius = flags[CONSTANTS.MODULE_NAME]?.radius ?? "";
   const nameOverride = flags[CONSTANTS.MODULE_NAME]?.nameOverride ?? "";
+  const wallsBlock = flags[CONSTANTS.MODULE_NAME]?.wallsBlock ?? "system";
 
   let contents = `
     <div class="tab" data-tab="ActiveAuras">
@@ -49,7 +54,7 @@ export async function extendEffectsForm(sheet, html) {
                     <option value="Allies"${flags[CONSTANTS.MODULE_NAME]?.aura === "Allies" ? "selected" : ""}>${FormTargetsAllies}</option>
                     <option value="All"${flags[CONSTANTS.MODULE_NAME]?.aura === "All" ? "selected" : ""}>${FormTargetsAll}</option>
                 </select>
-            </div>
+        </div>
         <div id="specifics">
             <div class="form-group">
                 <label>${FormNameOverride}</label>
@@ -99,7 +104,16 @@ export async function extendEffectsForm(sheet, html) {
             <div class="form-group">
                 <label>${ActivateOnce}</label>
                 <input name="flags.${CONSTANTS.MODULE_NAME}.onlyOnce" type="checkbox" ${flags[CONSTANTS.MODULE_NAME]?.onlyOnce ? "checked" : ""}></input>
-            </div>`;
+            </div>
+            <div class="form-group">
+                <label>${WallsBlockPrompt}:</label>
+                <select name="flags.${CONSTANTS.MODULE_NAME}.wallsBlock" data-dtype="String" value=${wallsBlock}>
+                    <option value="system" ${wallsBlock === "system" ? "selected" : ""}>${FormSystemWallsBlock}</option>
+                    <option value="true"${wallsBlock === "true" ? "selected" : ""}>${FormWallsBlock}</option>
+                    <option value="false"${wallsBlock === "false" ? "selected" : ""}>${FormWallsDontBlock}</option>
+                </select>
+          </div>
+            `;
 
   if (game.system.id === "swade") {
     contents += `

@@ -136,12 +136,19 @@ export class ActiveAuras {
       const auraTargets = auraEffect.data.flags?.ActiveAuras?.aura;
 
       const { radius, height, hostile, wildcard, extra } = (auraEffect.data.flags?.ActiveAuras ?? {});
-      let { type, alignment, customCheck } = (auraEffect.data.flags?.ActiveAuras ?? {});
-      type = type?.toLowerCase() ?? "";
+      let { type, alignment, customCheck, wallsBlock } = (auraEffect.data.flags?.ActiveAuras ?? {});
       alignment = alignment?.toLowerCase() ?? "";
       customCheck = customCheck?.toLowerCase() ?? "";
+      type = type?.toLowerCase() ?? "";
+      wallsBlock = wallsBlock?.toLowerCase() ?? "system";
+
       if (alignment && !tokenAlignment.includes(alignment) && !tokenAlignment.includes("any")) continue;
       if (customCheck && !AAHelpers.evaluateCustomCheck(canvasToken, customCheck)) continue;
+      if (wallsBlock !== "system") {
+        wallsBlock = wallsBlock === "true";
+      } else {
+        wallsBlock = game.settings.get("ActiveAuras", "wall-block");
+      }
 
       let auraEntity, distance;
 
@@ -181,7 +188,7 @@ export class ActiveAuras {
             distance = AAMeasure.inAura(
               canvasToken,
               auraEntity,
-              game.settings.get("ActiveAuras", "wall-block"),
+              wallsBlock,
               height,
               tokenRadius,
               shape
@@ -204,7 +211,7 @@ export class ActiveAuras {
             distance = AAMeasure.isTokenInside(
               templateDetails,
               canvasToken,
-              game.settings.get("ActiveAuras", "wall-block")
+              wallsBlock
             );
           }
           break;
@@ -220,7 +227,7 @@ export class ActiveAuras {
             distance = AAMeasure.inAura(
               canvasToken,
               auraEntity,
-              game.settings.get("ActiveAuras", "wall-block"),
+              wallsBlock,
               height,
               radius,
               shape
