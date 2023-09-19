@@ -1,3 +1,8 @@
+# 0.7.8
+
+- A tweak to template application to improve uuid detection from TPosney
+- A tweak to UI rendering to prevent failure of AA tab appearing on some existing effects.
+
 # 0.7.7
 
 - Based on a feature by Aedif, you can now specify a custom evaluation condition for the active aura. See the readme for details.
