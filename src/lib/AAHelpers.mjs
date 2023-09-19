@@ -376,7 +376,9 @@ export class AAHelpers {
         castLevel: args[0].spellLevel,
       };
       if (effect.flags["ActiveAuras"].displayTemp) data.data.duration = duration;
-      data.data.origin = `Actor.${args[0].actor._id}.Item.${args[0].item._id}`;
+      // console.warn("Applying template effect", {data , args});
+      // data.data.origin = `Actor.${args[0].actor._id}.Item.${args[0].item._id}`;
+      data.data.origin = args[0].item.uuid;
       templateEffectData.push(data);
     }
     Logger.debug("Applying template effect", templateEffectData);
