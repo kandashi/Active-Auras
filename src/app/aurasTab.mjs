@@ -34,7 +34,7 @@ export async function extendEffectsForm(sheet, html) {
 
   const tab = `<a class="item" data-tab="ActiveAuras"><i class="fas fa-broadcast-tower"></i> ${AuraTab}</a>`;
   const type = flags[CONSTANTS.MODULE_NAME]?.type ?? "";
-  const customCheck = flags[CONSTANTS.MODULE_NAME]?.customCheck.replace("\\\"", "\"") ?? "";
+  const customCheck = flags[CONSTANTS.MODULE_NAME]?.customCheck?.replace("\\\"", "\"") ?? "";
   const alignment = flags[CONSTANTS.MODULE_NAME]?.alignment ?? "";
   const radius = flags[CONSTANTS.MODULE_NAME]?.radius ?? "";
   const nameOverride = flags[CONSTANTS.MODULE_NAME]?.nameOverride ?? "";
