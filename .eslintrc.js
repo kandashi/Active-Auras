@@ -82,5 +82,6 @@ module.exports = {
     libWrapper: true,
     socketlib: true,
     globalThis: true,
+    fromUuidSync: true,
   },
 };

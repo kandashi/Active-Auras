@@ -1,3 +1,7 @@
+# NEXT UP
+
+- Some small tweaks to improve template and drawing aura detection.
+
 # 0.7.8
 
 - A tweak to template application to improve uuid detection from TPosney

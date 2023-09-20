@@ -105,35 +105,31 @@ export async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
 }
 
 function RetrieveTemplateAuras(effectArray) {
-  const auraTemplates = canvas.templates.placeables.filter((i) => i.document.flags?.ActiveAuras?.IsAura !== undefined);
+  const auraTemplates = canvas.templates.placeables.filter((i) => hasProperty(i, "document.flags.ActiveAuras.IsAura"));
 
   for (const template of auraTemplates) {
     for (const testEffect of (template.document.flags?.ActiveAuras?.IsAura ?? [])) {
       if (testEffect.disabled) continue;
-      if (testEffect.isSuppressed) continue; // effect is supressed for example because it is unequipped
+      if (testEffect.isSuppressed) continue; // effect is suppressed for example because it is unequipped
       const newEffect = duplicate(testEffect);
-      const parts = testEffect.data.origin.split(".");
-      const [entityName, entityId, embeddedName, embeddedId] = parts;
-      const actor = game.actors.get(entityId);
+      const actor = fromUuidSync(testEffect.data.origin)?.parent;
       const rollData = actor.getRollData();
       rollData["item.level"] = getProperty(testEffect, "castLevel");
       Object.assign(rollData, { item: { level: testEffect.castLevel } });
-      const re = /@[\w.]+/g;
+
       for (const change of newEffect.data.changes) {
         if (typeof change.value !== "string") continue;
         let s = change.value;
-        for (const match of s.match(re) || []) s = s.replace(match, getProperty(rollData, match.slice(1)));
+        for (const match of s.match(/@[\w.]+/g) || []) {
+          s = s.replace(match, getProperty(rollData, match.slice(1)));
+        }
         change.value = s;
         if (change.key.startsWith("macro.")) newEffect.data.flags.ActiveAuras.isMacro = true;
       }
       newEffect.disabled = false;
-      const macro = newEffect.data.flags.ActiveAuras.isMacro !== undefined
-        ? newEffect.data.flags.ActiveAuras.isMacro
-        : false;
-
       newEffect.data.flags.ActiveAuras.isAura = false;
       newEffect.data.flags.ActiveAuras.applied = true;
-      newEffect.data.flags.ActiveAuras.isMacro = macro;
+      newEffect.data.flags.ActiveAuras.isMacro = getProperty(newEffect, "data.flags.ActiveAuras.isMacro") ?? false;
       newEffect.data.flags.ActiveAuras.ignoreSelf = false;
       effectArray.push(newEffect);
     }
@@ -143,7 +139,7 @@ function RetrieveTemplateAuras(effectArray) {
 
 function RetrieveDrawingAuras(effectArray) {
   if (!effectArray) effectArray = CONFIG.AA.Map.get(canvas.scene._id)?.effects;
-  const auraDrawings = canvas.drawings.placeables.filter((i) => i.document.flags?.ActiveAuras?.IsAura !== undefined);
+  const auraDrawings = canvas.drawings.placeables.filter((i) => hasProperty(i, "document.flags.ActiveAuras.IsAura"));
 
   for (const drawing of auraDrawings) {
     for (const testEffect of (drawing.document.flags?.ActiveAuras?.IsAura ?? [])) {
@@ -156,28 +152,23 @@ function RetrieveDrawingAuras(effectArray) {
         entityType: "drawing",
         entityId: drawing.id,
       };
-      const parts = testEffect.origin.split(".");
-      const [entityName, entityId, embeddedName, embeddedId] = parts;
-      const actor = game.actors.get(entityId);
+      const actor = fromUuidSync(testEffect.data.origin)?.parent;
       if (actor) {
         let rollData = actor.getRollData();
         for (let change of newEffect.data.changes) {
           if (typeof change.value !== "string") continue;
-          const re = /@[\w.]+/g;
           let s = change.value;
-          for (const match of s.match(re) || []) s = s.replace(match, getProperty(rollData, match.slice(1)));
+          for (const match of s.match(/@[\w.]+/g) || []) {
+            s = s.replace(match, getProperty(rollData, match.slice(1)));
+          }
           change.value = s;
           if (change.key.startsWith("macro.")) newEffect.data.flags.ActiveAuras.isMacro = true;
         }
       }
       newEffect.disabled = false;
-      let macro = newEffect.data.flags.ActiveAuras.isMacro !== undefined
-        ? newEffect.data.flags.ActiveAuras.isMacro
-        : false;
-
       newEffect.data.flags.ActiveAuras.isAura = false;
       newEffect.data.flags.ActiveAuras.applied = true;
-      newEffect.data.flags.ActiveAuras.isMacro = macro;
+      newEffect.data.flags.ActiveAuras.isMacro = getProperty(newEffect, "data.flags.ActiveAuras.isMacro") ?? false;
       newEffect.data.flags.ActiveAuras.ignoreSelf = false;
       effectArray.push(newEffect);
     }
