@@ -115,13 +115,5 @@
       "value": null,
       "charged": false
     }
-  },
-  "_stats": {
-    "systemId": "dnd5e",
-    "systemVersion": "2.1.5",
-    "coreVersion": "10.291",
-    "createdTime": 1662274929977,
-    "modifiedTime": 1685209182970,
-    "lastModifiedBy": "WXjnI1KTF6OM7esR"
   }
 }

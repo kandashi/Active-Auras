@@ -173,13 +173,5 @@
       "mode": "none",
       "formula": ""
     }
-  },
-  "_stats": {
-    "systemId": "dnd5e",
-    "systemVersion": "2.1.5",
-    "coreVersion": "10.291",
-    "createdTime": 1662274929952,
-    "modifiedTime": 1685209182955,
-    "lastModifiedBy": "WXjnI1KTF6OM7esR"
   }
 }

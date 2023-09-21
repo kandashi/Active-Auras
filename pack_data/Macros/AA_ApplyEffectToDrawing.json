@@ -13,13 +13,5 @@
     "advanced-macros": { "runAsGM": false }
   },
   "_id": "r8hqRcIOLk3ymtUW",
-  "ownership": { "default": 0, "E4BVikjIkVl2lL2j": 3, "jkdToQqzFl0mFXls": 3 },
-  "_stats": {
-    "systemId": "dnd5e",
-    "systemVersion": "2.0.1",
-    "coreVersion": "10.283",
-    "createdTime": 1662274930165,
-    "modifiedTime": 1662275271741,
-    "lastModifiedBy": "GrX6tFOozYFBnDHq"
-  }
+  "ownership": { "default": 0, "E4BVikjIkVl2lL2j": 3, "jkdToQqzFl0mFXls": 3 }
 }

@@ -179,13 +179,5 @@
       "mode": "level",
       "formula": "1d8"
     }
-  },
-  "_stats": {
-    "systemId": "dnd5e",
-    "systemVersion": "2.1.5",
-    "coreVersion": "10.291",
-    "createdTime": 1662274929968,
-    "modifiedTime": 1685209182963,
-    "lastModifiedBy": "WXjnI1KTF6OM7esR"
   }
 }

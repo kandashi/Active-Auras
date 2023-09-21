@@ -265,13 +265,5 @@
     "detectionModes": []
   },
   "img": "icons/svg/mystery-man.svg",
-  "folder": null,
-  "_stats": {
-    "systemId": "dnd5e",
-    "systemVersion": "2.0.1",
-    "coreVersion": "10.283",
-    "createdTime": 1662274930116,
-    "modifiedTime": 1662274930149,
-    "lastModifiedBy": "GrX6tFOozYFBnDHq"
-  }
+  "folder": null
 }

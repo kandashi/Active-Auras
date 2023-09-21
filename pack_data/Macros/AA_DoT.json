@@ -11,13 +11,5 @@
   "_id": "TWJ7K9Rw384oXFxV",
   "ownership": { "default": 0, "E4BVikjIkVl2lL2j": 3 },
   "folder": null,
-  "sort": 0,
-  "_stats": {
-    "systemId": "dnd5e",
-    "systemVersion": "2.0.1",
-    "coreVersion": "10.283",
-    "createdTime": 1662274930162,
-    "modifiedTime": 1662274930162,
-    "lastModifiedBy": "GrX6tFOozYFBnDHq"
-  }
+  "sort": 0
 }
