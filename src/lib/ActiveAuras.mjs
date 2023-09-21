@@ -83,6 +83,7 @@ export class ActiveAuras {
     });
 
     for (const update of effectMap) {
+      console.warn("update", update);
       if (update[1].add) {
         await ActiveAuras.CreateActiveEffect(update[1].token.id, update[1].effect);
       } else {
@@ -198,7 +199,7 @@ export class ActiveAuras {
           {
             auraEntity = canvas.templates.get(auraEffect.entityId);
 
-            if (type) if (!AAHelpers.CheckType(canvasToken, type)) continue;
+            if (type && !AAHelpers.CheckType(canvasToken, type)) continue;
             if (hostile && canvasToken.id !== game.combats.active.current.tokenId) return;
             if (auraEffect.casterDisposition) {
               if (!AAHelpers.DispositionCheck(auraTargets, auraEffect.casterDisposition, canvasToken.disposition))
@@ -217,12 +218,10 @@ export class ActiveAuras {
         case "drawing":
           {
             auraEntity = canvas.drawings.get(auraEffect.entityId);
-
-            if (type) {
-              if (!AAHelpers.CheckType(canvasToken, type)) continue;
-            }
+            if (type && !AAHelpers.CheckType(canvasToken, type)) continue;
             if (hostile && canvasToken.id !== game.combats.active.current.tokenId) return;
-            const shape = AATemplates.getDrawingShape(auraEntity.data);
+
+            const shape = AATemplates.getDrawingShape(auraEntity);
             distance = AAMeasure.inAura(
               canvasToken,
               auraEntity,
@@ -231,6 +230,7 @@ export class ActiveAuras {
               radius,
               shape
             );
+
           }
           break;
       }

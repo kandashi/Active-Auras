@@ -45,17 +45,21 @@ export class AATemplates {
   }
 
   static PixiFromPolygon(data) {
-    const pixiPoints = data.points.map((p) => new PIXI.Point(p[0] + data.x, p[1] + data.y));
+    const shapeData = data.shape.data;
+    const pixiPoints = [];
+    for (let i = 0; i < shapeData.shape.points.length; i += 2) {
+      pixiPoints.push(new PIXI.Point(shapeData.shape.points[i] + shapeData.x, shapeData.shape.points[i+1] + shapeData.y));
+    }
     return new PIXI.Polygon(pixiPoints);
   }
 
   static PixiFromEllipse(data) {
-    const { x, y, width, height } = data;
+    const { x, y, width, height } = data.shape.data;
     return new PIXI.Ellipse(x + width / 2, y + height / 2, width / 2, height / 2);
   }
 
   static PixiFromRect(data) {
-    const { x, y, width, height } = data;
+    const { x, y, width, height } = data.shape.data;
     return new PIXI.Rectangle(x, y, width, height);
   }
 

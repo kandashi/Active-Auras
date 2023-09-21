@@ -30,12 +30,9 @@ function generateTargetEffect(token, effect) {
     if (change.key.startsWith("macro.")) newEffect.data.flags.ActiveAuras.isMacro = true;
   }
   newEffect.data.disabled = false;
-  const macro = newEffect.data.flags.ActiveAuras.isMacro !== undefined
-    ? newEffect.data.flags.ActiveAuras.isMacro
-    : false;
   newEffect.data.flags.ActiveAuras.isAura = false;
   newEffect.data.flags.ActiveAuras.applied = true;
-  newEffect.data.flags.ActiveAuras.isMacro = macro;
+  newEffect.data.flags.ActiveAuras.isMacro = getProperty(newEffect, "data.flags.ActiveAuras.isMacro") ?? false;
   newEffect.data.flags.ActiveAuras.ignoreSelf = false;
   if (effect.flags.ActiveAuras?.hidden && token.hidden) {
     newEffect.data.flags.ActiveAuras.Paused = true;
@@ -145,25 +142,9 @@ function RetrieveDrawingAuras(effectArray) {
     for (const testEffect of (drawing.document.flags?.ActiveAuras?.IsAura ?? [])) {
       if (testEffect.disabled) continue;
       if (testEffect.isSuppressed) continue;
-      const newEffect = {
-        data: duplicate(testEffect),
-        parentActorId: false,
-        parentActorLink: false,
-        entityType: "drawing",
-        entityId: drawing.id,
-      };
-      const actor = AAHelpers.getActorFromAAEffectData(testEffect);
-      if (actor) {
-        let rollData = actor.getRollData();
-        for (let change of newEffect.data.changes) {
-          if (typeof change.value !== "string") continue;
-          let s = change.value;
-          for (const match of s.match(/@[\w.]+/g) || []) {
-            s = s.replace(match, getProperty(rollData, match.slice(1)));
-          }
-          change.value = s;
-          if (change.key.startsWith("macro.")) newEffect.data.flags.ActiveAuras.isMacro = true;
-        }
+      const newEffect = duplicate(testEffect);
+      for (let change of newEffect.data.changes) {
+        if (change.key.startsWith("macro.")) newEffect.data.flags.ActiveAuras.isMacro = true;
       }
       newEffect.disabled = false;
       newEffect.data.flags.ActiveAuras.isAura = false;

@@ -396,6 +396,26 @@ export class AAHelpers {
     return { haltEffectsApplication: true };
   }
 
+  static async applyDrawing(drawing, effects) {
+    const templateEffectData = [];
+    for (let effect of effects) {
+      const newEffect = {
+        data: duplicate(effect),
+        parentActorId: false,
+        parentActorLink: false,
+        entityType: "drawing",
+        entityId: drawing.id,
+      };
+      newEffect.data.origin = (drawing.document ?? drawing).uuid;
+      templateEffectData.push(newEffect);
+    }
+
+    Logger.debug("Applying drawing effects", templateEffectData);
+    await (drawing.document ?? drawing).setFlag("ActiveAuras", "IsAura", templateEffectData);
+    await AAHelpers.UserCollateAuras(canvas.scene.id, true, false, "documentApply");
+    return { haltEffectsApplication: true };
+  }
+
   static async removeAurasOnToken(token) {
     if (!token.actorLink) return;
     const auras = token.actor.effects.filter((i) => hasProperty(i, "flags.ActiveAuras.applied")).map((i) => i.id);
