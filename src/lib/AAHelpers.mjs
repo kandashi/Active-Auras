@@ -42,6 +42,17 @@ export class AAHelpers {
     return false;
   }
 
+  static getActorFromAAEffectData(effectData) {
+    const originActor = fromUuidSync(effectData.data.origin)?.parent;
+    if (originActor) return originActor;
+
+    const parts = effectData.origin.split(".");
+    // eslint-disable-next-line no-unused-vars
+    const [entityName, entityId, embeddedName, embeddedId] = parts;
+    const actor = game.actors.get(entityId);
+    return actor;
+  }
+
   static DispositionCheck(auraTargets, auraDis, tokenDis) {
     switch (auraTargets) {
       case "Allies": {
@@ -376,9 +387,7 @@ export class AAHelpers {
         castLevel: args[0].spellLevel,
       };
       if (effect.flags["ActiveAuras"].displayTemp) data.data.duration = duration;
-      // console.warn("Applying template effect", {data , args});
-      // data.data.origin = `Actor.${args[0].actor._id}.Item.${args[0].item._id}`;
-      data.data.origin = args[0].item.uuid;
+      data.data.origin = args[0].item.uuid ?? `Actor.${args[0].actor._id}.Item.${args[0].item._id}`;
       templateEffectData.push(data);
     }
     Logger.debug("Applying template effect", templateEffectData);

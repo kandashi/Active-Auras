@@ -112,7 +112,7 @@ function RetrieveTemplateAuras(effectArray) {
       if (testEffect.disabled) continue;
       if (testEffect.isSuppressed) continue; // effect is suppressed for example because it is unequipped
       const newEffect = duplicate(testEffect);
-      const actor = fromUuidSync(testEffect.data.origin)?.parent;
+      const actor = AAHelpers.getActorFromAAEffectData(testEffect);
       const rollData = actor.getRollData();
       rollData["item.level"] = getProperty(testEffect, "castLevel");
       Object.assign(rollData, { item: { level: testEffect.castLevel } });
@@ -152,7 +152,7 @@ function RetrieveDrawingAuras(effectArray) {
         entityType: "drawing",
         entityId: drawing.id,
       };
-      const actor = fromUuidSync(testEffect.data.origin)?.parent;
+      const actor = AAHelpers.getActorFromAAEffectData(testEffect);
       if (actor) {
         let rollData = actor.getRollData();
         for (let change of newEffect.data.changes) {
