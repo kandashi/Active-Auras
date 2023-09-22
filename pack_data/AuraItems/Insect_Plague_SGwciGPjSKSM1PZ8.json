@@ -1,4 +1,5 @@
 {
+  "_id": "SGwciGPjSKSM1PZ8",
   "name": "Insect Plague",
   "type": "spell",
   "img": "icons/magic/nature/leaf-glow-maple-teal.webp",
@@ -10,7 +11,12 @@
           "stackable": "none",
           "macroRepeat": "endEveryTurn",
           "transfer": false,
-          "specialDuration": []
+          "specialDuration": [],
+          "selfTarget": false,
+          "selfTargetAlways": false,
+          "dontApply": false,
+          "showIcon": true,
+          "durationExpression": ""
         },
         "ActiveAuras": {
           "isAura": true,
@@ -20,16 +26,16 @@
           "alignment": "",
           "type": "",
           "aura": "All",
-          "radius": null,
+          "radius": "",
           "save": "",
           "savedc": null,
           "hostile": true,
           "onlyOnce": true,
           "time": "None",
-          "displayTemp": true
-        },
-        "core": {
-          "statusId": ""
+          "displayTemp": true,
+          "nameOverride": "",
+          "customCheck": "",
+          "wallsBlock": "system"
         }
       },
       "changes": [
@@ -51,12 +57,17 @@
         "startTurn": null
       },
       "icon": "icons/magic/nature/leaf-glow-maple-teal.webp",
-      "label": "Insect Plague",
       "tint": null,
       "transfer": false,
-      "origin": null
+      "origin": null,
+      "name": "Insect Plague",
+      "description": "",
+      "statuses": [],
+      "_key": "!items.effects!SGwciGPjSKSM1PZ8.V4qfaLuoUbtFQoLu"
     }
   ],
+  "folder": null,
+  "sort": 0,
   "flags": {
     "midi-qol": {
       "onUseMacroName": "[preActiveEffects]ItemMacro",
@@ -64,20 +75,17 @@
     },
     "itemacro": {
       "macro": {
-        "data": {
-          "_id": null,
-          "name": "Insect Plague",
-          "type": "script",
-          "author": "jkdToQqzFl0mFXls",
-          "img": "icons/svg/dice-target.svg",
-          "scope": "global",
-          "command": "if(args[0].tag === \"OnUse\"){\nAAhelpers.applyTemplate(args)\n}",
-          "folder": null,
-          "sort": 0,
-          "permission": {
-            "default": 0
-          },
-          "flags": {}
+        "name": "Insect Plague",
+        "type": "script",
+        "scope": "global",
+        "command": "if (args[0].macroPass === \"preActiveEffects\" || args[0].tag === \"OnUse\") {\n  return await game.modules.get(\"ActiveAuras\").api.AAHelpers.applyTemplate(args);\n}",
+        "author": "zeSnRWiI6cK2riHV",
+        "_id": null,
+        "img": "icons/magic/nature/leaf-glow-maple-teal.webp",
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0
         }
       }
     },
@@ -90,7 +98,11 @@
       "magicdam": false,
       "magiceffect": false,
       "concentration": false,
-      "toggleEffect": false
+      "toggleEffect": false,
+      "autoFailFriendly": false,
+      "autoSaveFriendly": false,
+      "offHandWeapon": false,
+      "ignoreTotalCover": false
     }
   },
   "system": {
@@ -106,9 +118,11 @@
       "condition": ""
     },
     "duration": {
-      "value": "10",
+      "value": 10,
       "units": "minute"
     },
+    "cover": null,
+    "crewed": false,
     "target": {
       "value": 20,
       "width": null,
@@ -122,7 +136,7 @@
     },
     "uses": {
       "value": 0,
-      "max": "",
+      "max": "0",
       "per": "",
       "recovery": ""
     },
@@ -133,11 +147,11 @@
     },
     "ability": "",
     "actionType": "save",
-    "attackBonus": "",
+    "attackBonus": 0,
     "chatFlavor": "",
     "critical": {
       "threshold": null,
-      "damage": ""
+      "damage": null
     },
     "damage": {
       "parts": [],
@@ -156,7 +170,8 @@
       "somatic": true,
       "material": true,
       "ritual": false,
-      "concentration": true
+      "concentration": true,
+      "value": ""
     },
     "materials": {
       "value": "A few grains of sugar, some kernels of grain, and a smear of fat",
@@ -172,5 +187,10 @@
       "mode": "level",
       "formula": "1d10"
     }
-  }
+  },
+  "ownership": {
+    "default": 0,
+    "E4BVikjIkVl2lL2j": 3
+  },
+  "_key": "!items!SGwciGPjSKSM1PZ8"
 }

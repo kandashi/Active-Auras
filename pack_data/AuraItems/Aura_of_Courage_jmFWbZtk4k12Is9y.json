@@ -1,46 +1,46 @@
 {
-  "name": "Aura of Protection",
+  "_id": "jmFWbZtk4k12Is9y",
+  "name": "Aura of Courage",
   "type": "feat",
-  "img": "icons/magic/air/wind-tornado-wall-blue.webp",
+  "img": "icons/magic/light/explosion-beam-impact-silhouette.webp",
   "effects": [
     {
-      "_id": "YA6d5MuIdX6Bkc8O",
+      "_id": "jqyEv4x6Yz5NcW9F",
       "flags": {
         "ActiveAuras": {
-          "aura": "Allies",
-          "radius": 10,
           "isAura": true,
           "inactive": false,
           "hidden": false,
-          "ignoreSelf": false,
-          "height": false,
+          "aura": "Allies",
+          "radius": "10",
+          "nameOverride": "",
           "alignment": "",
           "type": "",
-          "save": "",
-          "savedc": null,
+          "customCheck": "",
+          "ignoreSelf": false,
+          "height": false,
+          "displayTemp": true,
           "hostile": false,
           "onlyOnce": false,
-          "time": "None",
-          "displayTemp": false
+          "wallsBlock": "system"
         },
         "dae": {
-          "stackable": "none",
-          "specialDuration": [
-            "None"
-          ],
+          "stackable": "noneName",
+          "specialDuration": [],
           "transfer": true,
-          "macroRepeat": "none",
-          "durationExpression": ""
-        },
-        "core": {
-          "statusId": ""
+          "selfTarget": false,
+          "selfTargetAlways": false,
+          "dontApply": false,
+          "showIcon": true,
+          "durationExpression": "",
+          "macroRepeat": "none"
         }
       },
       "changes": [
         {
-          "key": "system.bonuses.abilities.save",
-          "mode": 2,
-          "value": "+@abilities.cha.mod",
+          "key": "system.traits.ci.value",
+          "mode": 0,
+          "value": "frightened",
           "priority": 20
         }
       ],
@@ -54,13 +54,18 @@
         "startRound": null,
         "startTurn": null
       },
-      "icon": "icons/magic/air/wind-tornado-wall-blue.webp",
-      "label": "Aura of Protection",
-      "origin": "Item.8csQOq23Ht2m47Zg",
+      "icon": "icons/magic/light/explosion-beam-impact-silhouette.webp",
       "tint": null,
-      "transfer": true
+      "transfer": true,
+      "origin": "Item.jmFWbZtk4k12Is9y",
+      "name": "Aura of Courage",
+      "description": "",
+      "statuses": [],
+      "_key": "!items.effects!jmFWbZtk4k12Is9y.jqyEv4x6Yz5NcW9F"
     }
   ],
+  "folder": null,
+  "sort": 0,
   "flags": {
     "dae": {
       "activeEquipped": false,
@@ -69,7 +74,7 @@
   },
   "system": {
     "description": {
-      "value": "<p>Starting at 6th level, whenever you or a friendly creature within 10 feet of you must make a saving throw, the creature gains a bonus to the saving throw equal to your Charisma modifier (with a minimum bonus of +1). You must be conscious to grant this bonus.</p><p> At 18th level, the range of this aura increases to 30 feet.</p>",
+      "value": "<p>Starting at 10th level, you and friendly creatures within 10 feet of you can't be frightened while you are conscious.</p><p>At 18th level, the range of this aura increases to 30 feet.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -80,13 +85,15 @@
       "condition": ""
     },
     "duration": {
-      "value": "",
+      "value": null,
       "units": ""
     },
+    "cover": null,
+    "crewed": false,
     "target": {
       "value": null,
       "width": null,
-      "units": "",
+      "units": null,
       "type": "self"
     },
     "range": {
@@ -96,9 +103,10 @@
     },
     "uses": {
       "value": 0,
-      "max": "",
+      "max": 0,
       "per": "",
-      "recovery": ""
+      "recovery": "",
+      "type": ""
     },
     "consume": {
       "type": "",
@@ -107,30 +115,37 @@
     },
     "ability": "",
     "actionType": "",
-    "attackBonus": "",
+    "attackBonus": 0,
     "chatFlavor": "",
     "critical": {
       "threshold": null,
-      "damage": ""
+      "damage": null
     },
     "damage": {
       "parts": [],
-      "versatile": ""
+      "versatile": "",
+      "value": ""
     },
     "formula": "",
     "save": {
       "ability": "",
       "dc": null,
-      "scaling": "spell"
+      "scaling": "spell",
+      "value": ""
     },
     "type": {
       "value": "",
       "subtype": ""
     },
-    "requirements": "Paladin 6",
+    "requirements": "Paladin 10",
     "recharge": {
       "value": null,
       "charged": false
     }
-  }
+  },
+  "ownership": {
+    "default": 0,
+    "E4BVikjIkVl2lL2j": 3
+  },
+  "_key": "!items!jmFWbZtk4k12Is9y"
 }

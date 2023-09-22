@@ -1,0 +1,156 @@
+{
+  "_id": "wRjkVOup7yqk2CKU",
+  "name": "Aura of Protection",
+  "type": "feat",
+  "img": "icons/magic/air/wind-tornado-wall-blue.webp",
+  "effects": [
+    {
+      "_id": "YA6d5MuIdX6Bkc8O",
+      "flags": {
+        "ActiveAuras": {
+          "aura": "Allies",
+          "radius": "10",
+          "isAura": true,
+          "inactive": false,
+          "hidden": false,
+          "ignoreSelf": false,
+          "height": false,
+          "alignment": "",
+          "type": "",
+          "save": "",
+          "savedc": null,
+          "hostile": false,
+          "onlyOnce": false,
+          "time": "None",
+          "displayTemp": true,
+          "nameOverride": "",
+          "customCheck": "",
+          "wallsBlock": "system"
+        },
+        "dae": {
+          "stackable": "none",
+          "specialDuration": [
+            "None"
+          ],
+          "transfer": true,
+          "macroRepeat": "none",
+          "durationExpression": "",
+          "selfTarget": false,
+          "selfTargetAlways": false,
+          "dontApply": false,
+          "showIcon": true
+        }
+      },
+      "changes": [
+        {
+          "key": "system.bonuses.abilities.save",
+          "mode": 2,
+          "value": "+@abilities.cha.mod",
+          "priority": 20
+        }
+      ],
+      "disabled": false,
+      "duration": {
+        "startTime": null,
+        "seconds": null,
+        "combat": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "icon": "icons/magic/air/wind-tornado-wall-blue.webp",
+      "origin": "Item.wRjkVOup7yqk2CKU",
+      "tint": null,
+      "transfer": true,
+      "name": "Aura of Protection",
+      "description": "",
+      "statuses": [],
+      "_key": "!items.effects!wRjkVOup7yqk2CKU.YA6d5MuIdX6Bkc8O"
+    }
+  ],
+  "folder": null,
+  "sort": 0,
+  "flags": {
+    "dae": {
+      "activeEquipped": false,
+      "alwaysActive": true
+    }
+  },
+  "system": {
+    "description": {
+      "value": "<p>Starting at 6th level, whenever you or a friendly creature within 10 feet of you must make a saving throw, the creature gains a bonus to the saving throw equal to your Charisma modifier (with a minimum bonus of +1). You must be conscious to grant this bonus.</p><p> At 18th level, the range of this aura increases to 30 feet.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": "PHB pg. 85",
+    "activation": {
+      "type": "",
+      "cost": 0,
+      "condition": ""
+    },
+    "duration": {
+      "value": null,
+      "units": ""
+    },
+    "cover": null,
+    "crewed": false,
+    "target": {
+      "value": null,
+      "width": null,
+      "units": null,
+      "type": "self"
+    },
+    "range": {
+      "value": 10,
+      "long": 30,
+      "units": "ft"
+    },
+    "uses": {
+      "value": 0,
+      "max": 0,
+      "per": "",
+      "recovery": "",
+      "type": ""
+    },
+    "consume": {
+      "type": "",
+      "target": null,
+      "amount": null
+    },
+    "ability": "",
+    "actionType": "",
+    "attackBonus": 0,
+    "chatFlavor": "",
+    "critical": {
+      "threshold": null,
+      "damage": null
+    },
+    "damage": {
+      "parts": [],
+      "versatile": "",
+      "value": ""
+    },
+    "formula": "",
+    "save": {
+      "ability": "",
+      "dc": null,
+      "scaling": "spell",
+      "value": ""
+    },
+    "type": {
+      "value": "",
+      "subtype": ""
+    },
+    "requirements": "Paladin 6",
+    "recharge": {
+      "value": null,
+      "charged": false
+    }
+  },
+  "ownership": {
+    "default": 0,
+    "jkdToQqzFl0mFXls": 3
+  },
+  "_key": "!items!wRjkVOup7yqk2CKU"
+}
