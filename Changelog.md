@@ -1,6 +1,9 @@
 # NEXT UP
 
 - Some small tweaks to improve template and drawing aura detection.
+- Applying auras to templates is possible again, see example macro.
+- Compendiums revisited and checked for issues.
+- Active Auras is now v11 only.
 
 # 0.7.8
 

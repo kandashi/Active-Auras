@@ -2,13 +2,15 @@
   "name": "Active-Auras",
   "license": "MIT",
   "scripts": {
-    "lint": "npx eslint ./",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "npx eslint ./src",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "buildCompendiums": "cd pack_data && node build.mjs"
   },
   "devDependencies": {
     "eslint": "^8.10.0",
     "eslint-config-prettier": "^8.4.0",
+    "nedb": "^1.8.0",
     "prettier": "2.0.5",
-    "nedb": "^1.8.0"
+    "@foundryvtt/foundryvtt-cli": "^1.0.0-rc.4"
   }
 }

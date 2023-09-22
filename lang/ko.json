@@ -37,13 +37,13 @@
     "ACTIVEAURAS.FORM_SavePrompt": "근력/민첩/건강/지혜/지능/매력",
     "ACTIVEAURAS.FORM_TimePrompt": "적용된 효과에 대한 특수 만료 시간",
     "ACTIVEAURAS.FORM_HostileTurn": "현재 전투원의 턴 중에만 적용",
-    "ACTIVEAURAS.FORM_ActivateOnce": "턴당 1회만 오러를 발동",    
+    "ACTIVEAURAS.FORM_ActivateOnce": "턴당 1회만 오러를 발동",
     "ACTIVEAURAS.FORM_Wildcard": "[EN] Apply to Wildcard Tokens",
     "ACTIVEAURAS.FORM_Extra": "[EN] Apply to Extra Tokens",
     "ACTIVEAURAS.FORM_Temporary" : "[EN] Apply Active Effect icon to affected tokens",
 
-    "ACTIVEAURAS.ApplyLog":"ActiveAuras | '{effectDataLabel}' 효과가 {tokenName} 캐릭터에게 적용되었습니다",
-    "ACTIVEAURAS.RemoveLog":"ActiveAuras | '{effectDataLabel}' 효과가 {tokenName} 캐릭터에게 제거되었습니다.",
-    "ACTIVEAURAS.IgnoreSelfLog":"ActiveAuras | '{effectDataLabel}' 효과를 무시하고 {changeKey}을/를 {actorName}로 변경하였습니다.",
-    "ACTIVEAURAS.SaveNotify": "${tokenName} 캐릭터가 ${oldEffectDataLabel} 효과에 대한 내성 굴림에 성공했습니다."
+    "ACTIVEAURAS.ApplyLog":"ActiveAuras | '{effectDataName}' 효과가 {tokenName} 캐릭터에게 적용되었습니다",
+    "ACTIVEAURAS.RemoveLog":"ActiveAuras | '{effectDataName}' 효과가 {tokenName} 캐릭터에게 제거되었습니다.",
+    "ACTIVEAURAS.IgnoreSelfLog":"ActiveAuras | '{effectDataName}' 효과를 무시하고 {changeKey}을/를 {actorName}로 변경하였습니다.",
+    "ACTIVEAURAS.SaveNotify": "${tokenName} 캐릭터가 ${oldeffectDataName} 효과에 대한 내성 굴림에 성공했습니다."
 }

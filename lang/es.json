@@ -43,8 +43,8 @@
     "ACTIVEAURAS.FORM_Temporary" : "[EN] Apply Active Effect icon to affected tokens",
 
 
-    "ACTIVEAURAS.ApplyLog":"ActiveAuras | '{effectDataLabel}' aplicado a {tokenName}",
-    "ACTIVEAURAS.RemoveLog":"ActiveAuras | '{effectDataLabel}' quitado de {tokenName}",
-    "ACTIVEAURAS.IgnoreSelfLog":"ActiveAuras | Ignorando '{effectDataLabel}' cambio {changeKey} a {actorName}",
-    "ACTIVEAURAS.SaveNotify": "${tokenName} supera la salvación contra ${oldEffectDataLabel}"
+    "ACTIVEAURAS.ApplyLog":"ActiveAuras | '{effectDataName}' aplicado a {tokenName}",
+    "ACTIVEAURAS.RemoveLog":"ActiveAuras | '{effectDataName}' quitado de {tokenName}",
+    "ACTIVEAURAS.IgnoreSelfLog":"ActiveAuras | Ignorando '{effectDataName}' cambio {changeKey} a {actorName}",
+    "ACTIVEAURAS.SaveNotify": "${tokenName} supera la salvación contra ${oldeffectDataName}"
 }

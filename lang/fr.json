@@ -34,7 +34,7 @@
     "ACTIVEAURAS.FORM_SaveDC": "DD de la sauvegarde",
     "ACTIVEAURAS.FORM_TypePrompt": "ex: humanoid/beast ... liste en anglais",
     "ACTIVEAURAS.FORM_RadiusPrompt": "Measuré par l'échelle de la grille",
-    "ACTIVEAURAS.FORM_SavePrompt": "str/dex/con/wis/int/cha",    
+    "ACTIVEAURAS.FORM_SavePrompt": "str/dex/con/wis/int/cha",
     "ACTIVEAURAS.FORM_TimePrompt": "Expiration Spéciale pour l'effet appliqué",
     "ACTIVEAURAS.FORM_HostileTurn": "Appliquer seulement pendant le tour actuel du combatant",
     "ACTIVEAURAS.FORM_ActivateOnce": "Se déclenche une fois seulement par tour de jeu",
@@ -42,8 +42,8 @@
     "ACTIVEAURAS.FORM_Extra": "[EN] Apply to Extra Tokens",
     "ACTIVEAURAS.FORM_Temporary" : "[EN] Apply Active Effect icon to affected tokens",
 
-    "ACTIVEAURAS.ApplyLog":"ActiveAuras | Applique un effet '{effectDataLabel}' à {tokenName}",
-    "ACTIVEAURAS.RemoveLog":"ActiveAuras | Retire un effet '{effectDataLabel}' à {tokenName}",
-    "ACTIVEAURAS.IgnoreSelfLog":"ActiveAuras | Ignore les changements de '{effectDataLabel}'  {changeKey} à {actorName}",
-    "ACTIVEAURAS.SaveNotify": "${tokenName} a réussi sa sauvegarde contre l'effet ${oldEffectDataLabel}"
+    "ACTIVEAURAS.ApplyLog":"ActiveAuras | Applique un effet '{effectDataName}' à {tokenName}",
+    "ACTIVEAURAS.RemoveLog":"ActiveAuras | Retire un effet '{effectDataName}' à {tokenName}",
+    "ACTIVEAURAS.IgnoreSelfLog":"ActiveAuras | Ignore les changements de '{effectDataName}'  {changeKey} à {actorName}",
+    "ACTIVEAURAS.SaveNotify": "${tokenName} a réussi sa sauvegarde contre l'effet ${oldeffectDataName}"
 }

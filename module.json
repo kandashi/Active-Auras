@@ -14,9 +14,9 @@
   "url": "https://github.com/kandashi/Active-Auras",
   "bugs": "https://github.com/kandashi/Active-Auras/issues",
   "flags": {},
-  "version": "0.7.8",
+  "version": "0.8.0",
   "compatibility": {
-    "minimum": 10,
+    "minimum": 11,
     "verified": 11
   },
   "esmodules": ["src/index.mjs"],
@@ -54,32 +54,48 @@
   ],
   "packs": [
     {
-      "name": "Active Auras Auras",
+      "name": "aa-aura-items",
       "label": "Active Auras Auras",
-      "path": "packs/AuraItems.db",
+      "path": "packs/AuraItems",
       "type": "Item",
-      "module": "ActiveAuras",
-      "private": false,
-      "system" : "dnd5e"
+      "system": "dnd5e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
     },
     {
-      "name": "Active Auras Zone Actors",
+      "name": "aa-zone-actors",
       "label": "Active Auras Zone Actors",
-      "path": "packs/ZoneActors.db",
+      "path": "packs/ZoneActors",
       "type": "Actor",
       "system": "dnd5e",
-      "module": "ActiveAuras",
-      "private": false
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
     },
     {
-      "name": "Active Auras Macros",
+      "name": "aa-macros",
       "label": "Active Auras Macros",
-      "path": "packs/Macros.db",
+      "path": "packs/Macros",
       "type": "Macro",
-      "module": "ActiveAuras",
-      "private": false
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
     }
   ],
+  "packFolders": [{
+    "name": "Active Auras",
+    "sorting": "m",
+    "packs": [
+      "aa-aura-items",
+      "aa-zone-actors",
+      "aa-macros"
+    ]
+  }],
+
   "relationships": {
     "requires" : [
       {

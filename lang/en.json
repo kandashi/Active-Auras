@@ -50,9 +50,9 @@
     "ACTIVEAURAS.FORM_Temporary" : "Apply Active Effect icon to affected tokens",
     "ACTIVEAURAS.FORM_NameOverride": "Name Override, renames created effect",
 
-    "ACTIVEAURAS.ApplyLog":"ActiveAuras | Applied '{effectDataLabel}' to {tokenName}",
-    "ACTIVEAURAS.RemoveLog":"ActiveAuras | Removed '{effectDataLabel}' from {tokenName}",
-    "ACTIVEAURAS.IgnoreSelfLog":"ActiveAuras | Ignoring '{effectDataLabel}' change {changeKey} to {actorName}",
-    "ACTIVEAURAS.SaveNotify": "${tokenName} passes the save against ${oldEffectDataLabel}"
+    "ACTIVEAURAS.ApplyLog":"ActiveAuras | Applied '{effectDataName}' to {tokenName}",
+    "ACTIVEAURAS.RemoveLog":"ActiveAuras | Removed '{effectDataName}' from {tokenName}",
+    "ACTIVEAURAS.IgnoreSelfLog":"ActiveAuras | Ignoring '{effectDataName}' change {changeKey} to {actorName}",
+    "ACTIVEAURAS.SaveNotify": "${tokenName} passes the save against ${oldeffectDataName}"
 }
 

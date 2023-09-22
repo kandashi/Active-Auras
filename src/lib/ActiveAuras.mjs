@@ -61,9 +61,7 @@ export class ActiveAuras {
       for (const m of iterator1) {
         if (m[0] === key) continue;
 
-        if ((m[1].effect.name ?? m[1].effect.label) === (value.effect.name ?? value.effect.label)
-          && m[1].add === true && value.add === true
-        ) {
+        if (m[1].effect.name === value.effect.name  && m[1].add === true && value.add === true) {
           for (let e = 0; e < m[1].effect.changes.length; e++) {
             if (typeof parseInt(m[1].effect.changes[e].value) !== "number") continue;
             if (value.effect.changes.length < e) continue;
@@ -74,7 +72,7 @@ export class ActiveAuras {
             }
           }
         } else if (
-          (m[1].effect.name ?? m[1].effect.label) === (value.effect.name ?? value.effect.label)
+          m[1].effect.name === value.effect.name
           && (m[1].add === true || value.add === true)
           && m[1].token.id === value.token.id
         ) {
@@ -123,10 +121,7 @@ export class ActiveAuras {
       checkEffects = checkEffects.filter((i) => i.entityId === tokenId);
       let duplicateEffect = [];
       checkEffects.forEach((e) =>
-        (duplicateEffect = MapObject.effects.filter((i) =>
-          (i.data?.name ?? i.data?.label) === (e.data?.name ?? e.data?.label)
-          && i.entityId !== tokenId)
-        )
+        (duplicateEffect = MapObject.effects.filter((i) => i.data?.name === e.data?.name && i.entityId !== tokenId))
       );
       checkEffects = checkEffects.concat(duplicateEffect);
     }
@@ -153,9 +148,7 @@ export class ActiveAuras {
       let auraEntity, distance;
 
       const rename = getProperty(auraEffect.data, "flags.ActiveAuras.nameOverride");
-      const effectName = (rename && rename.trim() !=="")
-        ? rename
-        : auraEffect.data.name ?? auraEffect.data.label;
+      const effectName = (rename && rename.trim() !=="") ? rename : auraEffect.data.name;
 
       switch (auraEffect.entityType) {
         //{data: testEffect.data, parentActorLink :testEffect.parent.data.token.actorLink, parentActorId : testEffect.parent._id, tokenId: testToken.id, templateId: template._id, }
@@ -247,7 +240,7 @@ export class ActiveAuras {
       } else if (
         !MapObject?.add
         && canvasToken.document.actor?.effects.contents.some(
-          (e) => e.origin === auraEffect.data.origin && (e.name ?? e.label) === effectName
+          (e) => e.origin === auraEffect.data.origin && e.name === effectName
         )
       ) {
         if (MapObject) {
@@ -283,13 +276,10 @@ export class ActiveAuras {
     const token = canvas.tokens.get(tokenID);
 
     const rename = getProperty(oldEffectData, "flags.ActiveAuras.nameOverride");
-    const effectName = (rename && rename.trim() !=="")
-      ? rename
-      : oldEffectData.name ?? oldEffectData.label;
+    const effectName = (rename && rename.trim() !=="") ? rename : oldEffectData.name;
 
     const duplicateEffect = token.document.actor.effects.contents.find((e) =>
-      e.origin === oldEffectData.origin
-      && (e.name ?? e.label) === effectName
+      e.origin === oldEffectData.origin && e.name === effectName
     );
     if (getProperty(duplicateEffect, "flags.ActiveAuras.isAura")) return;
     if (duplicateEffect) {
@@ -298,8 +288,7 @@ export class ActiveAuras {
       else await ActiveAuras.RemoveActiveEffects(tokenID, oldEffectData.origin);
     }
     let effectData = duplicate(oldEffectData);
-    if (effectData.name) effectData.name = effectName;
-    else effectData.label = effectName;
+    effectData.name = effectName;
 
     if (effectData.flags.ActiveAuras.onlyOnce) {
       const AAID = oldEffectData.origin.replaceAll(".", "");
@@ -345,7 +334,7 @@ export class ActiveAuras {
     }
 
     await token.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
-    Logger.debug(game.i18n.format("ACTIVEAURAS.ApplyLog", { effectDataLabel: (effectData.name ?? effectData.label), tokenName: token.name }));
+    Logger.debug(game.i18n.format("ACTIVEAURAS.ApplyLog", { effectDataName: effectData.name, tokenName: token.name }));
   }
 
   /**
@@ -365,7 +354,7 @@ export class ActiveAuras {
           Logger.error("ERROR CAUGHT in RemoveActiveEffects", err);
         } finally {
           Logger.debug(
-            game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataLabel: effectOrigin, tokenName: token.name })
+            game.i18n.format("ACTIVEAURAS.RemoveLog", { effectDataName: effectOrigin, tokenName: token.name })
           );
         }
       }
