@@ -66,7 +66,8 @@ export class ActiveAuras {
         ) {
           for (let e = 0; e < m[1].effect.changes.length; e++) {
             if (typeof parseInt(m[1].effect.changes[e].value) !== "number") continue;
-            const oldEffectValue = parseInt(value.effect.changes[e].value);
+            if (value.effect.changes.length < e) continue;
+            const oldEffectValue = parseInt(value.effect.changes[e]?.value ?? 0);
             const newEffectValue = parseInt(m[1].effect.changes[e].value);
             if (oldEffectValue < newEffectValue) {
               map1.delete(key);
@@ -83,7 +84,6 @@ export class ActiveAuras {
     });
 
     for (const update of effectMap) {
-      console.warn("update", update);
       if (update[1].add) {
         await ActiveAuras.CreateActiveEffect(update[1].token.id, update[1].effect);
       } else {
