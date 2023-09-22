@@ -1,4 +1,4 @@
-# NEXT UP
+# 0.8.0
 
 - Some small tweaks to improve template and drawing aura detection.
 - Applying auras to templates is possible again, see example macro.
