@@ -295,6 +295,7 @@ export function deleteMeasuredTemplateHook(doc){
   //if (!getProperty(data, "flags.ActiveAuras")) return;
   AAHelpers.ExtractAuraById(doc.id, doc.parent.id);
   //CollateAuras(scene._id, false, true, "template deletion")
+  debouncedCollate(canvas.scene.id, false, true, "deleteMeasuredTemplateHook");
 }
 
 export function preCreateActiveEffectHook(effect, _update, options) {

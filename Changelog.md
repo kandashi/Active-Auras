@@ -1,3 +1,7 @@
+# 0.8.1
+
+- Templates providing Aura effects would not remove effect if the token was still within the template if the effect was ended via concentration removal.
+
 # 0.8.0
 
 - Some small tweaks to improve template and drawing aura detection.
