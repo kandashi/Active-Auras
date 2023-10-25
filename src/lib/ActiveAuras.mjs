@@ -195,7 +195,7 @@ export class ActiveAuras {
             if (type && !AAHelpers.CheckType(canvasToken, type)) continue;
             if (hostile && canvasToken.id !== game.combats.active.current.tokenId) return;
             if (auraEffect.casterDisposition) {
-              if (!AAHelpers.DispositionCheck(auraTargets, auraEffect.casterDisposition, canvasToken.disposition))
+              if (!AAHelpers.DispositionCheck(auraTargets, auraEffect.casterDisposition, canvasToken.document.disposition))
                 continue;
             }
             // const shape = AATemplates.getTemplateShape(auraEntity);
