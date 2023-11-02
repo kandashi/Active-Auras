@@ -1,3 +1,11 @@
+# 0.8.3
+
+- Improvements to code to wait for movement animation to complete.
+
+# 0.8.2
+
+- For Template auras the check for canvasToken.disposition returns undefined. by @thatlonelybugbear in #294
+
 # 0.8.1
 
 - Templates providing Aura effects would not remove effect if the token was still within the template if the effect was ended via concentration removal.
