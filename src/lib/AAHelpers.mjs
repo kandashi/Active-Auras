@@ -5,6 +5,7 @@ export class AAHelpers {
 
   static evaluateCustomCheck(token, check) {
     try {
+      // these are exposed here so they can by used in the custom check/eval
       // eslint-disable-next-line no-unused-vars
       const actor = token.actor;
       // eslint-disable-next-line no-unused-vars
@@ -79,17 +80,36 @@ export class AAHelpers {
         return AAHelpers.typeCheck4e(canvasToken, type);
     }
   }
+
+  static CheckTypes(canvasToken, types) {
+    if (!types || types === "") return true;
+    const typesArray = Array.isArray(types)
+      ? types
+      : types?.toLowerCase().replaceAll(",", ";").split(";").map((t) => t.trim()) ?? [];
+
+    let match = false;
+    for (const type of typesArray) {
+      if (AAHelpers.CheckType(canvasToken, type)) {
+        match = true;
+        break;
+      }
+    }
+    return match;
+  }
+
   static typeCheck5e(canvasToken, type) {
+    if (type?.trim() === "any") return true;
     const systemData = canvasToken?.actor?.system;
-    let tokenType;
+    let tokenTypes;
     switch (canvasToken.actor.type) {
       case "npc":
         {
           try {
-            tokenType = [
+            tokenTypes = Array.from(new Set([
               systemData?.details.type.value,
-              systemData?.details.type.custom
-            ];
+              systemData?.details.type.subtype,
+              systemData?.details.type.custom,
+            ])).filter((t) => t);
           } catch (error) {
             Logger.error("ActiveAuras: the token has an unreadable type", canvasToken);
           }
@@ -99,12 +119,15 @@ export class AAHelpers {
         {
           try {
             if (game.system.id === "sw5e") {
-              tokenType = [systemData?.details.species.toLowerCase()];
+              tokenTypes = [systemData?.details.species.toLowerCase()];
             } else{
-              tokenType = [
+              tokenTypes = Array.from(new Set([
+                (systemData?.details?.race?.name ?? systemData?.details?.race)?.toLocaleLowerCase(),
                 (systemData?.details?.race?.name ?? systemData?.details?.race)?.toLocaleLowerCase().replace("-", " ").split(" "),
-                systemData?.details.type?.value?.toLocaleLowerCase().replace("-", " ").split(" "),
-              ].flat();
+                systemData?.details.type?.value?.toLocaleLowerCase(),
+                systemData?.details.type?.subtype?.toLocaleLowerCase(),
+                systemData?.details.type?.custom?.toLocaleLowerCase(),
+              ].flat())).filter((t) => t);
             }
           } catch (error) {
             Logger.error("ActiveAuras: the token has an unreadable type", canvasToken);
@@ -115,21 +138,24 @@ export class AAHelpers {
       case "vehicle":
         return;
     }
-    let humanoidRaces;
-    if (game.system.id === "sw5e") {
-      humanoidRaces = CONSTANTS.SW5E_HUMANOID_RACES;
-    } else humanoidRaces = CONSTANTS.HUMANOID_RACES;
 
-    if (tokenType.includes(type)) return true;
+    if (tokenTypes.includes(type)) return true;
 
-    for (let x of tokenType) {
+    // remaining humanoid checks only npcs in 5e or all in sw5e
+    if (type.trim() !== "humanoid") return false;
+    if (canvasToken.actor.type !== "character" && game.system.id === "dnd5e") return false;
+    const humanoidRaces = game.system.id === "sw5e"
+      ? CONSTANTS.SW5E_HUMANOID_RACES
+      : CONSTANTS.HUMANOID_RACES;
+
+    let match = false;
+    for (const x of tokenTypes) {
       if (humanoidRaces.includes(x)) {
-        tokenType = "humanoid";
-        continue;
+        match = true;
+        break;
       }
     }
-    if (tokenType === type || tokenType === "any") return true;
-    return false;
+    return match;
   }
 
   static typeCheckSWADE(canvasToken, type) {
@@ -279,12 +305,13 @@ export class AAHelpers {
     Logger.debug("RemoveAppliedAuras", { MapKey: canvas.scene.id, MapObject, EffectsArray });
 
     for (let removeToken of canvas.tokens.placeables) {
-      if (removeToken?.actor?.effects.size > 0) {
-        for (let testEffect of removeToken.actor.effects) {
+      const tokenEffects = Array.from(removeToken?.actor?.allApplicableEffects() ?? []);
+      if (tokenEffects.length > 0) {
+        for (let testEffect of tokenEffects) {
           if (!EffectsArray.includes(testEffect.origin) && testEffect?.flags?.ActiveAuras?.applied) {
             try {
               Logger.debug("RemoveAppliedAuras", { removeToken, testEffect });
-              await removeToken.actor.deleteEmbeddedDocuments("ActiveEffect", [testEffect.id]);
+              await removeToken.actor.deleteEmbeddedDocuments("ActiveEffect", [testEffect._id]);
             } catch (err) {
               Logger.error("ERROR CAUGHT in RemoveAppliedAuras", err);
             } finally {
@@ -303,8 +330,9 @@ export class AAHelpers {
 
   static async RemoveAllAppliedAuras() {
     for (let removeToken of canvas.tokens.placeables) {
-      if (removeToken?.actor?.effects.size > 0) {
-        let effects = removeToken.actor.effects.reduce((a, v) => {
+      const tokenEffects = Array.from(removeToken?.actor?.allApplicableEffects() ?? []);
+      if (tokenEffects.length > 0) {
+        let effects = tokenEffects.reduce((a, v) => {
           if (v?.flags?.ActiveAuras?.applied) return a.concat(v.id);
         }, []);
         try {
@@ -335,10 +363,6 @@ export class AAHelpers {
   static applyWrapper(wrapped, ...args) {
     let actor = args[0];
     let change = args[1];
-    // console.warn("checking apply wrapper", {
-    //   args: duplicate(args),
-    //   ignoreSelf: getProperty(change, "effect.flags.ActiveAuras.ignoreSelf"),
-    // })
     const AAFlags = getProperty(change, "effect.flags.ActiveAuras");
     if (AAFlags?.isAura === true && AAFlags?.ignoreSelf === true) {
       Logger.info(
@@ -348,7 +372,9 @@ export class AAHelpers {
           actorName: actor.name,
         })
       );
-      args[1] = {};
+      args[1].effect.isSuppressed = true;
+      args[1].key = "";
+      args[1].value = "";
       return wrapped(...args);
     }
     return wrapped(...args);
@@ -427,7 +453,8 @@ export class AAHelpers {
 
   static async removeAurasOnToken(token) {
     if (!token.actorLink) return;
-    const auras = token.actor.effects.filter((i) => hasProperty(i, "flags.ActiveAuras.applied")).map((i) => i.id);
+    const auras = Array.from(token.actor.allApplicableEffects())
+      .filter((i) => hasProperty(i, "flags.ActiveAuras.applied")).map((i) => i.id);
     if (!auras) return;
     try {
       Logger.debug("removeAurasOnToken", { token, auras });

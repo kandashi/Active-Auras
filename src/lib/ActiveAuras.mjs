@@ -172,7 +172,7 @@ export class ActiveAuras {
               )
             )
               continue;
-            if (type) if (!AAHelpers.CheckType(canvasToken, type)) continue;
+            if (type && !AAHelpers.CheckTypes(canvasToken, type)) continue;
             if (hostile && canvasToken.id !== game.combats.active?.current.tokenId) continue;
             if (game.system.id === "swade" && !AAHelpers.Wildcard(canvasToken, wildcard, extra)) continue;
 
@@ -192,7 +192,7 @@ export class ActiveAuras {
           {
             auraEntity = canvas.templates.get(auraEffect.entityId);
 
-            if (type && !AAHelpers.CheckType(canvasToken, type)) continue;
+            if (type && !AAHelpers.CheckTypes(canvasToken, type)) continue;
             if (hostile && canvasToken.id !== game.combats.active.current.tokenId) return;
             if (auraEffect.casterDisposition) {
               if (!AAHelpers.DispositionCheck(auraTargets, auraEffect.casterDisposition, canvasToken.document.disposition))
@@ -211,7 +211,7 @@ export class ActiveAuras {
         case "drawing":
           {
             auraEntity = canvas.drawings.get(auraEffect.entityId);
-            if (type && !AAHelpers.CheckType(canvasToken, type)) continue;
+            if (type && !AAHelpers.CheckTypes(canvasToken, type)) continue;
             if (hostile && canvasToken.id !== game.combats.active.current.tokenId) return;
 
             const shape = AATemplates.getDrawingShape(auraEntity);
@@ -239,7 +239,7 @@ export class ActiveAuras {
         }
       } else if (
         !MapObject?.add
-        && canvasToken.document.actor?.effects.contents.some(
+        && Array.from(canvasToken.document.actor?.allApplicableEffects() ?? []).some(
           (e) => e.origin === auraEffect.data.origin && e.name === effectName
         )
       ) {
@@ -278,7 +278,7 @@ export class ActiveAuras {
     const rename = getProperty(oldEffectData, "flags.ActiveAuras.nameOverride");
     const effectName = (rename && rename.trim() !=="") ? rename : oldEffectData.name;
 
-    const duplicateEffect = token.document.actor.effects.contents.find((e) =>
+    const duplicateEffect = Array.from(token.document.actor.allApplicableEffects()).find((e) =>
       e.origin === oldEffectData.origin && e.name === effectName
     );
     if (getProperty(duplicateEffect, "flags.ActiveAuras.isAura")) return;
@@ -343,12 +343,13 @@ export class ActiveAuras {
    */
   static async RemoveActiveEffects(tokenID, effectOrigin) {
     const token = canvas.tokens.get(tokenID);
-    for (const tokenEffects of token.actor.effects) {
-      if (tokenEffects.origin === effectOrigin && tokenEffects.flags?.ActiveAuras?.applied === true) {
+    const tokenEffects = Array.from(token.actor?.allApplicableEffects() ?? []);
+    for (const tokenEffect of tokenEffects) {
+      if (tokenEffect.origin === effectOrigin && tokenEffect.flags?.ActiveAuras?.applied === true) {
         try {
-          if (token.actor.getEmbeddedDocument("ActiveEffect", tokenEffects.id)) {
-            Logger.debug("RemoveActiveEffects", { token, tokenEffects });
-            await token.actor.deleteEmbeddedDocuments("ActiveEffect", [tokenEffects.id]);
+          if (token.actor.getEmbeddedDocument("ActiveEffect", tokenEffect.id)) {
+            Logger.debug("RemoveActiveEffects", { token, tokenEffects: tokenEffect });
+            await token.actor.deleteEmbeddedDocuments("ActiveEffect", [tokenEffect.id]);
           }
         } catch (err) {
           Logger.error("ERROR CAUGHT in RemoveActiveEffects", err);

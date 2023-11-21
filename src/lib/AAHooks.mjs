@@ -22,7 +22,8 @@ export function createTokenHook(token) {
   }
   try {
     if (getProperty(token, "flags.multilevel-tokens")) return;
-    for (let effect of (token.actor.effects?.contents ?? [])) {
+    const tokenEffects = Array.from(token.actor?.allApplicableEffects() ?? []);
+    for (let effect of (tokenEffects ?? [])) {
       if (effect.flags.ActiveAuras?.isAura) {
         Logger.debug("createToken, collate auras true false");
         debouncedCollate(canvas.scene.id, true, false, "createToken");
@@ -219,13 +220,12 @@ export function createCombatantHook(combat, combatant) {
   }
   if (!combat.active) return;
   combatant = canvas.tokens.get(combatant.tokenId);
-  if (combatant.actor.effects?.entries) {
-    for (let effect of (combatant.actor.effects?.entries ?? [])) {
-      if (effect.getFlag("ActiveAuras", "isAura")) {
-        Logger.debug("createToken, collate auras true false");
-        debouncedCollate(combat.scene.id, true, false, "add combatant");
-        break;
-      }
+  const tokenEffects = Array.from(combatant.actor?.allApplicableEffects() ?? []);
+  for (let effect of (tokenEffects ?? [])) {
+    if (effect.getFlag("ActiveAuras", "isAura")) {
+      Logger.debug("createToken, collate auras true false");
+      debouncedCollate(combat.scene.id, true, false, "add combatant");
+      break;
     }
   }
 }
