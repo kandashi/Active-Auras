@@ -80,12 +80,16 @@ export class AAHelpers {
     }
   }
   static typeCheck5e(canvasToken, type) {
+    const systemData = canvasToken?.actor?.system;
     let tokenType;
     switch (canvasToken.actor.type) {
       case "npc":
         {
           try {
-            tokenType = [canvasToken.actor?.system.details.type.value, canvasToken.actor?.system.details.type.custom];
+            tokenType = [
+              systemData?.details.type.value,
+              systemData?.details.type.custom
+            ];
           } catch (error) {
             Logger.error("ActiveAuras: the token has an unreadable type", canvasToken);
           }
@@ -95,8 +99,13 @@ export class AAHelpers {
         {
           try {
             if (game.system.id === "sw5e") {
-              tokenType = canvasToken.actor?.system.details.species.toLowerCase();
-            } else tokenType = [canvasToken.actor?.system.details.race.toLowerCase().replace("-", " ").split(" ")];
+              tokenType = [systemData?.details.species.toLowerCase()];
+            } else{
+              tokenType = [
+                (systemData?.details?.race?.name ?? systemData?.details?.race)?.toLocaleLowerCase().replace("-", " ").split(" "),
+                systemData?.details.type?.value?.toLocaleLowerCase().replace("-", " ").split(" "),
+              ].flat();
+            }
           } catch (error) {
             Logger.error("ActiveAuras: the token has an unreadable type", canvasToken);
           }
