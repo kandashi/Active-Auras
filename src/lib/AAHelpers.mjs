@@ -305,12 +305,13 @@ export class AAHelpers {
     Logger.debug("RemoveAppliedAuras", { MapKey: canvas.scene.id, MapObject, EffectsArray });
 
     for (let removeToken of canvas.tokens.placeables) {
-      if (removeToken?.actor?.effects.size > 0) {
-        for (let testEffect of removeToken.actor.effects) {
+      const tokenEffects = Array.from(removeToken?.actor?.allApplicableEffects() ?? []);
+      if (tokenEffects.length > 0) {
+        for (let testEffect of tokenEffects) {
           if (!EffectsArray.includes(testEffect.origin) && testEffect?.flags?.ActiveAuras?.applied) {
             try {
               Logger.debug("RemoveAppliedAuras", { removeToken, testEffect });
-              await removeToken.actor.deleteEmbeddedDocuments("ActiveEffect", [testEffect.id]);
+              await removeToken.actor.deleteEmbeddedDocuments("ActiveEffect", [testEffect._id]);
             } catch (err) {
               Logger.error("ERROR CAUGHT in RemoveAppliedAuras", err);
             } finally {
@@ -329,8 +330,9 @@ export class AAHelpers {
 
   static async RemoveAllAppliedAuras() {
     for (let removeToken of canvas.tokens.placeables) {
-      if (removeToken?.actor?.effects.size > 0) {
-        let effects = removeToken.actor.effects.reduce((a, v) => {
+      const tokenEffects = Array.from(removeToken?.actor?.allApplicableEffects() ?? []);
+      if (tokenEffects.length > 0) {
+        let effects = tokenEffects.reduce((a, v) => {
           if (v?.flags?.ActiveAuras?.applied) return a.concat(v.id);
         }, []);
         try {
@@ -361,10 +363,6 @@ export class AAHelpers {
   static applyWrapper(wrapped, ...args) {
     let actor = args[0];
     let change = args[1];
-    // console.warn("checking apply wrapper", {
-    //   args: duplicate(args),
-    //   ignoreSelf: getProperty(change, "effect.flags.ActiveAuras.ignoreSelf"),
-    // })
     const AAFlags = getProperty(change, "effect.flags.ActiveAuras");
     if (AAFlags?.isAura === true && AAFlags?.ignoreSelf === true) {
       Logger.info(
@@ -453,7 +451,8 @@ export class AAHelpers {
 
   static async removeAurasOnToken(token) {
     if (!token.actorLink) return;
-    const auras = token.actor.effects.filter((i) => hasProperty(i, "flags.ActiveAuras.applied")).map((i) => i.id);
+    const auras = Array.from(token.actor.allApplicableEffects())
+      .filter((i) => hasProperty(i, "flags.ActiveAuras.applied")).map((i) => i.id);
     if (!auras) return;
     try {
       Logger.debug("removeAurasOnToken", { token, auras });

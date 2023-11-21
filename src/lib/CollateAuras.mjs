@@ -6,14 +6,16 @@ import Logger from "./Logger.mjs";
 function generateTargetEffect(token, effect) {
   if (effect.disabled) return;
   if (effect.isSuppressed) return; // effect is suppressed for example because it is unequipped
+  const parentActor = effect.parent?.actor ?? effect.parent;
   const newEffect = {
     data: duplicate(effect),
-    parentActorLink: effect.parent.prototypeToken.actorLink,
-    parentActorId: effect.parent.id,
+    parentActorLink: parentActor.prototypeToken.actorLink,
+    parentActorId: parentActor.id,
     entityType: "token",
     entityId: token.id,
   };
   const re = /@[\w.]+/g;
+
   const rollData = token.actor.getRollData();
 
   for (const change of newEffect.data.changes) {
@@ -78,7 +80,7 @@ export async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
       continue;
     }
     // loop over effects
-    for (const testEffect of (testToken?.actor?.effects.contents ?? [])) {
+    for (const testEffect of (testToken?.actor?.allApplicableEffects() ?? [])) {
       if (testEffect.flags?.ActiveAuras?.isAura) {
         const newEffect = generateTargetEffect(testToken, testEffect);
         if (newEffect) effectArray.push(newEffect);
