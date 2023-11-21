@@ -1,4 +1,4 @@
-# 0.8.4
+# 0.8.4/0.8.5
 
 - Some Auras would not work in D&D 2.4 system.
 - Better support for 5e character race changes.

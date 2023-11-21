@@ -75,8 +75,6 @@ export async function updateTokenHook(token, update, _flags, _id) {
     return;
   }
 
-  console.warn(token)
-
   if ("y" in update || "x" in update || "elevation" in update) {
     // await token.object._animation;
     await CanvasAnimation.getAnimation(token.object.animationName)?.promise;
