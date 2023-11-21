@@ -372,7 +372,9 @@ export class AAHelpers {
           actorName: actor.name,
         })
       );
-      args[1] = {};
+      args[1].effect.isSuppressed = true;
+      args[1].key = "";
+      args[1].value = "";
       return wrapped(...args);
     }
     return wrapped(...args);
