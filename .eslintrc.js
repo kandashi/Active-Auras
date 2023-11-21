@@ -83,5 +83,6 @@ module.exports = {
     socketlib: true,
     globalThis: true,
     fromUuidSync: true,
+    CanvasAnimation: true,
   },
 };
