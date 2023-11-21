@@ -1,3 +1,7 @@
+# 0.8.4
+
+- Some Auras would not work in D&D 2.4 system.
+
 # 0.8.3
 
 - Improvements to code to wait for movement animation to complete.
