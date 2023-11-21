@@ -79,7 +79,7 @@ export async function updateTokenHook(token, update, _flags, _id) {
 
   if ("y" in update || "x" in update || "elevation" in update) {
     // await token.object._animation;
-    await CanvasAnimation.getAnimation(token.object.animationName);
+    await CanvasAnimation.getAnimation(token.object.animationName)?.promise;
     await ActiveAuras.movementUpdate(token);
   } else if (hasProperty(update, "hidden") && (!update.hidden || AAHelpers.IsAuraToken(token.id, token.parent.id))) {
     // in v10 invisible is now a thing, so hidden is considered "not on scene"
