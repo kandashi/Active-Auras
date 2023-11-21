@@ -1,4 +1,4 @@
-# NEXT UP
+# 0.9.0
 
 - They type checking filed can now take multiple entries, and you can split these using a `;` character. It will check the type, subtype and custom fields of an actor for a match.
 - Fix for tokens moving when GM is on different screen with new animation handling.
