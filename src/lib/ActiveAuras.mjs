@@ -172,7 +172,7 @@ export class ActiveAuras {
               )
             )
               continue;
-            if (type) if (!AAHelpers.CheckType(canvasToken, type)) continue;
+            if (type && !AAHelpers.CheckTypes(canvasToken, type)) continue;
             if (hostile && canvasToken.id !== game.combats.active?.current.tokenId) continue;
             if (game.system.id === "swade" && !AAHelpers.Wildcard(canvasToken, wildcard, extra)) continue;
 
@@ -192,7 +192,7 @@ export class ActiveAuras {
           {
             auraEntity = canvas.templates.get(auraEffect.entityId);
 
-            if (type && !AAHelpers.CheckType(canvasToken, type)) continue;
+            if (type && !AAHelpers.CheckTypes(canvasToken, type)) continue;
             if (hostile && canvasToken.id !== game.combats.active.current.tokenId) return;
             if (auraEffect.casterDisposition) {
               if (!AAHelpers.DispositionCheck(auraTargets, auraEffect.casterDisposition, canvasToken.document.disposition))
@@ -211,7 +211,7 @@ export class ActiveAuras {
         case "drawing":
           {
             auraEntity = canvas.drawings.get(auraEffect.entityId);
-            if (type && !AAHelpers.CheckType(canvasToken, type)) continue;
+            if (type && !AAHelpers.CheckTypes(canvasToken, type)) continue;
             if (hostile && canvasToken.id !== game.combats.active.current.tokenId) return;
 
             const shape = AATemplates.getDrawingShape(auraEntity);

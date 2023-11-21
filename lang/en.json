@@ -32,7 +32,7 @@
     "ACTIVEAURAS.FORM_Radius": "Aura radius",
     "ACTIVEAURAS.FORM_Height": "Check Token Height",
     "ACTIVEAURAS.FORM_Alignment": "Check Alignment",
-    "ACTIVEAURAS.FORM_Type": "Creature type match",
+    "ACTIVEAURAS.FORM_Type": "Creature types match, split multiple with ;",
     "ACTIVEAURAS.FORM_CustomCondition": "JavaScript",
     "ACTIVEAURAS.FORM_Good": "Good",
     "ACTIVEAURAS.FORM_Neutral": "Neutral",

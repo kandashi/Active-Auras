@@ -1,3 +1,8 @@
+# NEXT UP
+
+- They type checking filed can now take multiple entries, and you can split these using a `;` character. It will check the type, subtype and custom fields of an actor for a match.
+- Fix for tokens moving when GM is on different screen with new animation handling.
+
 # 0.8.4/0.8.5
 
 - Some Auras would not work in D&D 2.4 system.
