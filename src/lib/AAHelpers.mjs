@@ -360,7 +360,7 @@ export class AAHelpers {
    * Bind a filter to the ActiveEffect.apply() prototype chain
    */
 
-  static applyWrapper(wrapped, ...args) {
+  static async applyWrapper(wrapped, ...args) {
     let actor = args[0];
     let change = args[1];
     const AAFlags = getProperty(change, "effect.flags.ActiveAuras");
@@ -372,7 +372,7 @@ export class AAHelpers {
           actorName: actor.name,
         })
       );
-      args[1].effect.isSuppressed = true;
+      await args[1].effect.update({ 'isSuppressed': true });
       args[1].key = "";
       args[1].value = "";
       return wrapped(...args);
