@@ -1,7 +1,7 @@
 {
   "id": "ActiveAuras",
-  "title": "Active-Auras",
-  "description": "Active-Auras",
+  "title": "Active Auras",
+  "description": "Active Auras allows effects to br provided via auras from characters, drawings and templates",
   "license": "MIT License",
   "authors": [
     {
