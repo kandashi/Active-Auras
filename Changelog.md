@@ -1,3 +1,7 @@
+# 0.9.1
+
+- Effects which ignored self would not work in SWADE.
+
 # 0.9.0
 
 - They type checking filed can now take multiple entries, and you can split these using a `;` character. It will check the type, subtype and custom fields of an actor for a match.
