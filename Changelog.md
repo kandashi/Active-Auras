@@ -1,3 +1,7 @@
+# 0.9.2
+
+- More tweaks to ignore self auras for 5e.
+
 # 0.9.1
 
 - Effects which ignored self would not work in SWADE.
