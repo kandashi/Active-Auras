@@ -83,7 +83,7 @@ Better support for 4e.
 Spikegrowth example macro fixed.
 
 # 0.5.6
-Will now evaluate the radius as a rollterm, so you can use things like ` @scale.paladin.aura-of-protection` in the radius as well as numbers.
+Will now evaluate the radius as a rollterm, so you can use things like `@scale.paladin.aura-of-protection` in the radius as well as numbers.
 Auras would fail with new 5e Group actors due to lack of alignment.
 
 # 0.5.5
