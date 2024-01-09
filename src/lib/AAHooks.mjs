@@ -245,13 +245,14 @@ export function deleteWallHook() {
   debouncedCollate(canvas.scene.id, true, false, "Wall Deleted");
 }
 
-export function updateMeasuredTemplateHook(data, update) {
+export function updateMeasuredTemplateHook(data, _update, _options) {
   if (canvas.scene === null) {
     Logger.debug("Active Auras disabled due to no canvas");
     return;
   }
   if (!getProperty(data, "flags.ActiveAuras")) return;
-  ActiveAuras.MainAura(undefined, "template movement", data.parent.id);
+  // ActiveAuras.MainAura(undefined, "template movement", data.parent.id);
+  debouncedCollate(canvas.scene.id, true, true, "updateMeasuredTemplateHook");
 }
 
 export function deleteMeasuredTemplateHook(doc){

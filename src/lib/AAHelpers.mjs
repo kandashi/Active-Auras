@@ -12,6 +12,7 @@ export class AAHelpers {
       const system = token.actor?.system;
       // eslint-disable-next-line no-unused-vars
       const rollData = token.actor?.getRollData();
+      // console.warn("custom check", { token, check, actor, system, rollData });
       const result = Boolean(eval(check));
       return result;
     } catch (e) {
