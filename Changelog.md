@@ -1,3 +1,7 @@
+# 0.9.3
+
+- If a template was moved with an aura attached, auras refresh cycle was not triggered correctly.
+
 # 0.9.2
 
 - More tweaks to ignore self auras for 5e.
