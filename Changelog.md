@@ -1,3 +1,7 @@
+# 0.9.4
+
+- Update sample items for changes in DAE to what the values for stackable do.
+
 # 0.9.3
 
 - If a template was moved with an aura attached, auras refresh cycle was not triggered correctly.
