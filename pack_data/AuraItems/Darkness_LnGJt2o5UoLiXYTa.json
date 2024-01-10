@@ -8,7 +8,7 @@
       "_id": "G6rYwXfFameLG4DJ",
       "flags": {
         "dae": {
-          "stackable": "none",
+          "stackable": "noneName",
           "macroRepeat": "none",
           "transfer": false,
           "specialDuration": [],
@@ -31,7 +31,6 @@
           "savedc": null,
           "hostile": false,
           "onlyOnce": false,
-          "time": "None",
           "displayTemp": true,
           "nameOverride": "",
           "customCheck": "",

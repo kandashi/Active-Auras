@@ -21,7 +21,7 @@ jobs:
     - run: npm run lint
 
     # Build compendiums
-    - name: Buidd Compendiums
+    - name: Build Compendiums
       run: npm run buildCompendiums
 
     # Substitute the Manifest and Download URLs in the module.json

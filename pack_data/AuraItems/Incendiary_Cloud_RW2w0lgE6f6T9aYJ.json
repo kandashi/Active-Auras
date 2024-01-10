@@ -8,7 +8,7 @@
       "_id": "R631jf30058faRaj",
       "flags": {
         "dae": {
-          "stackable": "none",
+          "stackable": "noneName",
           "macroRepeat": "endEveryTurn",
           "transfer": false,
           "specialDuration": [],

@@ -8,7 +8,7 @@
       "_id": "V4qfaLuoUbtFQoLu",
       "flags": {
         "dae": {
-          "stackable": "none",
+          "stackable": "noneName",
           "macroRepeat": "endEveryTurn",
           "transfer": false,
           "specialDuration": [],

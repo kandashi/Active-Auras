@@ -28,7 +28,7 @@
           "wallsBlock": "system"
         },
         "dae": {
-          "stackable": "none",
+          "stackable": "noneName",
           "specialDuration": [
             "None"
           ],
