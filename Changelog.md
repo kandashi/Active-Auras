@@ -1,3 +1,8 @@
+# 0.9.5
+
+- Apply Active Effect Icon will now work.
+- Custom evaluation conditions now expose `auraEntity` as the entity from which the aura emanates. If the origin was a Token you can check `auraEntity.document.actor` for the originating aura actor, or `auraEntity.document` for the TokenDocument.
+
 # 0.9.4
 
 - Update sample items for changes in DAE to what the values for stackable do.

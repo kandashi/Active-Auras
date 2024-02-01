@@ -3,8 +3,9 @@ import Logger from "./Logger.mjs";
 
 export class AAHelpers {
 
-  static evaluateCustomCheck(token, check) {
+  static evaluateCustomCheck(token, check, auraEntity) {
     try {
+      console.warn("custom check", { token, check, auraEntity });
       // these are exposed here so they can by used in the custom check/eval
       // eslint-disable-next-line no-unused-vars
       const actor = token.actor;
@@ -16,7 +17,7 @@ export class AAHelpers {
       const result = Boolean(eval(check));
       return result;
     } catch (e) {
-      Logger.warn(`Custom check failed: ${check}`, e);
+      Logger.warn(`Custom check failed: ${check}`, { e, token, check, auraEntity });
     }
     return false;
   }
@@ -468,5 +469,21 @@ export class AAHelpers {
     } finally {
       Logger.info(game.i18n.format("ACTIVEAURAS.RemoveLog", { tokenName: token.name }));
     }
+  }
+
+  static showEffectIcon(wrapped) {
+    const superResult = wrapped();
+    if (superResult) return superResult;
+
+    // if not displaying temp, return default
+    if (!getProperty(this, `flags.${CONSTANTS.MODULE_NAME}.displayTemp`)) return superResult;
+
+    // if it is the main aura and ignoring self, return default
+    if (getProperty(this, `flags.${CONSTANTS.MODULE_NAME}.isAura`)
+      && getProperty(this, `flags.${CONSTANTS.MODULE_NAME}.ignoreSelf`)
+    ) {
+      return superResult;
+    }
+    return getProperty(this, `flags.${CONSTANTS.MODULE_NAME}.displayTemp`);
   }
 }
