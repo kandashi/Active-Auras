@@ -33,18 +33,29 @@ import { ActiveAuras } from "./lib/ActiveAuras.mjs";
 export function initHooks() {
   settings();
 
-  // libWrapper.register("ActiveAuras", "ActiveEffect.prototype.apply", AAHelpers.applyWrapper, "MIXED");
+  libWrapper.ignore_conflicts(
+    "ActiveAuras",
+    ["dae"],
+    [
+      "CONFIG.ActiveEffect.documentClass.prototype.isTemporary",
+      "CONFIG.ActiveEffect.documentClass.prototype.apply"
+    ],
+  );
+
   libWrapper.register("ActiveAuras", "CONFIG.ActiveEffect.documentClass.prototype.apply", AAHelpers.applyWrapper, "MIXED");
 
-
-  if (isNewerVersion(11, game.version)) {
-    libWrapper.register(
-      "ActiveAuras",
-      "ActiveEffect.prototype._displayScrollingStatus",
-      AAHelpers.scrollingText,
-      "MIXED"
-    );
-  }
+  libWrapper.register(
+    "ActiveAuras",
+    "ActiveEffect.prototype._displayScrollingStatus",
+    AAHelpers.scrollingText,
+    "MIXED"
+  );
+  libWrapper.register(
+    "ActiveAuras",
+    "CONFIG.ActiveEffect.documentClass.prototype.isTemporary",
+    AAHelpers.showEffectIcon,
+    "WRAPPER"
+  );
 
 }
 

@@ -231,7 +231,7 @@ export class ActiveAuras {
       MapObject = map.get(MapKey);
 
       if (distance && !auraEffect.data.flags?.ActiveAuras?.Paused) {
-        if (customCheck && !AAHelpers.evaluateCustomCheck(canvasToken, customCheck)) continue;
+        if (customCheck && !AAHelpers.evaluateCustomCheck(canvasToken, customCheck, auraEntity)) continue;
         if (MapObject) {
           MapObject.add = true;
         } else {
