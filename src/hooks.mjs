@@ -111,10 +111,8 @@ export async function readyHooks() {
     Hooks.on("createCombatant", createCombatantHook);
 
     // pre update hooks for scrolling text
-    if (isNewerVersion(game.version, 11)) {
-      Hooks.on("preCreateActiveEffect", preCreateActiveEffectHook);
-      Hooks.on("preDeleteActiveEffect", preDeleteActiveEffectHook);
-    }
+    Hooks.on("preCreateActiveEffect", preCreateActiveEffectHook);
+    Hooks.on("preDeleteActiveEffect", preDeleteActiveEffectHook);
   }
 
   Hooks.on("createWall", createWallHook);
@@ -122,6 +120,7 @@ export async function readyHooks() {
   Hooks.on("deleteWall", deleteWallHook);
   Hooks.on("updateMeasuredTemplate", updateMeasuredTemplateHook);
   Hooks.on("deleteMeasuredTemplate", deleteMeasuredTemplateHook);
+  if (CONFIG.AA.GM) canvasReadyHook(game.canvas);
 }
 
 export function socketLibReadyHooks() {
