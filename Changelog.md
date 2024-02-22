@@ -1,3 +1,8 @@
+# 0.9.6
+
+- Set Effect Origin to parent item for fun transfer effect times in D&D 3.0.
+- Initial Canvas parse of effects would not always trigger, so for example a Paladins Aura effect would not be applied until the Paladin moved.
+
 # 0.9.5
 
 - Apply Active Effect Icon will now work.

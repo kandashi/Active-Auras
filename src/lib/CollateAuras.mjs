@@ -41,6 +41,9 @@ function generateTargetEffect(token, effect) {
   } else {
     newEffect.data.flags.ActiveAuras.Paused = false;
   }
+  if (newEffect.data.origin === null && effect.parent?.uuid) {
+    newEffect.data.origin = effect.parent.uuid;
+  }
   return newEffect;
 }
 

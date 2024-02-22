@@ -11,11 +11,8 @@ export class AAMeasure {
 
   // collision blocked by sight or movement
   static checkCollision(ray) {
-    return isNewerVersion(11, game.version)
-      ? canvas.walls.checkCollision(ray, { mode: "any", type: "sight" })
-        || canvas.walls.checkCollision(ray, { mode: "any", type: "move" })
-      : CONFIG.Canvas.polygonBackends["sight"].testCollision(ray.A, ray.B, { mode: "any", type: "sight" })
-        || CONFIG.Canvas.polygonBackends["move"].testCollision(ray.A, ray.B, { mode: "any", type: "move" });
+    return CONFIG.Canvas.polygonBackends["sight"].testCollision(ray.A, ray.B, { mode: "any", type: "sight" })
+      || CONFIG.Canvas.polygonBackends["move"].testCollision(ray.A, ray.B, { mode: "any", type: "move" });
   }
 
   static inAura(target, source, wallBlocking = false, auraHeight, radius, shape) {
