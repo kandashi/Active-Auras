@@ -1,3 +1,7 @@
+# 0.9.7
+
+-- Set Effect Origin to parent item for fun transfer effect times in D&D 3.0, in more instances.
+
 # 0.9.6
 
 - Set Effect Origin to parent item for fun transfer effect times in D&D 3.0.
