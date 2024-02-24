@@ -13,6 +13,7 @@ import {
   deleteActiveEffectHook,
   deleteCombatHook,
   deleteCombatantHook,
+  deleteItemHook,
   deleteMeasuredTemplateHook,
   deleteWallHook,
   preCreateActiveEffectHook,
@@ -101,6 +102,7 @@ export async function readyHooks() {
     Hooks.on("preDeleteToken", preDeleteTokenHook);
     Hooks.on("preUpdateActor", preUpdateActorHook);
     Hooks.on("updateItem", updateItemHook); // On item Change for example equipped state change
+    Hooks.on("deleteItem", deleteItemHook);
     Hooks.on("updateActiveEffect", updateActiveEffectHook);
     Hooks.on("deleteActiveEffect", deleteActiveEffectHook); // if aura remove from canvas.tokens
     Hooks.on("createActiveEffect", createActiveEffectHook); // On creation of active effect on linked actor, run MainAura

@@ -1,6 +1,7 @@
 # 0.9.7
 
--- Set Effect Origin to parent item for fun transfer effect times in D&D 3.0, in more instances.
+- Set Effect Origin to parent item for fun transfer effect times in D&D 3.0, in more instances.
+- When an item is deleted from an actor with an aura that is effecting tokens on the scene, the aura effect will now be removed from the token on delete for systems not using legacy transferral.
 
 # 0.9.6
 

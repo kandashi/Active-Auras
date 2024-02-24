@@ -113,6 +113,24 @@ export function updateItemHook(item, update, _flags, _id) {
   }
 }
 
+export async function deleteItemHook(item, _flags, _id) {
+  if (CONFIG.ActiveEffect.legacyTransferral) return;
+  const sceneEffect = CONFIG.AA.Map.get(canvas.scene._id)?.effects.find((e) => e.data.origin === item.uuid);
+  if (sceneEffect) {
+    const effectMap = ActiveAuras.UpdateAllTokens(new Map(), canvas.tokens.placeables, sceneEffect.entityId);
+
+    for (const update of effectMap.values()) {
+      if (update.effect.origin === item.uuid) {
+        await ActiveAuras.RemoveActiveEffects(update[1].token.id, update[1].effect.origin);
+      }
+    }
+
+    AAHelpers.ExtractAuraById(sceneEffect.entityId, canvas.scene._id);
+  }
+
+  debouncedCollate(canvas.scene.id, true, true, "deleteItem");
+}
+
 
 export function updateActiveEffectHook(effect, _update) {
   if (canvas.scene === null) {
