@@ -1,3 +1,8 @@
+# 0.9.8
+
+- If using aura evaluation only in combat, when combat ended, in some instances auras would not be removed.
+- More selective use of setting auras origins to parent ids where the effect has an origin uuid that points to an actors item, and it's not a transfer effect.
+
 # 0.9.7
 
 - Set Effect Origin to parent item for fun transfer effect times in D&D 3.0, in more instances.
