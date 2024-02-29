@@ -336,6 +336,7 @@ export class AAHelpers {
       if (tokenEffects.length > 0) {
         let effects = tokenEffects.reduce((a, v) => {
           if (v?.flags?.ActiveAuras?.applied) return a.concat(v.id);
+          else return a;
         }, []);
         try {
           Logger.debug("RemoveAllAppliedAuras", { removeToken, effects });
