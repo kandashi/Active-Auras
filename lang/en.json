@@ -11,7 +11,7 @@
     "ACTIVEAURAS.removeHiddenAuras": "Remove Auras on hidden tokens?",
     "ACTIVEAURAS.removeHiddenAurasHint": "On tokens that are hidden, remove any auras they would provide, default on",
     "ACTIVEAURAS.combatOnly" : "Auras in combat",
-    "ACTIVEAURAS.combatHint" : "Only check auras while a combat is active, this is for performance reasons and should be on unless you really need it off",
+    "ACTIVEAURAS.combatHint" : "Only check auras while a combat is active, check this to improve performance outside of combat.",
     "ACTIVEAURAS.scrollingAura": "Disable scrolling text for auras",
     "ACTIVEAURAS.scrollingAuraHint" : "Removes the Active Effect scrolling text for any applied aura",
 
