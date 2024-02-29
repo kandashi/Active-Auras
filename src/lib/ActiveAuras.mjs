@@ -334,7 +334,7 @@ export class ActiveAuras {
     }
 
     await token.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
-    Logger.debug(game.i18n.format("ACTIVEAURAS.ApplyLog", { effectDataName: effectData.name, tokenName: token.name }));
+    Logger.debug(game.i18n.format("ACTIVEAURAS.ApplyLog", { effectDataName: effectData.name, tokenName: token.name, effectData }));
   }
 
   /**

@@ -41,7 +41,11 @@ function generateTargetEffect(token, effect) {
   } else {
     newEffect.data.flags.ActiveAuras.Paused = false;
   }
-  if (effect.parent?.uuid) {
+  // if it's not a transfer, and it already has an origin set to an actors, item, don't change
+  if (!effect.transfer
+    && ((/Actor\.([a-zA-Z0-9]{16})\.Item\.([a-zA-Z0-9]{16})/).test(newEffect.data.origin))) {
+    // no op
+  } else if (effect.parent?.uuid) {
     newEffect.data.origin = effect.parent.uuid;
   }
   return newEffect;
