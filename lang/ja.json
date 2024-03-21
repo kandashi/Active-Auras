@@ -7,7 +7,9 @@
     "ACTIVEAURAS.debug_hint" : "デバッグ作業のために、コンソールに追加の情報を表示します。",
     "ACTIVEAURAS.tabname": "オーラ",
     "ACTIVEAURAS.removeDead": "死亡時にオーラを除去する",
-    "ACTIVEAURAS.removeDeadHint": "コマのhpが0になったとき、オーラの影響を取り除きます。デフォルトはオンです。",
+    "ACTIVEAURAS.removeDeadHint": "コマのhpが0になったとき、オーラの影響を取り除きます。デフォルトはオンです",
+    "ACTIVEAURAS.removeHiddenAuras": "隠れたコマのオーラを取り除きますか？",
+    "ACTIVEAURAS.removeHiddenAurasHint": "隠れたコマから提供される、あらゆるオーラを取り除きます。デフォルトはオンです",
     "ACTIVEAURAS.combatOnly" : "戦闘中のオーラ",
     "ACTIVEAURAS.combatHint" : "戦闘中のみオーラをチェックします。これはパーフォーマンスに影響しますので、どうしてもオフにしたい時を除き、常にオンにしてください",
     "ACTIVEAURAS.scrollingAura": "オーラのスクロールするテキストを無効化",
@@ -45,6 +47,7 @@
     "ACTIVEAURAS.FORM_Wildcard": "ワイルドカードコマに適用",
     "ACTIVEAURAS.FORM_Extra": "他のコマに適用",
     "ACTIVEAURAS.FORM_Temporary" : "影響したコマにActive Effectアイコンを付与",
+    "ACTIVEAURAS.FORM_NameOverride": "名前上書き、作成された効果(effect)の名前を変更します",
 
     "ACTIVEAURAS.ApplyLog":"Active Auras | {effectDataName}が{tokenName}に適用されました。",
     "ACTIVEAURAS.RemoveLog":"Active Auras | {effectDataName}が{tokenName}から取り除かれました。",
