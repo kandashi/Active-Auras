@@ -8,13 +8,17 @@
     "ACTIVEAURAS.tabname": "オーラ",
     "ACTIVEAURAS.removeDead": "死亡時にオーラを除去する",
     "ACTIVEAURAS.removeDeadHint": "コマのhpが0になったとき、オーラの影響を取り除きます。デフォルトはオンです。",
-    "ACTIVEAURAS.combatOnly" : "[EN]Auras in combat",
-    "ACTIVEAURAS.combatHint" : "[EN] Only check auras while a combat is active, this is for performance reasons and should be on unless you really need it off",
-    "ACTIVEAURAS.scrollingAura": "[EN] Disable scrolling text for auras",
-    "ACTIVEAURAS.scrollingAuraHint" : "[EN] Removes the Active Effect scrolling text for any applied aura",
+    "ACTIVEAURAS.combatOnly" : "戦闘中のオーラ",
+    "ACTIVEAURAS.combatHint" : "戦闘中のみオーラをチェックします。これはパーフォーマンスに影響しますので、どうしてもオフにしたい時を除き、常にオンにしてください",
+    "ACTIVEAURAS.scrollingAura": "オーラのスクロールするテキストを無効化",
+    "ACTIVEAURAS.scrollingAuraHint" : "Active Effectによるスクロールを適用したオーラから除外します",
 
     "ACTIVEAURAS.walltoptions_name": "壁はオーラを遮る",
     "ACTIVEAURAS.walltoptions_hint":"オーラが壁に干渉すると、効果がブロックされます。",
+    "ACTIVEAURAS.FORM_WallsBlock": "このオーラは壁に遮られますか？",
+    "ACTIVEAURAS.FORM_SystemWallsBlock": "モジュールのデフォルトを使用",
+    "ACTIVEAURAS.FORM_WallsDoBlock": "はい",
+    "ACTIVEAURAS.FORM_WallsDontBlock": "いいえ",
 
     "ACTIVEAURAS.FORM_IsAura" : "効果をオーラとして適用する",
     "ACTIVEAURAS.FORM_IgnoreSelf": "自身を無視する",
@@ -38,12 +42,12 @@
     "ACTIVEAURAS.FORM_TimePrompt": "適用効果の特別な有効期限",
     "ACTIVEAURAS.FORM_HostileTurn": "現戦闘参加者のターン中のみ適用",
     "ACTIVEAURAS.FORM_ActivateOnce": "ターン中に一度だけオーラを発動",
-    "ACTIVEAURAS.FORM_Wildcard": "[EN] Apply to Wildcard Tokens",
-    "ACTIVEAURAS.FORM_Extra": "[EN] Apply to Extra Tokens",
-    "ACTIVEAURAS.FORM_Temporary" : "[EN] Apply Active Effect icon to affected tokens",
+    "ACTIVEAURAS.FORM_Wildcard": "ワイルドカードコマに適用",
+    "ACTIVEAURAS.FORM_Extra": "他のコマに適用",
+    "ACTIVEAURAS.FORM_Temporary" : "影響したコマにActive Effectアイコンを付与",
 
     "ACTIVEAURAS.ApplyLog":"Active Auras | {effectDataName}が{tokenName}に適用されました。",
     "ACTIVEAURAS.RemoveLog":"Active Auras | {effectDataName}が{tokenName}から取り除かれました。",
     "ACTIVEAURAS.IgnoreSelfLog":"ActiveAuras | '{effectDataName}'を無視し、{changeKey}を{actorName}に変更しました。",
-    "ACTIVEAURAS.SaveNotify": "${tokenName} は ${oldeffectDataName} に対するセーヴをパスしました。"
+    "ACTIVEAURAS.SaveNotify": "${tokenName} は ${oldeffectDataName} に対するセーヴに成功しました。"
 }
