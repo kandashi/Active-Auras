@@ -1,3 +1,7 @@
+# 0.9.9
+
+- JP language updates.
+
 # 0.9.8
 
 - If using aura evaluation only in combat, when combat ended, in some instances auras would not be removed.
