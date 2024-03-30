@@ -1,3 +1,7 @@
+# 0.9.10
+
+- Português (Brasil) Translation
+
 # 0.9.9
 
 - JP language updates.
