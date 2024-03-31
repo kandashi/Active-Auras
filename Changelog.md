@@ -1,3 +1,5 @@
+- Added German Translation.
+
 # 0.9.10
 
 - Português (Brasil) Translation

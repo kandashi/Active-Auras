@@ -19,8 +19,15 @@
     "minimum": 11,
     "verified": 11
   },
-  "esmodules": ["src/index.mjs"],
+  "esmodules": [
+    "src/index.mjs"
+  ],
   "languages": [
+    {
+      "lang": "de",
+      "name": "German",
+      "path": "lang/de.json"
+    },
     {
       "lang": "en",
       "name": "English",
@@ -32,9 +39,9 @@
       "path": "lang/es.json"
     },
     {
-      "lang": "ko",
-      "name": "Korean",
-      "path": "lang/ko.json"
+      "lang": "fr",
+      "name": "French",
+      "path": "lang/fr.json"
     },
     {
       "lang": "ja",
@@ -42,19 +49,19 @@
       "path": "lang/ja.json"
     },
     {
-      "lang": "fr",
-      "name": "French",
-      "path": "lang/fr.json"
-    },
-    {
-      "lang": "zh-tw",
-      "name": "正體中文",
-      "path": "lang/zh-tw.json"
+      "lang": "ko",
+      "name": "Korean",
+      "path": "lang/ko.json"
     },
     {
       "lang": "pt-BR",
       "name": "Português (Brasil)",
       "path": "lang/pt-BR.json"
+    },
+    {
+      "lang": "zh-tw",
+      "name": "正體中文",
+      "path": "lang/zh-tw.json"
     }
   ],
   "packs": [
@@ -91,18 +98,19 @@
       }
     }
   ],
-  "packFolders": [{
-    "name": "Active Auras",
-    "sorting": "m",
-    "packs": [
-      "aa-aura-items",
-      "aa-zone-actors",
-      "aa-macros"
-    ]
-  }],
-
+  "packFolders": [
+    {
+      "name": "Active Auras",
+      "sorting": "m",
+      "packs": [
+        "aa-aura-items",
+        "aa-zone-actors",
+        "aa-macros"
+      ]
+    }
+  ],
   "relationships": {
-    "requires" : [
+    "requires": [
       {
         "id": "socketlib"
       },
