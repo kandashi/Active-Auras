@@ -12,7 +12,7 @@ import Logger from "./Logger.mjs";
  * @param {String} source For console logging
  * @returns
  */
-const debouncedCollate = debounce((a, b, c, d) => CollateAuras(a, b, c, d), 200);
+const debouncedCollate = foundry.utils.debounce((a, b, c, d) => CollateAuras(a, b, c, d), 200);
 
 
 export function createTokenHook(token) {
@@ -21,7 +21,7 @@ export function createTokenHook(token) {
     return;
   }
   try {
-    if (getProperty(token, "flags.multilevel-tokens")) return;
+    if (foundry.utils.getProperty(token, "flags.multilevel-tokens")) return;
     const tokenEffects = Array.from(token.actor?.allApplicableEffects() ?? []);
     for (let effect of (tokenEffects ?? [])) {
       if (effect.flags.ActiveAuras?.isAura) {
@@ -70,7 +70,7 @@ export async function preDeleteTokenHook(token) {
  * On token movement run MainAura
  */
 export async function updateTokenHook(token, update, _flags, _id) {
-  Logger.debug("updateTokenHookArgs", { token: duplicate(token), update, _flags, _id, liveToken: token.object?._animation });
+  Logger.debug("updateTokenHookArgs", { token: foundry.utils.duplicate(token), update, _flags, _id, liveToken: token.object?._animation });
   if (canvas.scene === null) {
     Logger.debug("Active Auras disabled due to no canvas");
     return;
@@ -80,7 +80,7 @@ export async function updateTokenHook(token, update, _flags, _id) {
     // await token.object._animation;
     await CanvasAnimation.getAnimation(token.object?.animationName)?.promise;
     await ActiveAuras.movementUpdate(token);
-  } else if (hasProperty(update, "hidden") && (!update.hidden || AAHelpers.IsAuraToken(token.id, token.parent.id))) {
+  } else if (foundry.utils.hasProperty(update, "hidden") && (!update.hidden || AAHelpers.IsAuraToken(token.id, token.parent.id))) {
     // in v10 invisible is now a thing, so hidden is considered "not on scene"
     Logger.debug(`hidden, collate auras ${!update.hidden} ${update.hidden}`);
     debouncedCollate(canvas.scene.id, !update.hidden, update.hidden, "updateToken, hidden");
@@ -104,10 +104,10 @@ export function updateItemHook(item, update, _flags, _id) {
   // isSuppressed Checks for dnd5e
   // dnd5e makes an effect isSuppressed when equipped or attunement status changes
 
-  if (hasProperty(update, "system.equipped")) {
+  if (foundry.utils.hasProperty(update, "system.equipped")) {
     Logger.debug("equipped, collate auras true true");
     debouncedCollate(canvas.scene.id, true, true, "updateItem, equipped");
-  } else if (hasProperty(update, "system.attunement")) {
+  } else if (foundry.utils.hasProperty(update, "system.attunement")) {
     Logger.debug("attunement, collate auras true true");
     debouncedCollate(canvas.scene.id, true, true, "updateItem, attunement");
   }
@@ -204,9 +204,9 @@ export function preUpdateActorHook(actor, update) {
       });
     }
   }
-  if ((hasProperty(update, "system.attributes.hp.value") // 5e system
+  if ((foundry.utils.hasProperty(update, "system.attributes.hp.value") // 5e system
     && actor.system?.attributes?.hp?.value === 0 && update.system.attributes.hp.value > 0)
-   || (hasProperty(update, "system.wounds.value") // swade
+   || (foundry.utils.hasProperty(update, "system.wounds.value") // swade
      && (update.system.wounds.value - (actor.system?.wounds?.ignored ?? 0)) < (actor.system?.wounds?.max ?? 0))
   ) {
     Hooks.once("updateActor", () => {
@@ -268,7 +268,7 @@ export function updateMeasuredTemplateHook(data, _update, _options) {
     Logger.debug("Active Auras disabled due to no canvas");
     return;
   }
-  if (!getProperty(data, "flags.ActiveAuras")) return;
+  if (!foundry.utils.getProperty(data, "flags.ActiveAuras")) return;
   // ActiveAuras.MainAura(undefined, "template movement", data.parent.id);
   debouncedCollate(canvas.scene.id, true, true, "updateMeasuredTemplateHook");
 }
@@ -278,7 +278,7 @@ export function deleteMeasuredTemplateHook(doc){
     Logger.debug("Active Auras disabled due to no canvas");
     return;
   }
-  //if (!getProperty(data, "flags.ActiveAuras")) return;
+  //if (!foundry.utils.getProperty(data, "flags.ActiveAuras")) return;
   AAHelpers.ExtractAuraById(doc.id, doc.parent.id);
   //CollateAuras(scene._id, false, true, "template deletion")
   debouncedCollate(canvas.scene.id, false, true, "deleteMeasuredTemplateHook");
@@ -286,7 +286,7 @@ export function deleteMeasuredTemplateHook(doc){
 
 export function preCreateActiveEffectHook(effect, _update, options) {
   if (game.settings.get("ActiveAuras", "scrollingAura")) {
-    if (getProperty(effect, "flags.ActiveAuras.applied") === true) {
+    if (foundry.utils.getProperty(effect, "flags.ActiveAuras.applied") === true) {
       options.animate = false;
     }
   }
@@ -294,7 +294,7 @@ export function preCreateActiveEffectHook(effect, _update, options) {
 
 export function preDeleteActiveEffectHook(effect, options) {
   if (game.settings.get("ActiveAuras", "scrollingAura")) {
-    if (getProperty(effect, "flags.ActiveAuras.applied") === true) {
+    if (foundry.utils.getProperty(effect, "flags.ActiveAuras.applied") === true) {
       options.animate = false;
     }
   }

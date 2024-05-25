@@ -7,10 +7,10 @@
     "buildCompendiums": "cd pack_data && node build.mjs"
   },
   "devDependencies": {
-    "eslint": "^8.10.0",
-    "eslint-config-prettier": "^8.4.0",
+    "eslint": "^8.34.0",
+    "eslint-config-prettier": "^8.3.0",
+    "prettier": "2.3.2",
     "nedb": "^1.8.0",
-    "prettier": "2.0.5",
     "@foundryvtt/foundryvtt-cli": "^1.0.0-rc.4"
   }
 }

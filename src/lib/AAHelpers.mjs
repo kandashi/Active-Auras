@@ -232,8 +232,8 @@ export class AAHelpers {
     switch (game.system.id) {
       case "dnd5e":
       case "sw5e": {
-        if (getProperty(document, "system.attributes.hp.max") === 0) return true; // dead
-        if (getProperty(document, "system.attributes.hp.value") > 0) return false;
+        if (foundry.utils.getProperty(document, "system.attributes.hp.max") === 0) return true; // dead
+        if (foundry.utils.getProperty(document, "system.attributes.hp.value") > 0) return false;
         //alive!
         else return true; // dead
       }
@@ -256,7 +256,7 @@ export class AAHelpers {
 
   static EventHPCheck(event) {
     // if this is not a hp/wound check then assume not dead
-    if (!hasProperty(event, "system.wounds") && !getProperty(event, "system.attributes.hp")) {
+    if (!foundry.utils.hasProperty(event, "system.wounds") && !foundry.utils.getProperty(event, "system.attributes.hp")) {
       return false;
     }
     return AAHelpers.HPCheck(event);
@@ -366,7 +366,7 @@ export class AAHelpers {
   static applyWrapper(wrapped, ...args) {
     let actor = args[0];
     let change = args[1];
-    const AAFlags = getProperty(change, "effect.flags.ActiveAuras");
+    const AAFlags = foundry.utils.getProperty(change, "effect.flags.ActiveAuras");
     if (AAFlags?.isAura === true && AAFlags?.ignoreSelf === true) {
       Logger.info(
         game.i18n.format("ACTIVEAURAS.IgnoreSelfLog", {
@@ -419,7 +419,7 @@ export class AAHelpers {
     let templateEffectData = [];
     for (let effect of effects) {
       let data = {
-        data: duplicate(effect),
+        data: foundry.utils.duplicate(effect),
         parentActorId: false,
         parentActorLink: false,
         entityType: "template",
@@ -441,7 +441,7 @@ export class AAHelpers {
     const templateEffectData = [];
     for (let effect of effects) {
       const newEffect = {
-        data: duplicate(effect),
+        data: foundry.utils.duplicate(effect),
         parentActorId: false,
         parentActorLink: false,
         entityType: "drawing",
@@ -460,7 +460,7 @@ export class AAHelpers {
   static async removeAurasOnToken(token) {
     if (!token.actorLink) return;
     const auras = Array.from(token.actor.allApplicableEffects())
-      .filter((i) => hasProperty(i, "flags.ActiveAuras.applied")).map((i) => i.id);
+      .filter((i) => foundry.utils.hasProperty(i, "flags.ActiveAuras.applied")).map((i) => i.id);
     if (!auras) return;
     try {
       Logger.debug("removeAurasOnToken", { token, auras });
@@ -477,14 +477,14 @@ export class AAHelpers {
     if (superResult) return superResult;
 
     // if not displaying temp, return default
-    if (!getProperty(this, `flags.${CONSTANTS.MODULE_NAME}.displayTemp`)) return superResult;
+    if (!foundry.utils.getProperty(this, `flags.${CONSTANTS.MODULE_NAME}.displayTemp`)) return superResult;
 
     // if it is the main aura and ignoring self, return default
-    if (getProperty(this, `flags.${CONSTANTS.MODULE_NAME}.isAura`)
-      && getProperty(this, `flags.${CONSTANTS.MODULE_NAME}.ignoreSelf`)
+    if (foundry.utils.getProperty(this, `flags.${CONSTANTS.MODULE_NAME}.isAura`)
+      && foundry.utils.getProperty(this, `flags.${CONSTANTS.MODULE_NAME}.ignoreSelf`)
     ) {
       return superResult;
     }
-    return getProperty(this, `flags.${CONSTANTS.MODULE_NAME}.displayTemp`);
+    return foundry.utils.getProperty(this, `flags.${CONSTANTS.MODULE_NAME}.displayTemp`);
   }
 }

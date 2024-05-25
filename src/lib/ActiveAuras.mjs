@@ -34,7 +34,7 @@ export class ActiveAuras {
       if (AAHelpers.IsAuraToken(movedToken.id, sceneID)) {
         auraTokenId = movedToken.id;
       }
-      else if (getProperty(movedToken, "flags.token-attacher")) {
+      else if (foundry.utils.getProperty(movedToken, "flags.token-attacher")) {
         Logger.debug("ActiveAuras: token attacher movement");
       }
       else {
@@ -147,7 +147,7 @@ export class ActiveAuras {
 
       let auraEntity, distance;
 
-      const rename = getProperty(auraEffect.data, "flags.ActiveAuras.nameOverride");
+      const rename = foundry.utils.getProperty(auraEffect.data, "flags.ActiveAuras.nameOverride");
       const effectName = (rename && rename.trim() !=="") ? rename : auraEffect.data.name;
 
       switch (auraEffect.entityType) {
@@ -275,19 +275,19 @@ export class ActiveAuras {
   static async CreateActiveEffect(tokenID, oldEffectData) {
     const token = canvas.tokens.get(tokenID);
 
-    const rename = getProperty(oldEffectData, "flags.ActiveAuras.nameOverride");
+    const rename = foundry.utils.getProperty(oldEffectData, "flags.ActiveAuras.nameOverride");
     const effectName = (rename && rename.trim() !=="") ? rename : oldEffectData.name;
 
     const duplicateEffect = Array.from(token.document.actor.allApplicableEffects()).find((e) =>
       e.origin === oldEffectData.origin && e.name === effectName
     );
-    if (getProperty(duplicateEffect, "flags.ActiveAuras.isAura")) return;
+    if (foundry.utils.getProperty(duplicateEffect, "flags.ActiveAuras.isAura")) return;
     if (duplicateEffect) {
       if (duplicateEffect.origin === oldEffectData.origin) return;
       if (JSON.stringify(duplicateEffect.changes) === JSON.stringify(oldEffectData.changes)) return;
       else await ActiveAuras.RemoveActiveEffects(tokenID, oldEffectData.origin);
     }
-    let effectData = duplicate(oldEffectData);
+    let effectData = foundry.utils.duplicate(oldEffectData);
     effectData.name = effectName;
 
     if (effectData.flags.ActiveAuras.onlyOnce) {

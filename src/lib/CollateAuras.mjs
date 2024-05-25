@@ -8,7 +8,7 @@ function generateTargetEffect(token, effect) {
   if (effect.isSuppressed) return; // effect is suppressed for example because it is unequipped
   const parentActor = effect.parent?.actor ?? effect.parent;
   const newEffect = {
-    data: duplicate(effect),
+    data: foundry.utils.duplicate(effect),
     parentActorLink: parentActor.prototypeToken.actorLink,
     parentActorId: parentActor.id,
     entityType: "token",
@@ -25,7 +25,7 @@ function generateTargetEffect(token, effect) {
       if (s.includes("@@")) {
         s = s.replace(match, match.slice(1));
       } else {
-        s = s.replace(match, getProperty(rollData, match.slice(1)));
+        s = s.replace(match, foundry.utils.getProperty(rollData, match.slice(1)));
       }
     }
     change.value = s;
@@ -34,7 +34,7 @@ function generateTargetEffect(token, effect) {
   newEffect.data.disabled = false;
   newEffect.data.flags.ActiveAuras.isAura = false;
   newEffect.data.flags.ActiveAuras.applied = true;
-  newEffect.data.flags.ActiveAuras.isMacro = getProperty(newEffect, "data.flags.ActiveAuras.isMacro") ?? false;
+  newEffect.data.flags.ActiveAuras.isMacro = foundry.utils.getProperty(newEffect, "data.flags.ActiveAuras.isMacro") ?? false;
   newEffect.data.flags.ActiveAuras.ignoreSelf = false;
   if (effect.flags.ActiveAuras?.hidden && token.hidden) {
     newEffect.data.flags.ActiveAuras.Paused = true;
@@ -111,23 +111,23 @@ export async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
 }
 
 function RetrieveTemplateAuras(effectArray) {
-  const auraTemplates = canvas.templates.placeables.filter((i) => hasProperty(i, "document.flags.ActiveAuras.IsAura"));
+  const auraTemplates = canvas.templates.placeables.filter((i) => foundry.utils.hasProperty(i, "document.flags.ActiveAuras.IsAura"));
 
   for (const template of auraTemplates) {
     for (const testEffect of (template.document.flags?.ActiveAuras?.IsAura ?? [])) {
       if (testEffect.disabled) continue;
       if (testEffect.isSuppressed) continue; // effect is suppressed for example because it is unequipped
-      const newEffect = duplicate(testEffect);
+      const newEffect = foundry.utils.duplicate(testEffect);
       const actor = AAHelpers.getActorFromAAEffectData(testEffect);
       const rollData = actor.getRollData();
-      rollData["item.level"] = getProperty(testEffect, "castLevel");
+      rollData["item.level"] = foundry.utils.getProperty(testEffect, "castLevel");
       Object.assign(rollData, { item: { level: testEffect.castLevel } });
 
       for (const change of newEffect.data.changes) {
         if (typeof change.value !== "string") continue;
         let s = change.value;
         for (const match of s.match(/@[\w.]+/g) || []) {
-          s = s.replace(match, getProperty(rollData, match.slice(1)));
+          s = s.replace(match, foundry.utils.getProperty(rollData, match.slice(1)));
         }
         change.value = s;
         if (change.key.startsWith("macro.")) newEffect.data.flags.ActiveAuras.isMacro = true;
@@ -135,7 +135,7 @@ function RetrieveTemplateAuras(effectArray) {
       newEffect.disabled = false;
       newEffect.data.flags.ActiveAuras.isAura = false;
       newEffect.data.flags.ActiveAuras.applied = true;
-      newEffect.data.flags.ActiveAuras.isMacro = getProperty(newEffect, "data.flags.ActiveAuras.isMacro") ?? false;
+      newEffect.data.flags.ActiveAuras.isMacro = foundry.utils.getProperty(newEffect, "data.flags.ActiveAuras.isMacro") ?? false;
       newEffect.data.flags.ActiveAuras.ignoreSelf = false;
       effectArray.push(newEffect);
     }
@@ -145,20 +145,20 @@ function RetrieveTemplateAuras(effectArray) {
 
 function RetrieveDrawingAuras(effectArray) {
   if (!effectArray) effectArray = CONFIG.AA.Map.get(canvas.scene._id)?.effects;
-  const auraDrawings = canvas.drawings.placeables.filter((i) => hasProperty(i, "document.flags.ActiveAuras.IsAura"));
+  const auraDrawings = canvas.drawings.placeables.filter((i) => foundry.utils.hasProperty(i, "document.flags.ActiveAuras.IsAura"));
 
   for (const drawing of auraDrawings) {
     for (const testEffect of (drawing.document.flags?.ActiveAuras?.IsAura ?? [])) {
       if (testEffect.disabled) continue;
       if (testEffect.isSuppressed) continue;
-      const newEffect = duplicate(testEffect);
+      const newEffect = foundry.utils.duplicate(testEffect);
       for (let change of newEffect.data.changes) {
         if (change.key.startsWith("macro.")) newEffect.data.flags.ActiveAuras.isMacro = true;
       }
       newEffect.disabled = false;
       newEffect.data.flags.ActiveAuras.isAura = false;
       newEffect.data.flags.ActiveAuras.applied = true;
-      newEffect.data.flags.ActiveAuras.isMacro = getProperty(newEffect, "data.flags.ActiveAuras.isMacro") ?? false;
+      newEffect.data.flags.ActiveAuras.isMacro = foundry.utils.getProperty(newEffect, "data.flags.ActiveAuras.isMacro") ?? false;
       newEffect.data.flags.ActiveAuras.ignoreSelf = false;
       effectArray.push(newEffect);
     }
