@@ -1,5 +1,8 @@
 # 0.9.12
 
+- v12 official support.
+- Some template auras would fail to apply when cast via things like magic items.
+
 # 0.9.11
 
 - Added German Translation.

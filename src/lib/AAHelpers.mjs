@@ -49,7 +49,7 @@ export class AAHelpers {
     const originActor = fromUuidSync(effectData.data.origin)?.parent;
     if (originActor) return originActor;
 
-    const parts = effectData.origin.split(".");
+    const parts = (effectData.origin ?? effectData.data.origin).split(".");
     // eslint-disable-next-line no-unused-vars
     const [entityName, entityId, embeddedName, embeddedId] = parts;
     const actor = game.actors.get(entityId);
