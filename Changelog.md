@@ -1,3 +1,7 @@
+# 0.9.13
+
+- Resolve levels deprecation warnings.
+
 # 0.9.12
 
 - v12 official support.
