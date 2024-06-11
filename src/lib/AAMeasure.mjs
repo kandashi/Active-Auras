@@ -74,7 +74,7 @@ export class AAMeasure {
         if (wallBlocking) {
           let collision;
           if (game.modules.get("levels")?.active) {
-            collision = _levels.testCollision(
+            collision = CONFIG.Levels.API.testCollision(
               { x: t.x, y: t.y, z: target.document.elevation },
               { x: s.x, y: s.y, z: source.document.elevation ?? source.flags?.levels?.elevation },
               "collision"
