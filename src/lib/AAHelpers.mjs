@@ -5,7 +5,7 @@ export class AAHelpers {
 
   static evaluateCustomCheck(token, check, auraEntity) {
     try {
-      console.warn("custom check", { token, check, auraEntity });
+      // console.warn("custom check", { token, check, auraEntity });
       // these are exposed here so they can by used in the custom check/eval
       // eslint-disable-next-line no-unused-vars
       const actor = token.actor;
