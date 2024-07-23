@@ -28,11 +28,18 @@ export class AATemplates {
   }
 
   static getAuraShape(source, radius) {
+  	function getSafeSetting(systemId, settingKey, defaultValue = null) {
+  		try {
+  			return game.settings.get(systemId, settingKey);
+  		} catch (error) {
+  			return defaultValue;
+  		}
+  	}
     const gs = canvas.dimensions.size;
     const gd = gs / canvas.dimensions.distance;
     if (
       ["dnd5e", "dnd4e"].includes(game.system.id)
-      && game.settings.get(game.system.id, "diagonalMovement") === "555"
+      && ((getSafeSetting(game.system.id, "diagonalMovement") === "555" && parseInt(game.system.version.replace(/\./g, ''), 10) < 331) || (getSafeSetting("core", "gridDiagonals") === 0 && parseInt(game.system.version.replace(/\./g, ''), 10) >= 331))
     ) {
       return new PIXI.Rectangle(
         source.x - radius * gd,
