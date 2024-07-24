@@ -1,6 +1,8 @@
-# Next Up
+# 0.9.14
 
 - Remove errant warning
+- Fix auras in v12 and D&D v3.3.1
+- If using a Placeholder token in the combar tracker, AA could fail.
 
 # 0.9.13
 

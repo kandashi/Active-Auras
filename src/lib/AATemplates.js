@@ -28,27 +28,32 @@ export class AATemplates {
   }
 
   static getAuraShape(source, radius) {
-  	function getSafeSetting(systemId, settingKey, defaultValue = null) {
-  		try {
-  			return game.settings.get(systemId, settingKey);
-  		} catch (error) {
-  			return defaultValue;
-  		}
-  	}
+    let shape = "circle";
+    if (["dnd5e", "dnd4e"].includes(game.system.id)) {
+      if (foundry.utils.isNewerVersion(game.version, "12.0") && foundry.utils.isNewerVersion(game.system.version, "3.3.0")) {
+        if (game.settings.get("core", "gridDiagonals") === 0) shape = "rectangle";
+      } else {
+        if (game.settings.get(game.system.id, "diagonalMovement") === "555") shape = "rectangle";
+      }
+    }
+
     const gs = canvas.dimensions.size;
     const gd = gs / canvas.dimensions.distance;
-    if (
-      ["dnd5e", "dnd4e"].includes(game.system.id)
-      && (getSafeSetting(game.system.id, "diagonalMovement") === "555" && (!foundry.utils.isNewerVersion(game.system.version, "3.3.1") || !foundry.utils.isNewerVersion(game.version, "12.0"))) || (getSafeSetting("core", "gridDiagonals") === 0 && foundry.utils.isNewerVersion(game.system.version, "3.3.0"))
-    ) {
-      return new PIXI.Rectangle(
-        source.x - radius * gd,
-        source.y - radius * gd,
-        radius * gd * 2 + source.document.width * gs,
-        radius * gd * 2 + source.document.height * gs
-      );
+
+    switch (shape) {
+      case "rectangle": {
+        return new PIXI.Rectangle(
+          source.x - radius * gd,
+          source.y - radius * gd,
+          radius * gd * 2 + source.document.width * gs,
+          radius * gd * 2 + source.document.height * gs
+        );
+      }
+      case "circle":
+      default: {
+        return new PIXI.Circle(source.center.x, source.center.y, radius * gd + (source.document.width / 2) * gs);
+      }
     }
-    return new PIXI.Circle(source.center.x, source.center.y, radius * gd + (source.document.width / 2) * gs);
   }
 
   static PixiFromPolygon(data) {
