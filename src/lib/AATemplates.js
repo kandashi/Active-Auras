@@ -39,7 +39,7 @@ export class AATemplates {
     const gd = gs / canvas.dimensions.distance;
     if (
       ["dnd5e", "dnd4e"].includes(game.system.id)
-      && ((getSafeSetting(game.system.id, "diagonalMovement") === "555" && parseInt(game.system.version.replace(/\./g, ''), 10) < 331) || (getSafeSetting("core", "gridDiagonals") === 0 && parseInt(game.system.version.replace(/\./g, ''), 10) >= 331))
+      && (getSafeSetting(game.system.id, "diagonalMovement") === "555" && (!foundry.utils.isNewerVersion(game.system.version, "3.3.1") || !foundry.utils.isNewerVersion(game.version, "12.0"))) || (getSafeSetting("core", "gridDiagonals") === 0 && foundry.utils.isNewerVersion(game.system.version, "3.3.0"))
     ) {
       return new PIXI.Rectangle(
         source.x - radius * gd,
