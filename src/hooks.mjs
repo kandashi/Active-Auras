@@ -39,11 +39,17 @@ export function initHooks() {
     ["dae"],
     [
       "CONFIG.ActiveEffect.documentClass.prototype.isTemporary",
-      "CONFIG.ActiveEffect.documentClass.prototype.apply"
+      "CONFIG.ActiveEffect.documentClass.prototype.apply",
     ],
   );
 
-  libWrapper.register("ActiveAuras", "CONFIG.ActiveEffect.documentClass.prototype.apply", AAHelpers.applyWrapper, "MIXED");
+  libWrapper.register(
+    "ActiveAuras",
+    "CONFIG.ActiveEffect.documentClass.prototype.apply",
+    AAHelpers.applyWrapper,
+    "WRAPPER"
+  );
+
 
   libWrapper.register(
     "ActiveAuras",
@@ -126,7 +132,7 @@ export async function readyHooks() {
 }
 
 export function socketLibReadyHooks() {
-  setProperty(CONFIG, "AA.Socket", null);
+  foundry.utils.setProperty(CONFIG, "AA.Socket", null);
   CONFIG.AA.Socket = socketlib.registerModule("ActiveAuras");
   CONFIG.AA.Socket.register("userCollate", CollateAuras);
 }
