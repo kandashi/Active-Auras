@@ -3,9 +3,9 @@ import { CollateAuras } from "./lib/CollateAuras.mjs";
 
 export function settings() {
 
-  setProperty(CONFIG, "debug.AA", false);
-  setProperty(CONFIG, "AA.GM", false);
-  setProperty(CONFIG, "AA.Map", new Map());
+  foundry.utils.setProperty(CONFIG, "debug.AA", false);
+  foundry.utils.setProperty(CONFIG, "AA.GM", false);
+  foundry.utils.setProperty(CONFIG, "AA.Map", new Map());
 
   game.settings.register("ActiveAuras", "measurement", {
     name: game.i18n.format("ACTIVEAURAS.measurmentoptions_name"),

@@ -48,9 +48,11 @@ export async function updateCombatHook(combat, changed, options, userId) {
   if (!("turn" in changed)) return;
   let combatant = canvas.tokens.get(combat.current.tokenId);
   let previousCombatant = canvas.tokens.get(combat.previous.tokenId);
-  await previousCombatant.document.update({ "flags.ActiveAuras": false });
-  Logger.debug("updateCombat, main aura");
-  await ActiveAuras.MainAura(combatant.document, "combat update", combatant.scene.id);
+  if (previousCombatant) await previousCombatant.document.update({ "flags.ActiveAuras": false });
+  if (combatant) {
+    Logger.debug("updateCombat, main aura");
+    await ActiveAuras.MainAura(combatant.document, "combat update", combatant.scene.id);
+  }
 }
 
 export async function preDeleteTokenHook(token) {
