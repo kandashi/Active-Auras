@@ -38,14 +38,7 @@
           "wallsBlock": "system"
         }
       },
-      "changes": [
-        {
-          "key": "",
-          "mode": 0,
-          "value": "Convenient Effect: Blinded",
-          "priority": 20
-        }
-      ],
+      "changes": [],
       "disabled": false,
       "duration": {
         "startTime": null,
@@ -62,7 +55,7 @@
       "origin": null,
       "name": "Silence",
       "description": "",
-      "statuses": [],
+      "statuses": ["deafened"],
       "_key": "!items.effects!jNVxMgavVtbIZqFy.4gFVHoupB272LFGm"
     }
   ],
