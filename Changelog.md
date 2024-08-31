@@ -1,3 +1,7 @@
+# 0.9.15
+
+- Silence compendium example was not working.
+
 # 0.9.14
 
 - Remove errant warning
