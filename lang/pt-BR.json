@@ -11,7 +11,7 @@
     "ACTIVEAURAS.removeHiddenAuras": "Remover Auras em Tokens Escondido?",
     "ACTIVEAURAS.removeHiddenAurasHint": "Em tokens escondidos, remove qualquer aura que se origine deles. Ativado por padrão.",
     "ACTIVEAURAS.combatOnly" : "Auras em Combate",
-    "ACTIVEAURAS.combatHint" : "Verifica autas apenas se houver um combate ativo. Ative esta opção para melhorar a performance fora de combate.",
+    "ACTIVEAURAS.combatHint" : "Verifica auras apenas se houver um combate ativo. Ative esta opção para melhorar a performance fora de combate.",
     "ACTIVEAURAS.scrollingAura": "Desabilitar Texto para Auras",
     "ACTIVEAURAS.scrollingAuraHint" : "Remove o texto de Efeitos Ativos para qualquer aura aplicada.",
 
