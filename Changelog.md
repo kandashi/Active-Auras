@@ -1,3 +1,8 @@
+# 0.10.0
+
+- Foundry v12 Only
+- New status conditions option that will apply status effects to targets of aura.
+
 # 0.9.15
 
 - Silence compendium example was not working.

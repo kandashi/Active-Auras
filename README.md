@@ -61,6 +61,11 @@ To apply to only goblinoids:
 
 If the origin was a Token you can check `auraEntity.document.actor` for the originating aura actor, or `auraEntity.document` for the TokenDocument.
 
+## Status Conditions
+
+Status conditions on an effect are added to the source actor as usual. These will apply even if the ignore self option is checked.
+To apply status conditions to the target of the aura (but not the source actor, even is ignore self is not checked) add the condition on the Active Aura tab of the effect window.
+
 ## Notes
 - Only works when a GM player is connected
 - Only works while a GM views the scene where an update takes place (a notification is given when this occurs)
