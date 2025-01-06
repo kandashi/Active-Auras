@@ -1,5 +1,4 @@
 import CONSTANTS from "./constants.mjs";
-import Logger from "./lib/Logger.mjs";
 import { settings } from "./settings.mjs";
 import { AAHelpers } from "./lib/AAHelpers.mjs";
 import { AAMeasure } from "./lib/AAMeasure.mjs";
@@ -18,6 +17,7 @@ import {
   deleteWallHook,
   preCreateActiveEffectHook,
   preDeleteActiveEffectHook,
+  preUpdateActiveEffectHook,
   preDeleteTokenHook,
   preUpdateActorHook,
   updateActiveEffectHook,
@@ -64,6 +64,9 @@ export function initHooks() {
     "WRAPPER"
   );
 
+
+  if (game.settings.get("ActiveAuras", "debug")) CONFIG.debug.AA = true;
+
 }
 
 function configureApi() {
@@ -75,18 +78,37 @@ function configureApi() {
   game.modules.get(CONSTANTS.MODULE_NAME).api = API;
 }
 
-export async function readyHooks() {
-  if (!game.modules.get("lib-wrapper")?.active && game.user.isGM)
-    ui.notifications.error("Module XYZ requires the 'libWrapper' module. Please install and activate it.");
+function gmHooks() {
+  Hooks.on("createToken", createTokenHook);
+  Hooks.on("updateToken", updateTokenHook); // On token movement run MainAura
+  Hooks.on("preDeleteToken", preDeleteTokenHook);
+  Hooks.on("preUpdateActor", preUpdateActorHook);
+  Hooks.on("updateItem", updateItemHook); // On item Change for example equipped state change
+  Hooks.on("deleteItem", deleteItemHook);
+  Hooks.on("updateActiveEffect", updateActiveEffectHook);
+  Hooks.on("deleteActiveEffect", deleteActiveEffectHook); // if aura remove from canvas.tokens
+  Hooks.on("createActiveEffect", createActiveEffectHook); // On creation of active effect on linked actor, run MainAura
+  Hooks.on("canvasReady", canvasReadyHook);
+  Hooks.on("updateCombat", updateCombatHook);
+  Hooks.on("deleteCombat", deleteCombatHook);
+  Hooks.on("deleteCombatant", deleteCombatantHook);
+  Hooks.on("createCombatant", createCombatantHook);
 
-  configureApi();
+  // pre update hooks for scrolling text
+  Hooks.on("preCreateActiveEffect", preCreateActiveEffectHook);
+  Hooks.on("preCreateActiveEffect", preUpdateActiveEffectHook);
+  Hooks.on("preDeleteActiveEffect", preDeleteActiveEffectHook);
+}
 
-  if (game.settings.get("ActiveAuras", "debug")) CONFIG.debug.AA = true;
-  if (canvas.scene === null) {
-    Logger.debug("Active Auras disabled due to no canvas");
-    return;
-  }
+function allUserHooks() {
+  Hooks.on("createWall", createWallHook);
+  Hooks.on("updateWall", updateWallHook);
+  Hooks.on("deleteWall", deleteWallHook);
+  Hooks.on("updateMeasuredTemplate", updateMeasuredTemplateHook);
+  Hooks.on("deleteMeasuredTemplate", deleteMeasuredTemplateHook);
+}
 
+async function setAAGM() {
   // determine if this user is the active gm/first active in current session
   if (game.user.isGM) {
     const currentGMUser = game.users.get(game.settings.get("ActiveAuras", "ActiveGM"));
@@ -99,35 +121,26 @@ export async function readyHooks() {
   } else {
     CONFIG.AA.GM = false;
   }
+}
 
-  CollateAuras(canvas.id, true, false, "readyHook");
+export async function readyHooks() {
+  if (!game.modules.get("lib-wrapper")?.active && game.user.isGM)
+    ui.notifications.error("Module XYZ requires the 'libWrapper' module. Please install and activate it.");
+
+  configureApi();
+
+  await setAAGM();
+
+  // run initial aura collation before hooks
+  await CollateAuras(canvas.id, true, false, "readyHook");
+
+  allUserHooks();
 
   if (CONFIG.AA.GM) {
-    Hooks.on("createToken", createTokenHook);
-    Hooks.on("updateToken", updateTokenHook); // On token movement run MainAura
-    Hooks.on("preDeleteToken", preDeleteTokenHook);
-    Hooks.on("preUpdateActor", preUpdateActorHook);
-    Hooks.on("updateItem", updateItemHook); // On item Change for example equipped state change
-    Hooks.on("deleteItem", deleteItemHook);
-    Hooks.on("updateActiveEffect", updateActiveEffectHook);
-    Hooks.on("deleteActiveEffect", deleteActiveEffectHook); // if aura remove from canvas.tokens
-    Hooks.on("createActiveEffect", createActiveEffectHook); // On creation of active effect on linked actor, run MainAura
-    Hooks.on("canvasReady", canvasReadyHook);
-    Hooks.on("updateCombat", updateCombatHook);
-    Hooks.on("deleteCombat", deleteCombatHook);
-    Hooks.on("deleteCombatant", deleteCombatantHook);
-    Hooks.on("createCombatant", createCombatantHook);
-
-    // pre update hooks for scrolling text
-    Hooks.on("preCreateActiveEffect", preCreateActiveEffectHook);
-    Hooks.on("preDeleteActiveEffect", preDeleteActiveEffectHook);
+    // await canvasReadyHook(game.canvas);
+    gmHooks();
   }
 
-  Hooks.on("createWall", createWallHook);
-  Hooks.on("updateWall", updateWallHook);
-  Hooks.on("deleteWall", deleteWallHook);
-  Hooks.on("updateMeasuredTemplate", updateMeasuredTemplateHook);
-  Hooks.on("deleteMeasuredTemplate", deleteMeasuredTemplateHook);
   if (CONFIG.AA.GM) canvasReadyHook(game.canvas);
 }
 

@@ -49,6 +49,7 @@
     "ACTIVEAURAS.FORM_Extra": "Apply to Extra Tokens",
     "ACTIVEAURAS.FORM_Temporary" : "Apply Active Effect icon to affected tokens",
     "ACTIVEAURAS.FORM_NameOverride": "Name Override, renames created effect",
+    "ACTIVEAURAS.FORM_StatusConditions": "Status Conditions (these are not applied to self, use Effect Status conditions to apply to self)",
 
     "ACTIVEAURAS.ApplyLog":"ActiveAuras | Applied '{effectDataName}' to {tokenName}",
     "ACTIVEAURAS.RemoveLog":"ActiveAuras | Removed '{effectDataName}' from {tokenName}",

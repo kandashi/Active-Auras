@@ -48,6 +48,8 @@ function generateTargetEffect(token, effect) {
   } else if (effect.parent?.uuid) {
     newEffect.data.origin = effect.parent.uuid;
   }
+  const newStatuses = foundry.utils.getProperty(newEffect, "data.flags.ActiveAuras.statuses") ?? [];
+  newEffect.data.statuses = newStatuses;
   return newEffect;
 }
 
@@ -137,6 +139,8 @@ function RetrieveTemplateAuras(effectArray) {
       newEffect.data.flags.ActiveAuras.applied = true;
       newEffect.data.flags.ActiveAuras.isMacro = foundry.utils.getProperty(newEffect, "data.flags.ActiveAuras.isMacro") ?? false;
       newEffect.data.flags.ActiveAuras.ignoreSelf = false;
+      const newStatuses = foundry.utils.getProperty(newEffect, "data.flags.ActiveAuras.statuses") ?? [];
+      newEffect.data.statuses = Array.from(new Set(newEffect.data.statuses.concat(newStatuses)));
       effectArray.push(newEffect);
     }
   }
@@ -160,6 +164,8 @@ function RetrieveDrawingAuras(effectArray) {
       newEffect.data.flags.ActiveAuras.applied = true;
       newEffect.data.flags.ActiveAuras.isMacro = foundry.utils.getProperty(newEffect, "data.flags.ActiveAuras.isMacro") ?? false;
       newEffect.data.flags.ActiveAuras.ignoreSelf = false;
+      const newStatuses = foundry.utils.getProperty(newEffect, "data.flags.ActiveAuras.statuses") ?? [];
+      newEffect.data.statuses = Array.from(new Set(newEffect.data.statuses.concat(newStatuses)));
       effectArray.push(newEffect);
     }
   }

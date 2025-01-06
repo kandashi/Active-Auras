@@ -181,13 +181,13 @@ export function createActiveEffectHook(effect) {
 }
 
 
-export function canvasReadyHook(canvas) {
+export async function canvasReadyHook(canvas) {
   if (canvas.scene === null) {
     Logger.debug("Active Auras disabled due to no canvas");
     return;
   }
   Logger.debug("canvasReady, collate auras true false");
-  debouncedCollate(canvas.scene.id, true, false, "ready");
+  await debouncedCollate(canvas.scene.id, true, false, "ready");
 }
 
 
@@ -292,6 +292,21 @@ export function preCreateActiveEffectHook(effect, _update, options) {
       options.animate = false;
     }
   }
+
+  // const AAFlags = foundry.utils.getProperty(effect, "flags.ActiveAuras");
+  // if (!AAFlags) return;
+  // console.warn("AA PreCreate", { _update, effect, options, AAFlags });
+  // if (AAFlags.isAura === true && AAFlags.ignoreSelf !== true && AAFlags.statuses.length > 0) {
+  //   Logger.info(
+  //     game.i18n.format("ACTIVEAURAS.IgnoreSelfLog", {
+  //       effectDataName: `${effect.name} - Statuses`,
+  //       changeKey: Array.from(effect.statuses).join(", "),
+  //       actorName: effect.parent?.name ?? "Unknown",
+  //     })
+  //   );
+  //   effect.statuses = new Set(Array.from(effect.statuses).concat(AAFlags.statuses));
+  //   console.warn("preCreate triggered", effect);
+  // }
 }
 
 export function preDeleteActiveEffectHook(effect, options) {
@@ -301,3 +316,21 @@ export function preDeleteActiveEffectHook(effect, options) {
     }
   }
 }
+
+export function preUpdateActiveEffectHook(effect, update, options, _id) {
+  // const AAFlags = foundry.utils.getProperty(effect, "flags.ActiveAuras");
+  // if (!AAFlags) return;
+  // console.warn("AA PreUpdate", { update, effect, options, AAFlags });
+  // if (AAFlags.isAura === true && AAFlags.ignoreSelf !== true && AAFlags.statuses.length > 0) {
+  //   Logger.info(
+  //     game.i18n.format("ACTIVEAURAS.IgnoreSelfLog", {
+  //       effectDataName: `${effect.name} - Statuses`,
+  //       changeKey: Array.from(effect.statuses).join(", "),
+  //       actorName: effect.parent?.name ?? "Unknown",
+  //     })
+  //   );
+  //   effect.statuses = new Set(Array.from(effect.statuses).concat(AAFlags.statuses));
+  //   console.warn("preUpdate triggered", effect);
+  // }
+}
+

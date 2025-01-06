@@ -367,7 +367,9 @@ export class AAHelpers {
     let actor = args[0];
     let change = args[1];
     const AAFlags = foundry.utils.getProperty(change, "effect.flags.ActiveAuras");
-    if (AAFlags?.isAura === true && AAFlags?.ignoreSelf === true) {
+    if (!AAFlags) return wrapped(...args);
+    if (AAFlags.isAura !== true) return wrapped(...args);
+    if (AAFlags.ignoreSelf === true) {
       Logger.info(
         game.i18n.format("ACTIVEAURAS.IgnoreSelfLog", {
           effectDataName: change.effect.name,

@@ -31,6 +31,7 @@ export async function extendEffectsForm(sheet, html) {
   const FormSystemWallsBlock = game.i18n.format("ACTIVEAURAS.FORM_SystemWallsBlock");
   const FormWallsBlock = game.i18n.format("ACTIVEAURAS.FORM_WallsDoBlock");
   const FormWallsDontBlock = game.i18n.format("ACTIVEAURAS.FORM_WallsDontBlock");
+  const FormStatusConditions = game.i18n.format("ACTIVEAURAS.FORM_StatusConditions");
 
   const tab = `<a class="item" data-tab="ActiveAuras"><i class="fas fa-broadcast-tower"></i> ${AuraTab}</a>`;
   const type = flags[CONSTANTS.MODULE_NAME]?.type ?? "";
@@ -39,6 +40,21 @@ export async function extendEffectsForm(sheet, html) {
   const radius = flags[CONSTANTS.MODULE_NAME]?.radius ?? "";
   const nameOverride = flags[CONSTANTS.MODULE_NAME]?.nameOverride ?? "";
   const wallsBlock = flags[CONSTANTS.MODULE_NAME]?.wallsBlock ?? "system";
+
+  const flagStatuses = flags[CONSTANTS.MODULE_NAME]?.statuses ?? [];
+  const statuses = CONFIG.statusEffects.map((s) => {
+    return {
+      id: s.id,
+      label: game.i18n.localize(s.name),
+      selected: flagStatuses.includes(s.id) ? "selected" : ""
+    };
+  });
+
+
+  let statusHtml = "";
+  for (const status of statuses ) {
+    statusHtml += `<option value="${status.id}" ${status.selected}> ${status.label}</option>`;
+  }
 
   let contents = `
     <div class="tab" data-tab="ActiveAuras">
@@ -112,6 +128,14 @@ export async function extendEffectsForm(sheet, html) {
                     <option value="true"${wallsBlock === "true" ? "selected" : ""}>${FormWallsBlock}</option>
                     <option value="false"${wallsBlock === "false" ? "selected" : ""}>${FormWallsDontBlock}</option>
                 </select>
+          </div>
+              <div class="form-group">
+              <label>${FormStatusConditions}</label>
+              <div class="form-fields">
+                  <multi-select name="flags.${CONSTANTS.MODULE_NAME}.statuses">
+                      ${statusHtml}
+                  </multi-select>
+              </div>
           </div>
             `;
 
