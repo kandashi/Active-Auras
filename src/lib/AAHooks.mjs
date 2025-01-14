@@ -12,8 +12,9 @@ import Logger from "./Logger.mjs";
  * @param {String} source For console logging
  * @returns
  */
-const debouncedCollate = foundry.utils.debounce((a, b, c, d) => CollateAuras(a, b, c, d), 200);
-
+function debouncedCollate(sceneID, checkAuras, removeAuras, source) {
+  CONFIG.AA.Semaphore.add(CollateAuras, sceneID, checkAuras, removeAuras, source);
+}
 
 export function createTokenHook(token) {
   if (canvas.scene === null) {

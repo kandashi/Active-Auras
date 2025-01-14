@@ -17,7 +17,6 @@ import {
   deleteWallHook,
   preCreateActiveEffectHook,
   preDeleteActiveEffectHook,
-  preUpdateActiveEffectHook,
   preDeleteTokenHook,
   preUpdateActorHook,
   updateActiveEffectHook,
@@ -96,7 +95,7 @@ function gmHooks() {
 
   // pre update hooks for scrolling text
   Hooks.on("preCreateActiveEffect", preCreateActiveEffectHook);
-  Hooks.on("preCreateActiveEffect", preUpdateActiveEffectHook);
+  // Hooks.on("preUpdateActiveEffect", preUpdateActiveEffectHook);
   Hooks.on("preDeleteActiveEffect", preDeleteActiveEffectHook);
 }
 
@@ -130,6 +129,8 @@ export async function readyHooks() {
   configureApi();
 
   await setAAGM();
+
+  CONFIG.AA.Semaphore = new foundry.utils.Semaphore(1);
 
   // run initial aura collation before hooks
   await CollateAuras(canvas.id, true, false, "readyHook");
