@@ -47,13 +47,14 @@ export class ActiveAuras {
     //   auraTokenId,
     // });
 
-    const effectMap = ActiveAuras.UpdateAllTokens(new Map(), updateTokens, auraTokenId);
+    const rawMap = ActiveAuras.UpdateAllTokens(new Map(), updateTokens, auraTokenId);
 
     if (CONFIG.debug.AA) {
       Logger.info(`Active Auras Find Auras took ${performance.now() - perfStart} ms, FPS:${Math.round(canvas.app.ticker.FPS)}`);
     }
 
-    for (const mapEffect of effectMap) {
+    const effectMap = new Map();
+    for (const mapEffect of rawMap) {
       effectMap.set(mapEffect[0], {
         add: mapEffect[1].add,
         token: mapEffect[1].token,
@@ -63,7 +64,12 @@ export class ActiveAuras {
         effectName: mapEffect[1].effectName,
       });
     }
-    Logger.debug("Active Aura Effect map", effectMap);
+    if (CONFIG.debug.AA) {
+      Logger.debug("Active Aura Effect map", {
+        rawMap: foundry.utils.deepClone(rawMap),
+        effectMap: foundry.utils.deepClone(effectMap),
+      });
+    }
 
     // Loop over the map to remove any "add.false" entries where a "add.true" is present,
     // prevents odd ordering from removing auras when in range of 2 or more of the same aura
@@ -73,38 +79,72 @@ export class ActiveAuras {
       for (const m of iterator1) {
         if (m[0] === key) continue;
 
-        if (m[1].effect.name === value.effect.name && m[1].add === true && value.add === true) {
+        if (!map1.has(key)) continue;
+        // token entities don't match match
+        if (m[1].canvasTokenId !== value.canvasTokenId) continue;
+        if (
+          m[1].effect.name === value.effect.name // names match
+          && m[1].add === true && value.add === true // both add
+        ) {
+          let deleteKey = false;
           for (let e = 0; e < m[1].effect.changes.length; e++) {
+            const effectKey = m[1].effect.changes[e].key;
             const newEffectValue = parseInt(m[1].effect.changes[e].value);
+            // unable to determine evaluation condition
             if (typeof newEffectValue !== "number") continue;
             if (value.effect.changes.length < e) continue;
-            const oldChange = value.effect.changes.find((c) => c.key === m[1].effect.changes[e].key);
+            const oldChange = value.effect.changes.find((c) => c.key === effectKey);
             const oldEffectValue = parseInt(oldChange?.value ?? 0);
-            if (typeof oldEffectValue !== "number") map1.delete(key);
-            if (oldEffectValue === newEffectValue && value.auraEntityId === value.canvasTokenId) continue;
-            if (oldEffectValue < newEffectValue) {
-              map1.delete(key);
+            if (typeof oldEffectValue !== "number") {
+              deleteKey = true;
+              break;
+            }
+            // if (oldEffectValue === newEffectValue && value.auraEntityId === value.canvasTokenId) continue;
+            if (oldEffectValue <= newEffectValue) {
+              deleteKey = true;
+              break;
             }
           }
+          if (deleteKey) map1.delete(key);
         } else if (
-          m[1].effect.name === value.effect.name
-          && (m[1].add === true || value.add === true)
-          && m[1].token.id === value.token.id
+          m[1].effect.name === value.effect.name // names match
+          && (m[1].add === true || value.add === true) // one of them adds
+          // && m[1].token.id === value.token.id // tokens match
+          && m[1].auraEntityId === value.auraEntityId // aura entities match
+          && m[1].canvasTokenId === value.canvasTokenId // token entities match
         ) {
-          if (value.add === false) effectMap.delete(key);
+          if (value.add === false) {
+            map1.delete(key);
+          }
+        } else if (
+          m[1].effect.name === value.effect.name // names match
+          && (m[1].add === true || value.add === true) // one of them adds
+        ) {
+          Logger.debug("There is a delete effect match that wasn't handled", {
+            m,
+            value,
+            key,
+            map1,
+          });
         }
       }
     });
 
-    const results = [];
+    // remove all effects first to prevent issues with DAE where it will attempt to remove a duplicate
+    const removeResults = [];
     for (const update of effectMap) {
-      if (update[1].add) {
-        results.push(ActiveAuras.CreateActiveEffect(update[1].token.id, update[1].effect));
-      } else {
-        results.push(ActiveAuras.RemoveActiveEffects(update[1].token.id, update[1].effect.origin));
+      if (update[1].add === false) {
+        removeResults.push(ActiveAuras.RemoveActiveEffects(update[1].token.id, update[1].effect.origin));
       }
     }
-    await Promise.all(results);
+    await Promise.all(removeResults);
+    const createResults = [];
+    for (const update of effectMap) {
+      if (update[1].add) {
+        createResults.push(ActiveAuras.CreateActiveEffect(update[1].token.id, update[1].effect));
+      }
+    }
+    await Promise.all(createResults);
     if (CONFIG.debug.AA) {
       Logger.debug(
         `Active Auras Main Function took ${performance.now() - perfStart} ms, FPS:${Math.round(canvas.app.ticker.FPS)}`
@@ -164,9 +204,6 @@ export class ActiveAuras {
       }
 
       let auraEntity, distance;
-
-      const rename = foundry.utils.getProperty(auraEffect.data, "flags.ActiveAuras.nameOverride");
-      const effectName = (rename && rename.trim() !=="") ? rename : `${auraEffect.data.name} (In Aura)`;
 
       switch (auraEffect.entityType) {
         //{data: testEffect.data, parentActorLink :testEffect.parent.data.token.actorLink, parentActorId : testEffect.parent._id, tokenId: testToken.id, templateId: template._id, }
@@ -246,6 +283,9 @@ export class ActiveAuras {
           }
           break;
       }
+      const rename = foundry.utils.getProperty(auraEffect.data, "flags.ActiveAuras.nameOverride");
+      const effectName = (rename && rename.trim() !=="") ? rename : `${auraEffect.data.name} (In Aura)`;
+
       const MapKey = auraEffect.data.origin + "-" + canvasToken.id + "-" + auraEntity.id + "-" + effectName;
       MapObject = map.get(MapKey);
 
@@ -288,35 +328,53 @@ export class ActiveAuras {
 
   /**
    *
-   * @param {Token} token - token to apply effect too
+   * @param {string} tokenID - tokenId to apply effect too
    * @param {ActiveEffect} effectData - effect data to generate effect
    */
-  static async CreateActiveEffect(tokenID, oldEffectData) {
+  static async CreateActiveEffect(tokenID, effectData) {
     const token = canvas.tokens.get(tokenID);
 
-    const rename = foundry.utils.getProperty(oldEffectData, "flags.ActiveAuras.nameOverride");
-    const effectName = (rename && rename.trim() !=="") ? rename : `${oldEffectData.name} (In Aura)`;
+    const rename = foundry.utils.getProperty(effectData, "flags.ActiveAuras.nameOverride");
+    const effectName = (rename && rename.trim() !== "") ? rename : `${effectData.name} (In Aura)`;
 
     const duplicateEffect = Array.from(token.document.actor.allApplicableEffects()).find((e) =>
-      e.origin === oldEffectData.origin && e.name === effectName
+      e.origin === effectData.origin && e.name === effectName
     );
     if (foundry.utils.getProperty(duplicateEffect, "flags.ActiveAuras.isAura")) return;
     if (duplicateEffect) {
-      if (duplicateEffect.origin === oldEffectData.origin) return;
-      if (JSON.stringify(duplicateEffect.changes) === JSON.stringify(oldEffectData.changes)) return;
-      else await ActiveAuras.RemoveActiveEffects(tokenID, oldEffectData.origin);
+      // console.warn(`${token.name} ${tokenID} Duplicate Effect found for ${effectData.name}`, {
+      //   duplicateEffect,
+      //   effectData,
+      //   effectName,
+      //   token,
+      //   origin: effectData.origin,
+      // })
+      if (duplicateEffect.origin === effectData.origin) return;
+      if (JSON.stringify(duplicateEffect.changes) === JSON.stringify(effectData.changes)) return;
+      else {
+        Logger.debug("Removing and recreating updated effect");
+        await ActiveAuras.RemoveActiveEffects(tokenID, effectData.origin);
+      }
     }
-    let effectData = foundry.utils.duplicate(oldEffectData);
-    effectData.name = effectName;
+    // else {
+    //   console.warn(`${token.name} ${tokenID} No duplicate Effects found for ${effectData.name}`, {
+    //     token,
+    //     effects: Array.from(token.document.actor.allApplicableEffects()),
+    //     effectData
+    //   })
+    // }
 
-    if (effectData.flags.ActiveAuras.onlyOnce) {
-      const AAID = oldEffectData.origin.replaceAll(".", "");
+    let newEffectData = foundry.utils.duplicate(effectData);
+    newEffectData.name = effectName;
+
+    if (newEffectData.flags.ActiveAuras.onlyOnce) {
+      const AAID = effectData.origin.replaceAll(".", "");
       if (token.document.flags.ActiveAuras?.[AAID]) return;
       else await token.document.setFlag("ActiveAuras", AAID, true);
     }
-    if (effectData.flags.ActiveAuras?.isMacro) {
+    if (newEffectData.flags.ActiveAuras?.isMacro) {
       // eslint-disable-next-line no-unused-vars
-      for (let [changeIndex, change] of effectData.changes.entries()) {
+      for (let [changeIndex, change] of newEffectData.changes.entries()) {
         let newValue = change.value;
         if (change.key.startsWith("macro.")) {
           if (typeof newValue === "string") {
@@ -342,21 +400,21 @@ export class ActiveAuras {
       }
     }
     ["ignoreSelf", "hidden", "height", "alignment", "type", "aura", "radius", "isAura", "height"].forEach(
-      (e) => delete effectData.flags.ActiveAuras[e]
+      (e) => delete newEffectData.flags.ActiveAuras[e]
     );
     if (
-      effectData.flags.ActiveAuras.time !== "None"
-      && effectData.flags.ActiveAuras.time !== undefined
+      newEffectData.flags.ActiveAuras.time !== "None"
+      && newEffectData.flags.ActiveAuras.time !== undefined
       && game.modules.get("dae")?.active
     ) {
-      effectData.flags.dae?.specialDuration?.push(effectData.flags.ActiveAuras.time);
+      newEffectData.flags.dae?.specialDuration?.push(newEffectData.flags.ActiveAuras.time);
     }
 
-    await token.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
+    await token.actor.createEmbeddedDocuments("ActiveEffect", [newEffectData]);
     Logger.debug(game.i18n.format("ACTIVEAURAS.ApplyLog", {
-      effectDataName: effectData.name,
+      effectDataName: newEffectData.name,
       tokenName: token.name,
-      effectData,
+      effectData: newEffectData,
     }));
   }
 
