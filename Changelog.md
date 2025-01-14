@@ -1,3 +1,12 @@
+# 0.11.0
+
+- Potentially Breaking Changes!
+- Previously an aura applied to self would use the changes on the origin Aura Effect. Active Auras will now create a child aura on the origin if it targets self, rather than using the changes on the origin aura.
+- The created Aura Effect will append "(Aura)" to the name of the effect if no name override is given in the config.
+- Improved aura queuing to reduce chances of duplicate auras during movement.
+- Improved duplicate aura detection to help instances where say multiple Paladins with the same auras are in play.
+-  mild performance improvements.
+
 # 0.10.0
 
 - Foundry v12 Only
