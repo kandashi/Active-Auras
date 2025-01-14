@@ -368,7 +368,6 @@ export class AAHelpers {
     let change = args[1];
     const AAFlags = foundry.utils.getProperty(change, "effect.flags.ActiveAuras");
     if (!AAFlags) return wrapped(...args);
-    if (AAFlags.isAura !== true) return wrapped(...args);
     if (AAFlags.ignoreSelf === true) {
       Logger.info(
         game.i18n.format("ACTIVEAURAS.IgnoreSelfLog", {
@@ -385,6 +384,7 @@ export class AAHelpers {
       args[1].value = "";
       return wrapped(...args);
     }
+    if (AAFlags.isAura !== true) return wrapped(...args);
     return wrapped(...args);
   }
 
@@ -479,14 +479,14 @@ export class AAHelpers {
     if (superResult) return superResult;
 
     // if not displaying temp, return default
-    if (!foundry.utils.getProperty(this, `flags.${CONSTANTS.MODULE_NAME}.displayTemp`)) return superResult;
+    if (!foundry.utils.getProperty(this, "flags.ActiveAuras.displayTemp")) return superResult;
 
     // if it is the main aura and ignoring self, return default
-    if (foundry.utils.getProperty(this, `flags.${CONSTANTS.MODULE_NAME}.isAura`)
-      && foundry.utils.getProperty(this, `flags.${CONSTANTS.MODULE_NAME}.ignoreSelf`)
+    if (foundry.utils.getProperty(this, "flags.ActiveAuras.isAura")
+    // && foundry.utils.getProperty(this, "flags.ActiveAuras.ignoreSelf")
     ) {
       return superResult;
     }
-    return foundry.utils.getProperty(this, `flags.${CONSTANTS.MODULE_NAME}.displayTemp`);
+    return foundry.utils.getProperty(this, "flags.ActiveAuras.displayTemp");
   }
 }
