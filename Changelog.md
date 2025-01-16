@@ -1,6 +1,7 @@
 # 0.11.1
 
 - In some configuration combinations auras applied to self would double changesets.
+- Improve handling of Aura creation when token is added to scene.
 
 # 0.11.0
 
