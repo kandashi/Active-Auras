@@ -44,6 +44,7 @@ export class ActiveAuras {
 
     // console.warn("MainAura prep", {
     //   updateTokens,
+    //   updateTokenNames: updateTokens.map((t) => t.name),
     //   auraTokenId,
     // });
 
@@ -174,7 +175,12 @@ export class ActiveAuras {
     let MapObject = CONFIG.AA.Map.get(MapKey);
     let checkEffects = MapObject.effects;
     //Check for other types of X aura if the aura token is moved
-    // console.warn(`ActiveAuras UpdateToken ${tokenId}`, { tokenMatch: tokenId && canvasToken.id !== tokenId, tokenId, checkEffects, canvasToken });
+    // console.warn(`ActiveAuras UpdateToken ${tokenId}`, {
+    //   tokenMatch: tokenId && canvasToken.id !== tokenId,
+    //   tokenId,
+    //   checkEffects,
+    //   canvasToken,
+    // });
     if (tokenId && canvasToken.id !== tokenId) {
       checkEffects = checkEffects.filter((i) => i.entityId === tokenId);
       let duplicateEffect = [];
@@ -184,7 +190,12 @@ export class ActiveAuras {
       checkEffects = checkEffects.concat(duplicateEffect);
     }
 
-    // console.warn("ActiveAura UpdateToken Map details", { MapKey, MapObject, checkEffects, tokenAlignment})
+    // console.warn("ActiveAura UpdateToken Map details", {
+    //   MapKey,
+    //   MapObject,
+    //   checkEffects,
+    //   tokenAlignment,
+    // });
 
     for (const auraEffect of checkEffects) {
       const auraTargets = auraEffect.data.flags?.ActiveAuras?.aura;
@@ -195,6 +206,13 @@ export class ActiveAuras {
       customCheck = customCheck?.trim() ?? "";
       type = type?.toLowerCase() ?? "";
       wallsBlock = wallsBlock?.toLowerCase() ?? "system";
+
+      // console.warn(`Checking aura ${auraEffect.data.name}`, {
+      //   auraEffect,
+      //   auraTargets,
+      //   alignment,
+      //   wallsBlock,
+      // });
 
       if (alignment && !tokenAlignment.includes(alignment) && !tokenAlignment.includes("any")) continue;
       if (wallsBlock !== "system") {
@@ -218,7 +236,10 @@ export class ActiveAuras {
             } else auraEntity = canvas.tokens.get(auraEffect.entityId);
 
             const ignoreSelf = foundry.utils.getProperty(auraEffect.data, "flags.ActiveAuras.ignoreSelf");
-            if (auraEntity.id === canvasToken.id && ignoreSelf) continue;
+            if (auraEntity.id === canvasToken.id && ignoreSelf) {
+              Logger.debug(`Ignoring effect "${auraEffect.data.name}" for self`, { ignoreSelf, auraEffect, canvasToken: canvasToken.name });
+              continue;
+            }
 
             if (
               !AAHelpers.DispositionCheck(
@@ -232,16 +253,27 @@ export class ActiveAuras {
             if (hostile && canvasToken.id !== game.combats.active?.current.tokenId) continue;
             if (game.system.id === "swade" && !AAHelpers.Wildcard(canvasToken, wildcard, extra)) continue;
 
-            const tokenRadius = AAHelpers.EvaluateRollString({ rollString: radius, token: auraEntity });
-            const shape = AATemplates.getAuraShape(auraEntity, tokenRadius);
-            distance = AAMeasure.inAura(
-              canvasToken,
-              auraEntity,
-              wallsBlock,
-              height,
-              tokenRadius,
-              shape
-            );
+            if (auraEntity.id === canvasToken.id) {
+              distance = true;
+            } else {
+              const tokenRadius = AAHelpers.EvaluateRollString({ rollString: radius, token: auraEntity });
+              const shape = AATemplates.getAuraShape(auraEntity, tokenRadius);
+
+              // console.warn(`Shape Check`, {
+              //   shape,
+              //   auraEntity,
+              //   tokenRadius,
+              //   inAura: AAMeasure.inAura(canvasToken, auraEntity, wallsBlock, height, tokenRadius, shape),
+              // });
+              distance = AAMeasure.inAura(
+                canvasToken,
+                auraEntity,
+                wallsBlock,
+                height,
+                tokenRadius,
+                shape,
+              );
+            }
           }
           break;
         case "template":
@@ -288,6 +320,12 @@ export class ActiveAuras {
 
       const MapKey = auraEffect.data.origin + "-" + canvasToken.id + "-" + auraEntity.id + "-" + effectName;
       MapObject = map.get(MapKey);
+
+      if (CONFIG.debug.AA) {
+        Logger.debug(`Evaluating aura ${effectName} from ${auraEntity.id}`, {
+          MapObject, auraEffect, canvasToken, auraEntity, MapKey, distance
+        });
+      }
 
       if (distance && !auraEffect.data.flags?.ActiveAuras?.Paused) {
         if (customCheck && !AAHelpers.evaluateCustomCheck(canvasToken, customCheck, auraEntity)) continue;

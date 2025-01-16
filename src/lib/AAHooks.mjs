@@ -1,8 +1,9 @@
 /* eslint-disable no-unused-vars */
 import { AAHelpers } from "./AAHelpers.mjs";
 import { ActiveAuras } from "./ActiveAuras.mjs";
-import { CollateAuras } from "./CollateAuras.mjs";
+import { CollateAuras, generateConfigMap } from "./CollateAuras.mjs";
 import Logger from "./Logger.mjs";
+
 
 /**
  *
@@ -12,22 +13,30 @@ import Logger from "./Logger.mjs";
  * @param {String} source For console logging
  * @returns
  */
-function debouncedCollate(sceneID, checkAuras, removeAuras, source) {
+function addToCollateSemaphore(sceneID, checkAuras, removeAuras, source) {
   CONFIG.AA.Semaphore.add(CollateAuras, sceneID, checkAuras, removeAuras, source);
 }
 
-export function createTokenHook(token) {
+export async function createTokenHook(token, _config, _id) {
   if (canvas.scene === null) {
     Logger.debug("Active Auras disabled due to no canvas");
     return;
   }
   try {
+    await CanvasAnimation.getAnimation(token.object?.animationName)?.promise;
     if (foundry.utils.getProperty(token, "flags.multilevel-tokens")) return;
     const tokenEffects = Array.from(token.actor?.allApplicableEffects() ?? []);
     for (let effect of (tokenEffects ?? [])) {
       if (effect.flags.ActiveAuras?.isAura) {
         Logger.debug("createToken, collate auras true false");
-        debouncedCollate(canvas.scene.id, true, false, "createToken");
+
+        const debouncedCollate = foundry.utils.debounce(async () => {
+          addToCollateSemaphore(canvas.id, true, false, "createTokenCollate");
+          // wait to allow token to be placed on canvas and report
+        }, 500);
+
+        debouncedCollate(token);
+
         break;
       }
     }
@@ -66,7 +75,14 @@ export async function preDeleteTokenHook(token) {
     AAHelpers.ExtractAuraById(token.id, token.parent.id);
   }
   await AAHelpers.removeAurasOnToken(token);
-  debouncedCollate(canvas.scene.id, false, true, "deleteActiveEffect");
+}
+
+export async function deleteTokenHook() {
+  if (canvas.scene === null) {
+    Logger.debug("Active Auras disabled due to no canvas");
+    return;
+  }
+  addToCollateSemaphore(canvas.scene.id, true, true, "deleteTokenHook");
 }
 
 /**
@@ -86,10 +102,10 @@ export async function updateTokenHook(token, update, _flags, _id) {
   } else if (foundry.utils.hasProperty(update, "hidden") && (!update.hidden || AAHelpers.IsAuraToken(token.id, token.parent.id))) {
     // in v10 invisible is now a thing, so hidden is considered "not on scene"
     Logger.debug(`hidden, collate auras ${!update.hidden} ${update.hidden}`);
-    debouncedCollate(canvas.scene.id, !update.hidden, update.hidden, "updateToken, hidden");
+    addToCollateSemaphore(canvas.scene.id, !update.hidden, update.hidden, "updateToken, hidden");
   } else if (AAHelpers.IsAuraToken(token.id, token.parent.id) && AAHelpers.EntityHPCheck(token)) {
     Logger.debug("0hp, collate auras true true");
-    debouncedCollate(canvas.scene.id, false, true, "updateToken, dead");
+    addToCollateSemaphore(canvas.scene.id, false, true, "updateToken, dead");
   }
 }
 
@@ -109,10 +125,10 @@ export function updateItemHook(item, update, _flags, _id) {
 
   if (foundry.utils.hasProperty(update, "system.equipped")) {
     Logger.debug("equipped, collate auras true true");
-    debouncedCollate(canvas.scene.id, true, true, "updateItem, equipped");
+    addToCollateSemaphore(canvas.scene.id, true, true, "updateItem, equipped");
   } else if (foundry.utils.hasProperty(update, "system.attunement")) {
     Logger.debug("attunement, collate auras true true");
-    debouncedCollate(canvas.scene.id, true, true, "updateItem, attunement");
+    addToCollateSemaphore(canvas.scene.id, true, true, "updateItem, attunement");
   }
 }
 
@@ -131,7 +147,7 @@ export async function deleteItemHook(item, _flags, _id) {
     AAHelpers.ExtractAuraById(sceneEffect.entityId, canvas.scene._id);
   }
 
-  debouncedCollate(canvas.scene.id, true, true, "deleteItem");
+  addToCollateSemaphore(canvas.scene.id, true, true, "deleteItem");
 }
 
 
@@ -142,7 +158,7 @@ export function updateActiveEffectHook(effect, _update) {
   }
   if (effect.flags?.ActiveAuras?.isAura) {
     Logger.debug("updateAE, collate auras true true");
-    debouncedCollate(canvas.scene.id, true, true, "updateActiveEffect");
+    addToCollateSemaphore(canvas.scene.id, true, true, "updateActiveEffect");
   }
 }
 
@@ -160,7 +176,7 @@ export function deleteActiveEffectHook(effect, options) {
 
   if (!applyStatus && auraStatus && !timeUpExpiry) {
     Logger.debug("deleteActiveEffect, collate auras true false", { effect, options });
-    debouncedCollate(canvas.scene.id, false, true, "deleteActiveEffect");
+    addToCollateSemaphore(canvas.scene.id, false, true, "deleteActiveEffect");
   } else if (auraStatus) {
     const sceneEffect = CONFIG.AA.Map.get(canvas.scene._id)?.effects.find((e) => e.data._id === effect.id);
     if (sceneEffect) AAHelpers.ExtractAuraById(sceneEffect.entityId, canvas.scene._id);
@@ -177,7 +193,7 @@ export function createActiveEffectHook(effect) {
   }
   if (!effect.flags?.ActiveAuras?.applied && effect.flags?.ActiveAuras?.isAura) {
     Logger.debug("createActiveEffect, collate auras true false", { effect });
-    debouncedCollate(canvas.scene.id, true, false, "createActiveEffect");
+    addToCollateSemaphore(canvas.scene.id, true, false, "createActiveEffect");
   }
 }
 
@@ -188,7 +204,7 @@ export async function canvasReadyHook(canvas) {
     return;
   }
   Logger.debug("canvasReady, collate auras true false");
-  await debouncedCollate(canvas.scene.id, true, false, "ready");
+  addToCollateSemaphore(canvas.scene.id, true, false, "ready");
 }
 
 
@@ -203,7 +219,7 @@ export function preUpdateActorHook(actor, update) {
     if (activeTokens.length > 0 && AAHelpers.IsAuraToken(activeTokens[0].id, canvas.id)) {
       Logger.debug("preUpdate0hp, collate auras true true");
       Hooks.once("updateActor", () => {
-        debouncedCollate(canvas.scene.id, true, true, "updateActor, dead");
+        addToCollateSemaphore(canvas.scene.id, true, true, "updateActor, dead");
       });
     }
   }
@@ -213,7 +229,7 @@ export function preUpdateActorHook(actor, update) {
      && (update.system.wounds.value - (actor.system?.wounds?.ignored ?? 0)) < (actor.system?.wounds?.max ?? 0))
   ) {
     Hooks.once("updateActor", () => {
-      debouncedCollate(canvas.scene.id, true, false, "updateActor, revived");
+      addToCollateSemaphore(canvas.scene.id, true, false, "updateActor, revived");
     });
   }
 }
@@ -245,7 +261,7 @@ export function createCombatantHook(combat, combatant) {
   for (let effect of (tokenEffects ?? [])) {
     if (effect.getFlag("ActiveAuras", "isAura")) {
       Logger.debug("createToken, collate auras true false");
-      debouncedCollate(combat.scene.id, true, false, "add combatant");
+      addToCollateSemaphore(combat.scene.id, true, false, "add combatant");
       break;
     }
   }
@@ -253,17 +269,17 @@ export function createCombatantHook(combat, combatant) {
 
 export function createWallHook() {
   Logger.debug("createWall, collate auras false true");
-  debouncedCollate(canvas.scene.id, false, true, "Wall Created");
+  addToCollateSemaphore(canvas.scene.id, false, true, "Wall Created");
 }
 
 export function updateWallHook() {
   Logger.debug("updateWall, collate auras true true");
-  debouncedCollate(canvas.scene.id, true, true, "Wall Updated");
+  addToCollateSemaphore(canvas.scene.id, true, true, "Wall Updated");
 }
 
 export function deleteWallHook() {
   Logger.debug("updateWall, collate auras true false");
-  debouncedCollate(canvas.scene.id, true, false, "Wall Deleted");
+  addToCollateSemaphore(canvas.scene.id, true, false, "Wall Deleted");
 }
 
 export function updateMeasuredTemplateHook(data, _update, _options) {
@@ -273,7 +289,7 @@ export function updateMeasuredTemplateHook(data, _update, _options) {
   }
   if (!foundry.utils.getProperty(data, "flags.ActiveAuras")) return;
   // ActiveAuras.MainAura(undefined, "template movement", data.parent.id);
-  debouncedCollate(canvas.scene.id, true, true, "updateMeasuredTemplateHook");
+  addToCollateSemaphore(canvas.scene.id, true, true, "updateMeasuredTemplateHook");
 }
 
 export function deleteMeasuredTemplateHook(doc){
@@ -284,7 +300,7 @@ export function deleteMeasuredTemplateHook(doc){
   //if (!foundry.utils.getProperty(data, "flags.ActiveAuras")) return;
   AAHelpers.ExtractAuraById(doc.id, doc.parent.id);
   //CollateAuras(scene._id, false, true, "template deletion")
-  debouncedCollate(canvas.scene.id, false, true, "deleteMeasuredTemplateHook");
+  addToCollateSemaphore(canvas.scene.id, false, true, "deleteMeasuredTemplateHook");
 }
 
 export function preCreateActiveEffectHook(effect, _update, options) {

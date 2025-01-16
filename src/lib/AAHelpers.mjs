@@ -376,15 +376,9 @@ export class AAHelpers {
           actorName: actor.name,
         })
       );
-      // these systems override isSuppressed and we need to change it
-      // if (["dnd5e", "sw5e"].includes(game.system.id)) {
-      //   args[1].effect.isSuppressed = true;
-      // }
       args[1].key = "";
       args[1].value = "";
-      return wrapped(...args);
     }
-    if (AAFlags.isAura !== true) return wrapped(...args);
     return wrapped(...args);
   }
 

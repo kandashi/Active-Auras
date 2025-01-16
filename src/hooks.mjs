@@ -14,6 +14,7 @@ import {
   deleteCombatantHook,
   deleteItemHook,
   deleteMeasuredTemplateHook,
+  deleteTokenHook,
   deleteWallHook,
   preCreateActiveEffectHook,
   preDeleteActiveEffectHook,
@@ -80,6 +81,7 @@ function configureApi() {
 function gmHooks() {
   Hooks.on("createToken", createTokenHook);
   Hooks.on("updateToken", updateTokenHook); // On token movement run MainAura
+  Hooks.on("deleteToken", deleteTokenHook);
   Hooks.on("preDeleteToken", preDeleteTokenHook);
   Hooks.on("preUpdateActor", preUpdateActorHook);
   Hooks.on("updateItem", updateItemHook); // On item Change for example equipped state change

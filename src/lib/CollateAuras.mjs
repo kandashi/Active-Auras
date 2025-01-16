@@ -35,7 +35,7 @@ function generateTargetEffect(token, effect) {
   newEffect.data.flags.ActiveAuras.isAura = false;
   newEffect.data.flags.ActiveAuras.applied = true;
   newEffect.data.flags.ActiveAuras.isMacro = foundry.utils.getProperty(newEffect, "data.flags.ActiveAuras.isMacro") ?? false;
-  newEffect.data.flags.ActiveAuras.ignoreSelf = false;
+  // newEffect.data.flags.ActiveAuras.ignoreSelf = false;
   if (effect.flags.ActiveAuras?.hidden && token.hidden) {
     newEffect.data.flags.ActiveAuras.Paused = true;
   } else {
@@ -53,23 +53,8 @@ function generateTargetEffect(token, effect) {
   return newEffect;
 }
 
-/**
- *
- * @param {String} sceneID Scene to check upon
- * @param {Boolean} checkAuras Can apply auras
- * @param {Boolean} removeAuras Can remove auras
- * @param {String} source For console logging
- * @returns
- */
-export async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
-  if (!CONFIG.AA.GM) return;
-  if (sceneID !== canvas.id) {
-    ui.notifications.warn(
-      "Collate Auras called on a non viewed scene, auras will be updated when you return to that scene"
-    );
-    return;
-  }
-  Logger.debug(`CollateAuras called for ${source}`);
+export async function generateConfigMap(sceneID, source) {
+  Logger.debug(`ConfigMap generation called for ${source} in ${sceneID}`);
   const effectArray = [];
 
   for (const t of canvas.tokens.placeables) {
@@ -101,6 +86,27 @@ export async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
 
   CONFIG.AA.Map.set(sceneID, { effects: effectArray });
   Logger.debug("CONFIG.AA.Map", CONFIG.AA.Map);
+
+}
+
+/**
+ *
+ * @param {String} sceneID Scene to check upon
+ * @param {Boolean} checkAuras Can apply auras
+ * @param {Boolean} removeAuras Can remove auras
+ * @param {String} source For console logging
+ * @returns
+ */
+export async function CollateAuras(sceneID, checkAuras, removeAuras, source) {
+  if (!CONFIG.AA.GM) return;
+  if (sceneID !== canvas.id) {
+    ui.notifications.warn(
+      "Collate Auras called on a non viewed scene, auras will be updated when you return to that scene"
+    );
+    return;
+  }
+  Logger.debug(`CollateAuras called for ${source}`);
+  await generateConfigMap(sceneID, source);
 
   if (checkAuras) {
     await ActiveAuras.MainAura(undefined, "Collate auras", canvas.id);

@@ -19,6 +19,8 @@ export class AAMeasure {
     const gs = canvas.dimensions.size;
     const g2 = gs / 2;
 
+    // console.warn(`SourceX: ${source.x}, SourceY: ${source.y}, TargetX: ${target.x}, TargetY: ${target.y}`);
+
     if (!AAMeasure.boundingCheck(target, source, radius)) return false;
     const auraPoly = shape;
     if (CONFIG.debug.AA && shape) {
