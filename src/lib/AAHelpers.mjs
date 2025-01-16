@@ -413,6 +413,9 @@ export class AAHelpers {
     let disposition = args[0].actor.token?.disposition ?? args[0].actor.prototypeToken?.disposition;
     let effects = args[0].item.effects;
     let templateEffectData = [];
+
+    Logger.debug("applyTemplate", { template, effects, duration, disposition , args });
+
     for (let effect of effects) {
       let data = {
         data: foundry.utils.duplicate(effect),
@@ -429,7 +432,7 @@ export class AAHelpers {
     }
     Logger.debug("Applying template effect", templateEffectData);
     await template.document.setFlag("ActiveAuras", "IsAura", templateEffectData);
-    await AAHelpers.UserCollateAuras(canvas.scene.id, true, false, "templateApply");
+    // await AAHelpers.UserCollateAuras(canvas.scene.id, true, false, "templateApply");
     return { haltEffectsApplication: true };
   }
 
