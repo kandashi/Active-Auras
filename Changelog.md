@@ -1,3 +1,7 @@
+# 0.11.3
+
+- Italiano translation by GregoryWarn
+
 # 0.11.2
 
 - Prevent double application of effects from Templates.
