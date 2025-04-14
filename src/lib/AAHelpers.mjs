@@ -409,9 +409,9 @@ export class AAHelpers {
         startTurn: game.combat?.turn,
       };
     }
-    let template = canvas.templates.get(args[0].templateId);
-    let disposition = args[0].actor.token?.disposition ?? args[0].actor.prototypeToken?.disposition;
-    let effects = args[0].item.effects;
+    const template = canvas.templates.get(args[0].templateId)?.document ?? (await fromUuid(args[0].templateUuid));
+    const disposition = args[0].actor.token?.disposition ?? args[0].actor.prototypeToken?.disposition;
+    const effects = args[0].item.effects;
     let templateEffectData = [];
 
     Logger.debug("applyTemplate", { template, effects, duration, disposition , args });
@@ -431,7 +431,7 @@ export class AAHelpers {
       templateEffectData.push(data);
     }
     Logger.debug("Applying template effect", templateEffectData);
-    await template.document.setFlag("ActiveAuras", "IsAura", templateEffectData);
+    await template.setFlag("ActiveAuras", "IsAura", templateEffectData);
     // await AAHelpers.UserCollateAuras(canvas.scene.id, true, false, "templateApply");
     return { haltEffectsApplication: true };
   }

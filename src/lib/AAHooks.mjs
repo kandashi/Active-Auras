@@ -110,6 +110,8 @@ export async function updateTokenHook(token, update, _flags, _id) {
 }
 
 export function updateItemHook(item, update, _flags, _id) {
+  // console.warn("updateItemHook", { item, _flags, _id });
+  if (item.actor?.compendium) return;
   // Logger.debug("updateItemHookArgs", { item, update, _flags, _id });
   if (canvas.scene === null) {
     Logger.debug("Active Auras disabled due to no canvas");
@@ -133,6 +135,8 @@ export function updateItemHook(item, update, _flags, _id) {
 }
 
 export async function deleteItemHook(item, _flags, _id) {
+  // console.warn("deleteItemHook", { item, _flags, _id });
+  if (item.actor?.compendium) return;
   if (CONFIG.ActiveEffect.legacyTransferral) return;
   const sceneEffect = CONFIG.AA.Map.get(canvas.scene._id)?.effects.find((e) => e.data.origin === item.uuid);
   if (sceneEffect) {
@@ -208,7 +212,9 @@ export async function canvasReadyHook(canvas) {
 }
 
 
-export function preUpdateActorHook(actor, update) {
+export function preUpdateActorHook(actor, update, _other) {
+  // console.warn("preUpdateActorHook", { actor, update, _other });
+  if (actor.compendium) return;
   if (canvas.scene === null) {
     Logger.debug("Active Auras disabled due to no canvas");
     return;
