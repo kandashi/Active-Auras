@@ -1,3 +1,7 @@
+# 0.11.4
+
+- Template Auras would not work with newer midi versions.
+
 # 0.11.3
 
 - Italiano translation by GregoryWarn
