@@ -21,7 +21,7 @@ function getSchema(document) {
 
   const { BooleanField, StringField } = foundry.data.fields;
 
-  return {
+  const schema = {
     isAura: {
       field: new BooleanField({
         label: game.i18n.format("ACTIVEAURAS.FORM_IsAura"),
@@ -93,8 +93,105 @@ function getSchema(document) {
       value: document.getFlag(CONSTANTS.MODULE_NAME, "customCheck") ?? "",
       placeholder: game.i18n.format("ACTIVEAURAS.FORM_CustomConditionPrompt"),
     },
+    ignoreSelf: {
+      field: new BooleanField({
+        label: game.i18n.format("ACTIVEAURAS.FORM_IgnoreSelf"),
+        initial: false,
+      }),
+      name: `flags.${CONSTANTS.MODULE_NAME}.ignoreSelf`,
+      value: document.getFlag(CONSTANTS.MODULE_NAME, "ignoreSelf") ?? false,
+    },
+    height: {
+      field: new BooleanField({
+        label: game.i18n.format("ACTIVEAURAS.FORM_Height"),
+        initial: false,
+      }),
+      name: `flags.${CONSTANTS.MODULE_NAME}.height`,
+      value: document.getFlag(CONSTANTS.MODULE_NAME, "height") ?? false,
+    },
+    hidden: {
+      field: new BooleanField({
+        label: game.i18n.format("ACTIVEAURAS.FORM_Hidden"),
+        initial: false,
+      }),
+      name: `flags.${CONSTANTS.MODULE_NAME}.hidden`,
+      value: document.getFlag(CONSTANTS.MODULE_NAME, "hidden") ?? false,
+    },
+    displayTemp: {
+      field: new BooleanField({
+        label: game.i18n.format("ACTIVEAURAS.FORM_DisplayTemp"),
+        initial: false,
+      }),
+      name: `flags.${CONSTANTS.MODULE_NAME}.displayTemp`,
+      value: document.getFlag(CONSTANTS.MODULE_NAME, "displayTemp") ?? false,
+    },
+    hostile: {
+      field: new BooleanField({
+        label: game.i18n.format("ACTIVEAURAS.FORM_HostileTurn"),
+        initial: false,
+      }),
+      name: `flags.${CONSTANTS.MODULE_NAME}.hostile`,
+      value: document.getFlag(CONSTANTS.MODULE_NAME, "hostile") ?? false,
+    },
+    onlyOnce: {
+      field: new BooleanField({
+        label: game.i18n.format("ACTIVEAURAS.FORM_ActivateOnce"),
+        initial: false,
+      }),
+      name: `flags.${CONSTANTS.MODULE_NAME}.onlyOnce`,
+      value: document.getFlag(CONSTANTS.MODULE_NAME, "onlyOnce") ?? false,
+    },
+    wallsBlock: {
+      field: new StringField({
+        label: game.i18n.format("ACTIVEAURAS.FORM_WallsBlock"),
+        initial: "",
+      }),
+      name: `flags.${CONSTANTS.MODULE_NAME}.wallsBlock`,
+      value: document.getFlag(CONSTANTS.MODULE_NAME, "wallsBlock") ?? "system",
+      options: [
+        { value: "system", label: game.i18n.localize("ACTIVEAURAS.FORM_SystemWallsBlock") },
+        { value: "true", label: game.i18n.localize("ACTIVEAURAS.FORM_WallsDoBlock") },
+        { value: "false", label: game.i18n.localize("ACTIVEAURAS.FORM_WallsDontBlock") },
+      ],
+    },
+    statuses: {
+      set field?
+      field: new StringField({
+        label: game.i18n.format("ACTIVEAURAS.FORM_Statuses"),
+        initial: "",
+      }),
+      name: `flags.${CONSTANTS.MODULE_NAME}.statuses`,
+      value: document.getFlag(CONSTANTS.MODULE_NAME, "statuses") ?? "",
+      options: CONFIG.statusEffects.map((s) => {
+        return {
+          value: s.id,
+          label: game.i18n.localize(s.name),
+          selected: flagStatuses.includes(s.id) ? "selected" : ""
+        };
+      }),
+    },
   };
 
+  if (game.system.id === "swade") {
+    schema["wildcard"] = {
+      field: new BooleanField({
+        label: game.i18n.format("ACTIVEAURAS.FORM_Wildcard"),
+        initial: false,
+      }),
+      name: `flags.${CONSTANTS.MODULE_NAME}.wildcard`,
+      value: document.getFlag(CONSTANTS.MODULE_NAME, "wildcard") ?? false,
+    };
+    schema["extra"] = {
+      field: new BooleanField({
+        label: game.i18n.format("ACTIVEAURAS.FORM_Extra"),
+        initial: false,
+      }),
+      name: `flags.${CONSTANTS.MODULE_NAME}.extra`,
+      value: document.getFlag(CONSTANTS.MODULE_NAME, "extra") ?? false,
+    };
+  }
+
+  return schema;
 }
 
 
