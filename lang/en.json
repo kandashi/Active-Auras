@@ -33,7 +33,8 @@
     "ACTIVEAURAS.FORM_Height": "Check Token Height",
     "ACTIVEAURAS.FORM_Alignment": "Check Alignment",
     "ACTIVEAURAS.FORM_Type": "Creature types match, split multiple with ;",
-    "ACTIVEAURAS.FORM_CustomCondition": "JavaScript",
+    "ACTIVEAURAS.FORM_CustomCondition": "Custom Check",
+    "ACTIVEAURAS.FORM_CustomConditionPrompt": "JavaScript",
     "ACTIVEAURAS.FORM_Good": "Good",
     "ACTIVEAURAS.FORM_Neutral": "Neutral",
     "ACTIVEAURAS.FORM_Evil": "Evil",
@@ -53,6 +54,7 @@
     "ACTIVEAURAS.ApplyLog":"ActiveAuras | Applied '{effectDataName}' to {tokenName}",
     "ACTIVEAURAS.RemoveLog":"ActiveAuras | Removed '{effectDataName}' from {tokenName}",
     "ACTIVEAURAS.IgnoreSelfLog":"ActiveAuras | Ignoring '{effectDataName}' change {changeKey} to {actorName}",
-    "ACTIVEAURAS.SaveNotify": "${tokenName} passes the save against ${oldeffectDataName}"
-}
+    "ACTIVEAURAS.SaveNotify": "${tokenName} passes the save against ${oldeffectDataName}",
+    "EFFECT.TABS.activeauras": "Active Auras"
+  }
 

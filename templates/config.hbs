@@ -1,0 +1,8 @@
+<section class="tab scrollable{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+  <fieldset>
+  {{formGroup activeAuras.isAura.field name=activeAuras.isAura.name value=activeAuras.isAura.value rootId=rootId}}
+
+  {{formGroup activeAuras.aura.field name=activeAuras.aura.name value=activeAuras.aura.value options=activeAuras.aura.options rootId=rootId}}
+
+  </fieldset>
+</section>

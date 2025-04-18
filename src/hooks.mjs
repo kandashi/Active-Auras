@@ -28,6 +28,7 @@ import {
   updateWallHook,
 } from "./lib/AAHooks.mjs";
 import { ActiveAuras } from "./lib/ActiveAuras.mjs";
+import { extendAESheet } from "./app/ActiveAuraSheet.mjs";
 
 
 
@@ -66,6 +67,8 @@ export function initHooks() {
 
 
   if (game.settings.get("ActiveAuras", "debug")) CONFIG.debug.AA = true;
+
+  extendAESheet();
 
 }
 

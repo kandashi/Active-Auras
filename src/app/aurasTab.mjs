@@ -2,6 +2,8 @@ import CONSTANTS from "../constants.mjs";
 
 
 export async function extendEffectsForm(sheet, html) {
+  if (foundry.utils.isNewerVersion(game.version ?? "", "13")) return;
+
   const flags = sheet.object.flags ?? {};
   const FormIsAura = game.i18n.format("ACTIVEAURAS.FORM_IsAura");
   const FormIgnoreSelf = game.i18n.format("ACTIVEAURAS.FORM_IgnoreSelf");
