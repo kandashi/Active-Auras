@@ -119,7 +119,7 @@ function getSchema(document) {
     },
     displayTemp: {
       field: new BooleanField({
-        label: game.i18n.format("ACTIVEAURAS.FORM_DisplayTemp"),
+        label: game.i18n.format("ACTIVEAURAS.FORM_Temporary"),
         initial: false,
       }),
       name: `flags.${CONSTANTS.MODULE_NAME}.displayTemp`,
@@ -156,10 +156,11 @@ function getSchema(document) {
     },
     statuses: {
       field: new SetField(new StringField({
-        label: game.i18n.format("ACTIVEAURAS.FORM_Statuses"),
         blank: false,
+      }), {
+        label: game.i18n.format("ACTIVEAURAS.FORM_StatusConditions"),
         initial: [],
-      })),
+      }),
       name: `flags.${CONSTANTS.MODULE_NAME}.statuses`,
       value: document.getFlag(CONSTANTS.MODULE_NAME, "statuses") ?? [],
       options: CONFIG.statusEffects.map((s) => {
