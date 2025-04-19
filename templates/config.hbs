@@ -1,28 +1,27 @@
 <section class="tab scrollable{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+{{#if activeAuras.applied}}
+  <h3> You cannot alter an applied aura </h3>
+{{else}}
   <fieldset>
   {{formGroup activeAuras.isAura.field name=activeAuras.isAura.name value=activeAuras.isAura.value rootId=rootId}}
   {{formGroup activeAuras.aura.field name=activeAuras.aura.name value=activeAuras.aura.value options=activeAuras.aura.options rootId=rootId}}
   {{formGroup activeAuras.nameOverride.field name=activeAuras.nameOverride.name value=activeAuras.nameOverride.value rootId=rootId}}
-
   {{formGroup activeAuras.radius.field name=activeAuras.radius.name value=activeAuras.radius.value placeholder=activeAuras.radius.placeholder rootId=rootId}}
   {{formGroup activeAuras.alignment.field name=activeAuras.alignment.name value=activeAuras.alignment.value options=activeAuras.alignment.options rootId=rootId}}
   {{formGroup activeAuras.type.field name=activeAuras.type.name value=activeAuras.type.value placeholder=activeAuras.type.placeholder rootId=rootId}}
   {{formGroup activeAuras.customCheck.field name=activeAuras.customCheck.name value=activeAuras.customCheck.value placeholder=activeAuras.customCheck.placeholder rootId=rootId}}
   {{formGroup activeAuras.ignoreSelf.field name=activeAuras.ignoreSelf.name value=activeAuras.ignoreSelf.value rootId=rootId}}
-
   {{formGroup activeAuras.height.field name=activeAuras.height.name value=activeAuras.height.value rootId=rootId}}
   {{formGroup activeAuras.hidden.field name=activeAuras.hidden.name value=activeAuras.hidden.value rootId=rootId}}
   {{formGroup activeAuras.displayTemp.field name=activeAuras.displayTemp.name value=activeAuras.displayTemp.value rootId=rootId}}
-
   {{formGroup activeAuras.hostile.field name=activeAuras.hostile.name value=activeAuras.hostile.value rootId=rootId}}
-  {{formGroup activeAuras.onceOnly.field name=activeAuras.onceOnly.name value=activeAuras.onceOnly.value rootId=rootId}}
+  {{formGroup activeAuras.onlyOnce.field name=activeAuras.onlyOnce.name value=activeAuras.onlyOnce.value rootId=rootId}}
   {{formGroup activeAuras.wallsBlock.field name=activeAuras.wallsBlock.name value=activeAuras.wallsBlock.value options=activeAuras.wallsBlock.options rootId=rootId}}
-
   {{formGroup activeAuras.statuses.field name=activeAuras.statuses.name value=activeAuras.statuses.value options=activeAuras.statuses.options rootId=rootId classes="statuses"}}
-
-{{#if activeAuras.wildcard}}
+{{#if activeAuras.swade}}
   {{formGroup activeAuras.wildcard.field name=activeAuras.wildcard.name value=activeAuras.wildcard.value rootId=rootId}}
   {{formGroup activeAuras.extra.field name=activeAuras.extra.name value=activeAuras.extra.value rootId=rootId}}
 {{/if}}
   </fieldset>
+{{/if}}
 </section>

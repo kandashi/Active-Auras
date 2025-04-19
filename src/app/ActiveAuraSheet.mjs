@@ -198,18 +198,9 @@ function getSchema(document) {
 async function prepareContext(wrapped, ...args) {
   const result = await wrapped(...args);
 
-  // const isAuraInput = foundry.applications.elements.HTMLDocumentTagsElement.create({
-  //   value: this.document.getFlag(CONSTANTS.MODULE_NAME, "isAura") ?? false,
-  //   name: `flags.${CONSTANTS.MODULE_NAME}.isAura`
-  // });
-  // const isAura = foundry.applications.fields.createFormGroup({ input: isAuraInput, label: "Is Aura" });
-  // result.activeAuras = {
-  //   isAura: isAura.outerHTML,
-  // };
   result.activeAuras = getSchema(this.document);
-  // const formGroup = foundry.applications.fields.createFormGroup({ input, label: "Scene Effects" })
-  // const scenEffectsField = formGroup.outerHTML;
-
+  result.activeAuras.applied = this.document.getFlag(CONSTANTS.MODULE_NAME, "applied") ?? false;
+  result.activeAuras.swade = game.system.id === "swade";
   console.warn(result);
 
   return result;
