@@ -19,7 +19,7 @@ function getExtendedTabs(origTabs) {
 
 function getSchema(document) {
 
-  const { BooleanField, StringField } = foundry.data.fields;
+  const { BooleanField, StringField, SetField } = foundry.data.fields;
 
   const schema = {
     isAura: {
@@ -155,18 +155,17 @@ function getSchema(document) {
       ],
     },
     statuses: {
-      set field?
-      field: new StringField({
+      field: new SetField(new StringField({
         label: game.i18n.format("ACTIVEAURAS.FORM_Statuses"),
-        initial: "",
-      }),
+        blank: false,
+        initial: [],
+      })),
       name: `flags.${CONSTANTS.MODULE_NAME}.statuses`,
-      value: document.getFlag(CONSTANTS.MODULE_NAME, "statuses") ?? "",
+      value: document.getFlag(CONSTANTS.MODULE_NAME, "statuses") ?? [],
       options: CONFIG.statusEffects.map((s) => {
         return {
           value: s.id,
           label: game.i18n.localize(s.name),
-          selected: flagStatuses.includes(s.id) ? "selected" : ""
         };
       }),
     },
