@@ -194,17 +194,16 @@ function getSchema(document) {
   return schema;
 }
 
+async function _preparePartContext(wrapped, ...args) {
+  let context = await wrapped(...args);
 
-async function prepareContext(wrapped, ...args) {
-  const result = await wrapped(...args);
-
-  result.activeAuras = getSchema(this.document);
-  result.activeAuras.applied = this.document.getFlag(CONSTANTS.MODULE_NAME, "applied") ?? false;
-  result.activeAuras.swade = game.system.id === "swade";
-  console.warn(result);
-
-  return result;
-}
+  if (args[0] === "activeauras") {
+    context.activeAuras = getSchema(this.document);
+    context.activeAuras.applied = this.document.getFlag(CONSTANTS.MODULE_NAME, "applied") ?? false;
+    context.activeAuras.swade = game.system.id === "swade";
+  }
+  return context;
+};
 
 
 export function extendAESheet() {
@@ -214,8 +213,8 @@ export function extendAESheet() {
 
   libWrapper.register(
     "ActiveAuras",
-    "foundry.applications.sheets.ActiveEffectConfig.prototype._prepareContext",
-    prepareContext,
+    "foundry.applications.sheets.ActiveEffectConfig.prototype._preparePartContext",
+    _preparePartContext,
     "WRAPPER"
   );
 
