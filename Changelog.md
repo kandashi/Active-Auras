@@ -1,3 +1,7 @@
+# 0.12.0
+
+- v13 support
+
 # 0.11.4
 
 - Template Auras would not work with newer midi versions.
