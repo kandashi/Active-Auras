@@ -211,6 +211,13 @@ export function extendAESheet() {
   foundry.applications.sheets.ActiveEffectConfig.PARTS = getExtendedParts(foundry.applications.sheets.ActiveEffectConfig.PARTS);
   foundry.applications.sheets.ActiveEffectConfig.TABS = getExtendedTabs(foundry.applications.sheets.ActiveEffectConfig.TABS);
 
+  // add post setup for DAE
+  Hooks.on("ready", () => {
+    if (CONFIG.ActiveEffect.sheetClasses.base["core.DAEActiveEffectConfig"]){
+      CONFIG.ActiveEffect.sheetClasses.base["core.DAEActiveEffectConfig"].cls.PARTS = getExtendedParts(CONFIG.ActiveEffect.sheetClasses.base["core.DAEActiveEffectConfig"].cls.PARTS);
+    }
+  });
+
   libWrapper.register(
     "ActiveAuras",
     "foundry.applications.sheets.ActiveEffectConfig.prototype._preparePartContext",
