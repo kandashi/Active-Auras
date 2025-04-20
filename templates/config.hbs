@@ -2,8 +2,10 @@
 {{#if activeAuras.applied}}
   <h3> You cannot alter an applied aura </h3>
 {{else}}
-  <fieldset>
+  <fieldset id="activeauras-isaura">
   {{formGroup activeAuras.isAura.field name=activeAuras.isAura.name value=activeAuras.isAura.value rootId=rootId}}
+  </fieldset>
+  <fieldset id="activeauras-details" {{#unless activeAuras.isAura.value}} style="display: none;"{{/unless}}>
   {{formGroup activeAuras.aura.field name=activeAuras.aura.name value=activeAuras.aura.value options=activeAuras.aura.options rootId=rootId}}
   {{formGroup activeAuras.nameOverride.field name=activeAuras.nameOverride.name value=activeAuras.nameOverride.value rootId=rootId}}
   {{formGroup activeAuras.radius.field name=activeAuras.radius.name value=activeAuras.radius.value placeholder=activeAuras.radius.placeholder rootId=rootId}}

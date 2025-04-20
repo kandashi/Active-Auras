@@ -33,12 +33,13 @@ function getSchema(document) {
     aura: {
       field: new StringField({
         label: game.i18n.format("ACTIVEAURAS.FORM_TargetsName"),
-        initial: "",
+        initial: "All",
+        required: true,
+        blank: false,
       }),
       name: `flags.${CONSTANTS.MODULE_NAME}.aura`,
-      value: document.getFlag(CONSTANTS.MODULE_NAME, "aura") ?? "",
+      value: document.getFlag(CONSTANTS.MODULE_NAME, "aura") ?? "All",
       options: [
-        { value: "None", label: "" },
         { value: "Enemy", label: game.i18n.localize("ACTIVEAURAS.FORM_TargetsEnemy") },
         { value: "Allies", label: game.i18n.localize("ACTIVEAURAS.FORM_TargetsAllies") },
         { value: "All", label: game.i18n.localize("ACTIVEAURAS.FORM_TargetsAll") },
@@ -144,7 +145,9 @@ function getSchema(document) {
     wallsBlock: {
       field: new StringField({
         label: game.i18n.format("ACTIVEAURAS.FORM_WallsBlock"),
-        initial: "",
+        initial: "system",
+        required: true,
+        blank: false,
       }),
       name: `flags.${CONSTANTS.MODULE_NAME}.wallsBlock`,
       value: document.getFlag(CONSTANTS.MODULE_NAME, "wallsBlock") ?? "system",
@@ -206,17 +209,24 @@ async function _preparePartContext(wrapped, ...args) {
 };
 
 
+function _onRender(wrapped, ...args) {
+  this.element.querySelectorAll("fieldset#activeauras-isaura :is(input)").forEach((checkbox) => {
+    checkbox.addEventListener("change", async (event) => {
+      const checked = event.target.checked;
+      const detailsFieldset = this.element.querySelector("fieldset#activeauras-details");
+      detailsFieldset.style.display = checked ? "" : "none";
+    });
+  });
+
+  return wrapped(...args);
+}
+
+
 export function extendAESheet() {
+  if (!foundry.utils.isNewerVersion(game.version ?? "", "13")) return;
 
   foundry.applications.sheets.ActiveEffectConfig.PARTS = getExtendedParts(foundry.applications.sheets.ActiveEffectConfig.PARTS);
   foundry.applications.sheets.ActiveEffectConfig.TABS = getExtendedTabs(foundry.applications.sheets.ActiveEffectConfig.TABS);
-
-  // add post setup for DAE
-  Hooks.on("ready", () => {
-    if (CONFIG.ActiveEffect.sheetClasses.base["core.DAEActiveEffectConfig"]){
-      CONFIG.ActiveEffect.sheetClasses.base["core.DAEActiveEffectConfig"].cls.PARTS = getExtendedParts(CONFIG.ActiveEffect.sheetClasses.base["core.DAEActiveEffectConfig"].cls.PARTS);
-    }
-  });
 
   libWrapper.register(
     "ActiveAuras",
@@ -224,5 +234,26 @@ export function extendAESheet() {
     _preparePartContext,
     "WRAPPER"
   );
+
+  libWrapper.register(
+    "ActiveAuras",
+    "foundry.applications.sheets.ActiveEffectConfig.prototype._onRender",
+    _onRender,
+    "WRAPPER"
+  );
+
+  // add post setup for DAE
+  Hooks.on("ready", () => {
+    if (CONFIG.ActiveEffect.sheetClasses.base["core.DAEActiveEffectConfig"]){
+      CONFIG.ActiveEffect.sheetClasses.base["core.DAEActiveEffectConfig"].cls.PARTS = getExtendedParts(CONFIG.ActiveEffect.sheetClasses.base["core.DAEActiveEffectConfig"].cls.PARTS);
+
+      libWrapper.register(
+        "ActiveAuras",
+        "CONFIG.ActiveEffect.sheetClasses.base['core.DAEActiveEffectConfig'].cls.prototype._onRender",
+        _onRender,
+        "WRAPPER"
+      );
+    }
+  });
 
 }
