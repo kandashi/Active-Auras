@@ -1,3 +1,7 @@
+# 0.12.1
+
+- Fix missing templates in v13
+
 # 0.12.0
 
 - v13 support
