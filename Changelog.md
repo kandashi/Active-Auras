@@ -1,6 +1,7 @@
 # 0.12.1
 
 - Fix missing templates in v13
+- Português (Brasil) Translation updates
 
 # 0.12.0
 
