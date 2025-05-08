@@ -72,7 +72,7 @@ export class AAMeasure {
       if (!auraPoly.contains(t.x, t.y)) continue; // quick exit if not in the aura
 
       for (const s of sourceCorners) {
-        const r = new Ray(t, s);
+        const r = new (foundry.canvas?.geometry?.Ray ?? Ray)(t, s);
         if (wallBlocking) {
           let collision;
           if (game.modules.get("levels")?.active) {

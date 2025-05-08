@@ -97,7 +97,11 @@ export async function updateTokenHook(token, update, _flags, _id) {
 
   if ("y" in update || "x" in update || "elevation" in update) {
     // await token.object._animation;
-    await CanvasAnimation.getAnimation(token.object?.animationName)?.promise;
+    if (token.object.movementAnimationPromise) {
+      await token.object.movementAnimationPromise;
+    }
+    const animationName = token.object?.animationName;
+    if (animationName) await (foundry.canvas?.animation?.CanvasAnimation ?? CanvasAnimation).getAnimation(animationName)?.promise;
     await ActiveAuras.movementUpdate(token);
   } else if (foundry.utils.hasProperty(update, "hidden") && (!update.hidden || AAHelpers.IsAuraToken(token.id, token.parent.id))) {
     // in v10 invisible is now a thing, so hidden is considered "not on scene"
@@ -111,7 +115,12 @@ export async function updateTokenHook(token, update, _flags, _id) {
 
 export function updateItemHook(item, update, _flags, _id) {
   // console.warn("updateItemHook", { item, _flags, _id });
-  if (item.actor?.compendium) return;
+  if (foundry.utils.isNewerVersion(game.version ?? "", "13")) {
+    if (item.actor?.inCompendium) return;
+  } else {
+    if (item.actor?.compendium) return;
+  }
+
   // Logger.debug("updateItemHookArgs", { item, update, _flags, _id });
   if (canvas.scene === null) {
     Logger.debug("Active Auras disabled due to no canvas");
@@ -136,7 +145,11 @@ export function updateItemHook(item, update, _flags, _id) {
 
 export async function deleteItemHook(item, _flags, _id) {
   // console.warn("deleteItemHook", { item, _flags, _id });
-  if (item.actor?.compendium) return;
+  if (foundry.utils.isNewerVersion(game.version ?? "", "13")) {
+    if (item.actor?.inCompendium) return;
+  } else {
+    if (item.actor?.compendium) return;
+  }
   if (CONFIG.ActiveEffect.legacyTransferral) return;
   const sceneEffect = CONFIG.AA.Map.get(canvas.scene._id)?.effects.find((e) => e.data.origin === item.uuid);
   if (sceneEffect) {
@@ -214,7 +227,11 @@ export async function canvasReadyHook(canvas) {
 
 export function preUpdateActorHook(actor, update, _other) {
   // console.warn("preUpdateActorHook", { actor, update, _other });
-  if (actor.compendium) return;
+  if (foundry.utils.isNewerVersion(game.version ?? "", "13")) {
+    if (actor.inCompendium) return;
+  } else {
+    if (actor.compendium) return;
+  }
   if (canvas.scene === null) {
     Logger.debug("Active Auras disabled due to no canvas");
     return;
