@@ -1,3 +1,8 @@
+# 0.12.2
+
+- In v13, depending on animation settings, auras would update too late.
+- Some v13 deprecation notices removed.
+
 # 0.12.1
 
 - Fix missing templates in v13
