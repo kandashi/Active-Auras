@@ -30,11 +30,7 @@ export class AATemplates {
   static getAuraShape(source, radius) {
     let shape = "circle";
     if (["dnd5e", "dnd4e"].includes(game.system.id)) {
-      if (foundry.utils.isNewerVersion(game.version, "12.0") && foundry.utils.isNewerVersion(game.system.version, "3.3.0")) {
-        if (game.settings.get("core", "gridDiagonals") === 0) shape = "rectangle";
-      } else {
-        if (game.settings.get(game.system.id, "diagonalMovement") === "555") shape = "rectangle";
-      }
+      if (game.settings.get("core", "gridDiagonals") === 0) shape = "rectangle";
     }
 
     const gs = canvas.dimensions.size;

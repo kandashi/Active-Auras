@@ -15,6 +15,19 @@ export class AAMeasure {
       || CONFIG.Canvas.polygonBackends["move"].testCollision(ray.A, ray.B, { mode: "any", type: "move" });
   }
 
+  /**
+   * Get a set of Tokens which might be within the specified radius of the source token
+   * @param {TokenDocument} sourceToken   The source token from which to measure
+   * @param {number} radius               The radius of the grid-based circle to estimate
+   * @returns {Set<Token>}                A set of Tokens which might be within range
+    */
+  static getInRangeTokens(sourceToken, radius) {
+    const adjustedRadius = sourceToken.parent.grid.size * ((radius / sourceToken.parent.grid.distance) + sourceToken.width / 2);
+    const center = sourceToken.object.center;
+    const rect = new PIXI.Rectangle(center.x - adjustedRadius, center.y - adjustedRadius, 2 * adjustedRadius, 2 * adjustedRadius);
+    return sourceToken.layer.quadtree.getObjects(rect);
+  }
+
   static inAura(target, source, wallBlocking = false, auraHeight, radius, shape) {
     const gs = canvas.dimensions.size;
     const g2 = gs / 2;
