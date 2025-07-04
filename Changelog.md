@@ -1,3 +1,8 @@
+# 0.12.3
+
+- In v13 removing a token from the combat tracker would trigger an error.
+- zh-tw language updates by zeteticl.
+
 # 0.12.2
 
 - In v13, depending on animation settings, auras would update too late.

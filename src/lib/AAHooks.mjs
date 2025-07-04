@@ -268,8 +268,9 @@ export function deleteCombatHook(combat) {
 }
 
 export function deleteCombatantHook(combatant) {
-  if (AAHelpers.IsAuraToken(combatant.tokenId, combatant.parent.scene.id)) {
-    AAHelpers.ExtractAuraById(combatant.tokenId, combatant.parent.scene.id);
+  const sceneId = combatant.sceneId ?? combatant.parent.scene?.id;
+  if (AAHelpers.IsAuraToken(combatant.tokenId, sceneId)) {
+    AAHelpers.ExtractAuraById(combatant.tokenId, sceneId);
   }
 }
 
