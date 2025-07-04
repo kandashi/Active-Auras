@@ -8,11 +8,10 @@
     "ACTIVEAURAS.tabname": "光環",
     "ACTIVEAURAS.removeDead": "在死亡時移除光環",
     "ACTIVEAURAS.removeDeadHint": "在棋子達到0 hp時, 刪除提供給它們的任何光環,默認為啓用",
-    "ACTIVEAURAS.combatOnly" : "[EN]Auras in combat",
-    "ACTIVEAURAS.combatHint" : "[EN] Only check auras while a combat is active, this is for performance reasons and should be on unless you really need it off",
-    "ACTIVEAURAS.scrollingAura": "[EN] Disable scrolling text for auras",
-    "ACTIVEAURAS.scrollingAuraHint" : "[EN] Removes the Active Effect scrolling text for any applied aura",
-
+    "ACTIVEAURAS.combatOnly": "僅限戰鬥時",
+    "ACTIVEAURAS.combatHint": "僅在戰鬥期間才檢查光環。此設定是基於效能考量，建議保持啟用，除非您有特殊需求必須關閉。",
+    "ACTIVEAURAS.scrollingAura": "停用光環捲動文字",
+    "ACTIVEAURAS.scrollingAuraHint": "移除因套用光環而產生的「主動效果」捲動文字。"
     "ACTIVEAURAS.walltoptions_name": "牆壁阻隔光環",
     "ACTIVEAURAS.walltoptions_hint": "介入兩者的牆壁將阻止光環效果",
 
@@ -38,12 +37,23 @@
     "ACTIVEAURAS.FORM_TimePrompt": "所應用效果的特別有效期",
     "ACTIVEAURAS.FORM_HostileTurn": "僅在當前戰鬥人員回合期間適用",
     "ACTIVEAURAS.FORM_ActivateOnce": "每回合僅觸發一次光環",
-    "ACTIVEAURAS.FORM_Wildcard": "[EN] Apply to Wildcard Tokens",
-    "ACTIVEAURAS.FORM_Extra": "[EN] Apply to Extra Tokens",
-    "ACTIVEAURAS.FORM_Temporary" : "[EN] Apply Active Effect icon to affected tokens",
+    "ACTIVEAURAS.FORM_Wildcard": "套用於通配符棋子",
+    "ACTIVEAURAS.FORM_Extra": "套用於額外棋子",
+    "ACTIVEAURAS.FORM_Temporary": "將主動效果圖示套用於受影響的棋子"
 
     "ACTIVEAURAS.ApplyLog": "ActiveAuras |將 '{effectDataName}' 應用於 {tokenName} ",
     "ACTIVEAURAS.RemoveLog": "ActiveAuras |已從 {tokenName} 中刪除 '{effectDataName}' ",
     "ACTIVEAURAS.IgnoreSelfLog": "ActiveAuras |忽略 '{effectDataName}' 將 {changeKey} 更改為 {actorName} ",
-    "ACTIVEAURAS.SaveNotify": "${tokenName} 將保存到 ${oldeffectDataName}"
+    "ACTIVEAURAS.SaveNotify": "${tokenName} 將保存到 ${oldeffectDataName}",
+   "ACTIVEAURAS.removeHiddenAuras": "移除隱藏棋子的光環？",
+    "ACTIVEAURAS.removeHiddenAurasHint": "當棋子隱藏時，移除其提供的所有光環，預設為啟用。",
+    "ACTIVEAURAS.FORM_WallsBlock": "牆壁是否阻隔此光環？",
+    "ACTIVEAURAS.FORM_SystemWallsBlock": "使用模組預設",
+    "ACTIVEAURAS.FORM_WallsDoBlock": "是",
+    "ACTIVEAURAS.FORM_WallsDontBlock": "否",
+    "ACTIVEAURAS.FORM_CustomCondition": "自訂檢查",
+    "ACTIVEAURAS.FORM_CustomConditionPrompt": "JavaScript",
+    "ACTIVEAURAS.FORM_NameOverride": "覆蓋名稱（將重新命名所新增的效果）",
+    "ACTIVEAURAS.FORM_StatusConditions": "要添加的狀態效果",
+    "EFFECT.TABS.activeauras": "主動光環"
 }
