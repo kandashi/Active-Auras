@@ -23,7 +23,7 @@ export async function createTokenHook(token, _config, _id) {
     return;
   }
   try {
-    await CanvasAnimation.getAnimation(token.object?.animationName)?.promise;
+    await (foundry.canvas?.animation?.CanvasAnimation ?? CanvasAnimation).getAnimation(token.object?.animationName)?.promise;
     if (foundry.utils.getProperty(token, "flags.multilevel-tokens")) return;
     const tokenEffects = Array.from(token.actor?.allApplicableEffects() ?? []);
     for (let effect of (tokenEffects ?? [])) {
