@@ -8,10 +8,8 @@
     "ACTIVEAURAS.tabname": "光環",
     "ACTIVEAURAS.removeDead": "在死亡時移除光環",
     "ACTIVEAURAS.removeDeadHint": "在棋子達到0 hp時, 刪除提供給它們的任何光環,默認為啓用",
-
     "ACTIVEAURAS.walltoptions_name": "牆壁阻隔光環",
     "ACTIVEAURAS.walltoptions_hint": "介入兩者的牆壁將阻止光環效果",
-
     "ACTIVEAURAS.FORM_IsAura": "效果就是光環",
     "ACTIVEAURAS.FORM_IgnoreSelf": "忽略自己",
     "ACTIVEAURAS.FORM_Hidden": "隱藏時禁用",
@@ -34,7 +32,6 @@
     "ACTIVEAURAS.FORM_TimePrompt": "所應用效果的特別有效期",
     "ACTIVEAURAS.FORM_HostileTurn": "僅在當前戰鬥人員回合期間適用",
     "ACTIVEAURAS.FORM_ActivateOnce": "每回合僅觸發一次光環",
-
     "ACTIVEAURAS.ApplyLog": "ActiveAuras |將 '{effectDataLabel}' 應用於 {tokenName} ",
     "ACTIVEAURAS.RemoveLog": "ActiveAuras |已從 {tokenName} 中刪除 '{effectDataLabel}' ",
     "ACTIVEAURAS.IgnoreSelfLog": "ActiveAuras |忽略 '{effectDataLabel}' 將 {changeKey} 更改為 {actorName} ",
