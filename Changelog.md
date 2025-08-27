@@ -1,3 +1,7 @@
+# 0.12.4
+
+- Template auras applied from features would fail to apply in new 5e versions due to duration moving to activities.
+
 # 0.12.3
 
 - In v13 removing a token from the combat tracker would trigger an error.
