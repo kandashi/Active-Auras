@@ -1,6 +1,7 @@
 # 0.12.4
 
 - Template auras applied from features would fail to apply in new 5e versions due to duration moving to activities.
+- In v13 Auras would not apply if the only use in combat option was selected.
 
 # 0.12.3
 

@@ -15,8 +15,8 @@ export class ActiveAuras {
 
     if (typeof movedToken?.documentName !== "string") movedToken = movedToken?.document ?? undefined;
     if (!CONFIG.AA.GM) return;
-    const sceneCombat = game.combats.filter((c) => c.scene?.id === sceneID);
-    if (game.settings.get("ActiveAuras", "combatOnly") && !sceneCombat[0]?.started) {
+    const activeCombat = game.combats.filter((c) => c.active && c.started);
+    if (game.settings.get("ActiveAuras", "combatOnly") && !activeCombat) {
       Logger.debug("Active Auras not active when not in combat");
       return;
     }
