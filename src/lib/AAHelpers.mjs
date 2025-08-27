@@ -393,9 +393,85 @@ export class AAHelpers {
     return wrapped(...args);
   }
 
+  static convertDuration({ units, value } = {}, inCombat, maxSecondsToConvert) {
+    let useTurns = inCombat && game.modules.get("times-up")?.active;
+    if (units === "second" && value > maxSecondsToConvert) useTurns = false;
+    if (!units || (units === "second" && value < CONFIG.time.roundTime)) { // no duration or very short (less than 1 round)
+      if (useTurns)
+        return { type: "turns", seconds: 0, rounds: 0, turns: 1 };
+      else
+        return { type: "seconds", seconds: Math.min(1, value ?? 1), rounds: 0, turns: 0 };
+    }
+
+    const calendar = game.time.calendar;
+    const secondsPerDay = calendar.days.secondsPerMinute * calendar.days.minutesPerHour * calendar.days.hoursPerDay;
+
+    switch (units) {
+      case "turn":
+      case "turns": return { type: useTurns ? "turns" : "seconds", seconds: 1, rounds: 0, turns: value };
+      case "round":
+      case "rounds": return { type: useTurns ? "turns" : "seconds", seconds: value * CONFIG.time.roundTime, rounds: value, turns: 0 };
+      case "second":
+      case "seconds":
+        return { type: useTurns ? "turns" : "seconds", seconds: value, rounds: value / CONFIG.time.roundTime, turns: 0 };
+      case "minute":
+      case "minutes": {
+        let durSeconds = value * calendar.days.secondsPerMinute;
+        if (durSeconds / CONFIG.time.roundTime <= 10) {
+          return { type: useTurns ? "turns" : "seconds", seconds: durSeconds, rounds: durSeconds / CONFIG.time.roundTime, turns: 0 };
+        } else {
+          return { type: "seconds", seconds: durSeconds, rounds: durSeconds / CONFIG.time.roundTime, turns: 0 };
+        }
+      }
+      case "hour":
+      case "hours": return { type: "seconds", seconds: value * calendar.days.secondsPerMinute * calendar.days.minutesPerHour, rounds: 0, turns: 0 };
+      case "day":
+      case "days": return { type: "seconds", seconds: value * secondsPerDay, rounds: 0, turns: 0 };
+      case "week":
+      case "weeks": return { type: "seconds", seconds: value * secondsPerDay * calendar.days.values.length, rounds: 0, turns: 0 };
+      case "month":
+      case "months": {
+        const averageMonth = calendar.months.values.reduce((acc, month) => acc + month.days, 0) / calendar.months.values.length;
+        return { type: "seconds", seconds: value * secondsPerDay * averageMonth, rounds: 0, turns: 0 };
+      }
+      case "year":
+      case "years": return { type: "seconds", seconds: value * secondsPerDay * calendar.days.daysPerYear, rounds: 0, turns: 0 };
+      case "inst":
+        return { type: useTurns ? "turns" : "seconds", seconds: 0, rounds: 0, turns: 0 };
+      case "spec":
+      case "perm":
+      case "disp":
+      case "distr":
+        return { type: useTurns ? "none" : "none", seconds: undefined, rounds: undefined, turns: undefined };
+      default:
+        Logger.debug("unknown time unit found", units);
+        return { type: useTurns ? "none" : "none", seconds: undefined, rounds: undefined, turns: undefined };
+    }
+  }
+
+  /**
+   * Applies effects to a measured template on the canvas, setting duration and relevant flags.
+   *
+   * @param {Object|Object[]} args - Arguments containing effect, template, and actor data. Can be a single object or an array (first element used).
+   * @param {Object} args.duration - Duration information for the effect.
+   * @param {Object} args.workflow - Optional midiqol workflow
+   * @param {Object} args.itemData - Optional item data, may contain system and duration.
+   * @param {string} args.templateId - ID of the measured template on the canvas.
+   * @param {string} args.templateUuid - UUID of the measured template (used if not found on canvas).
+   * @param {Object} args.actor - Actor data, may contain token and disposition.
+   * @param {Object[]} args.effects - Array of effect objects to apply.
+   * @param {Object} args.item - Item data, may contain effects and uuid.
+   * @param {number} args.spellLevel - Spell level used for casting.
+   * @param {string} args.uuid - Optional origin UUID.
+   * @returns {Promise<Object>} The modified args object with `haltEffectsApplication` set to true.
+   */
   static async applyTemplate(args) {
     let duration;
-    const convertedDuration = globalThis.DAE.convertDuration(args[0].itemData.system.duration, true);
+    const arg = Array.isArray(args) ? args[0] : args;
+    const convertedDuration = AAHelpers.convertDuration(
+      arg.duration
+      ?? arg.workflow?.activity?.duration
+      ?? arg.itemData?.system?.duration, true);
     if (convertedDuration?.type === "seconds") {
       duration = {
         seconds: convertedDuration.seconds,
@@ -409,9 +485,9 @@ export class AAHelpers {
         startTurn: game.combat?.turn,
       };
     }
-    const template = canvas.templates.get(args[0].templateId)?.document ?? (await fromUuid(args[0].templateUuid));
-    const disposition = args[0].actor.token?.disposition ?? args[0].actor.prototypeToken?.disposition;
-    const effects = args[0].item.effects;
+    const template = canvas.templates.get(arg.templateId)?.document ?? (await fromUuid(arg.templateUuid));
+    const disposition = arg.actor?.token?.disposition ?? arg.actor?.prototypeToken?.disposition ?? 0;
+    const effects = arg.effects ?? arg.workflow?.activity?.effects.map((e) => e.effect) ?? arg.item?.effects;
     let templateEffectData = [];
 
     Logger.debug("applyTemplate", { template, effects, duration, disposition , args });
@@ -424,16 +500,21 @@ export class AAHelpers {
         entityType: "template",
         entityId: template.id,
         casterDisposition: disposition,
-        castLevel: args[0].spellLevel,
+        castLevel: arg.spellLevel,
       };
-      if (effect.flags["ActiveAuras"].displayTemp) data.data.duration = duration;
-      data.data.origin = args[0].item.uuid ?? `Actor.${args[0].actor._id}.Item.${args[0].item._id}`;
+      if (effect.flags.ActiveAuras?.displayTemp) data.data.duration = duration;
+      const origin = arg.item?.uuid
+        ?? arg.uuid
+        ?? (arg.actor && arg.item ? `Actor.${arg.actor._id}.Item.${arg.item._id}` : undefined);
+      data.data.origin = origin;
       templateEffectData.push(data);
     }
     Logger.debug("Applying template effect", templateEffectData);
     await template.setFlag("ActiveAuras", "IsAura", templateEffectData);
     // await AAHelpers.UserCollateAuras(canvas.scene.id, true, false, "templateApply");
-    return { haltEffectsApplication: true };
+    // if midi, this halts effects application for on use macros that call this function
+    arg.haltEffectsApplication = true;
+    return arg;
   }
 
   static async applyDrawing(drawing, effects) {
