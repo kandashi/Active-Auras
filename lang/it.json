@@ -33,7 +33,8 @@
     "ACTIVEAURAS.FORM_Height": "Controlla Altezza Token",
     "ACTIVEAURAS.FORM_Alignment": "Controlla Allineamento",
     "ACTIVEAURAS.FORM_Type": "I tipi di creatura corrispondono, si dividono più volte con ;",
-    "ACTIVEAURAS.FORM_CustomCondition": "JavaScript",
+    "ACTIVEAURAS.FORM_CustomCondition": "Check Personalizzato",
+    "ACTIVEAURAS.FORM_CustomConditionPrompt": "JavaScript",
     "ACTIVEAURAS.FORM_Good": "Buono",
     "ACTIVEAURAS.FORM_Neutral": "Neutrale",
     "ACTIVEAURAS.FORM_Evil": "Malvagio",
@@ -53,5 +54,6 @@
     "ACTIVEAURAS.ApplyLog":"ActiveAuras | Applicato '{effectDataName}' a {tokenName}",
     "ACTIVEAURAS.RemoveLog":"ActiveAuras | Rimosso '{effectDataName}' da {tokenName}",
     "ACTIVEAURAS.IgnoreSelfLog":"ActiveAuras | Ignorato '{effectDataName}' cambio {changeKey} per {actorName}",
-    "ACTIVEAURAS.SaveNotify": "${tokenName} supera tiro slvezza contro ${oldeffectDataName}"
+    "ACTIVEAURAS.SaveNotify": "${tokenName} supera tiro slvezza contro ${oldeffectDataName}",
+    "EFFECT.TABS.activeauras": "Active Auras"
 }
