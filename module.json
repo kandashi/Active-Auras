@@ -24,6 +24,11 @@
   ],
   "languages": [
     {
+      "lang": "cs",
+      "name": "Čeština",
+      "path": "lang/cs.json"
+    },
+    {
       "lang": "de",
       "name": "German",
       "path": "lang/de.json"
