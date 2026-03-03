@@ -14,10 +14,11 @@
   "url": "https://github.com/kandashi/Active-Auras",
   "bugs": "https://github.com/kandashi/Active-Auras/issues",
   "flags": {},
-  "version": "0.12.6",
+  "version": "0.12.7",
   "compatibility": {
     "minimum": 12,
-    "verified": 13
+    "verified": 13,
+    "maximum": 13
   },
   "esmodules": [
     "src/index.mjs"

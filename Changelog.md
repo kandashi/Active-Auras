@@ -1,3 +1,7 @@
+# 0.12.7
+
+- Shadow of the demon lord support by @sasquach45932
+
 # 0.12.6
 
 - zh-tw language updates by zeteticl
