@@ -33,6 +33,7 @@
     "ACTIVEAURAS.FORM_Height": "Check Token Height",
     "ACTIVEAURAS.FORM_Alignment": "Check Alignment",
     "ACTIVEAURAS.FORM_Type": "Creature types match, split multiple with ;",
+    "ACTIVEAURAS.FORM_TypeDemonlord": "Ancestry, Creature descriptor match, split multiple with ;",
     "ACTIVEAURAS.FORM_CustomCondition": "Custom Check",
     "ACTIVEAURAS.FORM_CustomConditionPrompt": "JavaScript",
     "ACTIVEAURAS.FORM_Good": "Good",

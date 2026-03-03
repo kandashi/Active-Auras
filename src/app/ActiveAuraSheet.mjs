@@ -78,7 +78,7 @@ function getSchema(document) {
     },
     type: {
       field: new StringField({
-        label: game.i18n.format("ACTIVEAURAS.FORM_Type"),
+        label: (game.system.id === "demonlord") ? game.i18n.format("ACTIVEAURAS.FORM_TypeDemonlord") : game.i18n.format("ACTIVEAURAS.FORM_Type"),
         initial: "",
       }),
       name: `flags.${CONSTANTS.MODULE_NAME}.type`,
@@ -204,6 +204,7 @@ async function _preparePartContext(wrapped, ...args) {
     context.activeAuras = getSchema(this.document);
     context.activeAuras.applied = this.document.getFlag(CONSTANTS.MODULE_NAME, "applied") ?? false;
     context.activeAuras.swade = game.system.id === "swade";
+    context.activeAuras.demonlord = game.system.id === "demonlord";
   }
   return context;
 };
@@ -250,6 +251,18 @@ export function extendAESheet() {
       libWrapper.register(
         "ActiveAuras",
         "CONFIG.ActiveEffect.sheetClasses.base['core.DAEActiveEffectConfig'].cls.prototype._onRender",
+        _onRender,
+        "WRAPPER"
+      );
+    }
+
+    // demonlord
+    if (CONFIG.ActiveEffect.sheetClasses.base["demonlord.DLActiveEffectConfig"]){
+      CONFIG.ActiveEffect.sheetClasses.base["demonlord.DLActiveEffectConfig"].cls.PARTS = getExtendedParts(CONFIG.ActiveEffect.sheetClasses.base["demonlord.DLActiveEffectConfig"].cls.PARTS);
+
+      libWrapper.register(
+        "ActiveAuras",
+        "CONFIG.ActiveEffect.sheetClasses.base['demonlord.DLActiveEffectConfig'].cls.prototype._onRender",
         _onRender,
         "WRAPPER"
       );

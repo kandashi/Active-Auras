@@ -80,6 +80,8 @@ export class AAHelpers {
         return AAHelpers.typeCheckSWADE(canvasToken, type);
       case "dnd4e":
         return AAHelpers.typeCheck4e(canvasToken, type);
+      case "demonlord":
+        return AAHelpers.typeCheckDemonLord(canvasToken, type);
     }
   }
 
@@ -220,6 +222,43 @@ export class AAHelpers {
     return false;
   }
 
+  static typeCheckDemonLord(canvasToken, type) {
+    if (type?.trim() === "any") return true;
+    const actorData = canvasToken?.actor;
+    let tokenTypes;
+    switch (canvasToken.actor.type) {
+      case "character":
+        {
+          try {
+            tokenTypes = [actorData?.items.find((i) => i.type === "ancestry")?.name?.toLocaleLowerCase()]
+          } catch (error) {
+            Logger.error("ActiveAuras: the token has an unreadable type", canvasToken);
+          }
+        }
+        break;
+      case "creature":
+        {
+          try {
+            if (actorData.system.descriptor.toLocaleLowerCase().includes('('))
+            {
+              let descriptor = actorData.system.descriptor.toLocaleLowerCase()
+              descriptor = descriptor.replace(")", "")
+              tokenTypes = descriptor.replace("(", "").split(" ")
+            }
+            else
+            tokenTypes = [actorData.system.descriptor.toLocaleLowerCase()]
+          } catch (error) {
+            Logger.error("ActiveAuras: the token has an unreadable type", canvasToken);
+          }
+        }
+        break;
+      case "vehicle":
+        return;
+    }
+    if (tokenTypes.includes(type)) return true;
+    return false;
+  }
+
   static Wildcard(canvasToken, wildcard, extra) {
     if (game.system.id !== "swade") return true;
     let Wild = canvasToken.actor.isWildcard;
@@ -241,6 +280,12 @@ export class AAHelpers {
         const { max, value, ignored } = document.system.wounds;
         if (value === 0) return false; // no wounds taken
         if ((value - ignored) >= max) return true;
+        // dead
+        else return false;
+      }
+      case "demonlord": {
+        const { max, value } = document.system.characteristics.health
+        if ((value) >= max) return true;
         // dead
         else return false;
       }

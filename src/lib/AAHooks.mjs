@@ -250,6 +250,8 @@ export function preUpdateActorHook(actor, update, _other) {
     && actor.system?.attributes?.hp?.value === 0 && update.system.attributes.hp.value > 0)
    || (foundry.utils.hasProperty(update, "system.wounds.value") // swade
      && (update.system.wounds.value - (actor.system?.wounds?.ignored ?? 0)) < (actor.system?.wounds?.max ?? 0))
+   || (foundry.utils.hasProperty(update, "system.characteristics.health.injured") // demonlord
+     && actor.system.characteristics.health.value >= actor.system.characteristics.health.max)
   ) {
     Hooks.once("updateActor", () => {
       addToCollateSemaphore(canvas.scene.id, true, false, "updateActor, revived");

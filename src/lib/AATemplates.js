@@ -29,7 +29,7 @@ export class AATemplates {
 
   static getAuraShape(source, radius) {
     let shape = "circle";
-    if (["dnd5e", "dnd4e"].includes(game.system.id)) {
+    if (["dnd5e", "dnd4e","demonlord"].includes(game.system.id)) {
       if (game.settings.get("core", "gridDiagonals") === 0) shape = "rectangle";
     }
 
